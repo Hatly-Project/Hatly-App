@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>909717739576-n7afm0p71b7jkanbc1vegt6spoqra3l4.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.909717739576-n7afm0p71b7jkanbc1vegt6spoqra3l4</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCdw8M1ArOAqd61RvdIkegbRO48dvDsdx4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>909717739576</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.hatly</string>
+	<key>PROJECT_ID</key>
+	<string>hatly-71af4</string>
+	<key>STORAGE_BUCKET</key>
+	<string>hatly-71af4.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:909717739576:ios:c147471ff355b8fb6f6ecd</string>
+</dict>
+</plist>

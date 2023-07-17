@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "909717739576",
+    "project_id": "hatly-71af4",
+    "storage_bucket": "hatly-71af4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909717739576:android:62641e8eb25b1d0a6f6ecd",
+        "android_client_info": {
+          "package_name": "com.example.hatly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "909717739576-vlapsrmd6na5k84g65pimr5iq2v4rn16.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmSWZ7HsG6koPTM7aX00_U41_2g53khCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "909717739576-vlapsrmd6na5k84g65pimr5iq2v4rn16.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

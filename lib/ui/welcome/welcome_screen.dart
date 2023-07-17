@@ -3,6 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/ui/login/login_screen.dart';
+import 'package:hatly/ui/register/register_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   static const String routeName = 'Welcome';
@@ -71,7 +72,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, LoginScreen.routeName);
+                        Navigator.pushNamed(context, RegisterScreen.routeName);
                       },
                       style: ElevatedButton.styleFrom(
                           // minimumSize: Size(double.infinity, 10),
