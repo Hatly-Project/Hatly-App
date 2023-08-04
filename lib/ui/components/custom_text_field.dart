@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 
 typedef MyValidator = String? Function(String?);
+typedef OnTap = void Function()?;
 
 class CustomFormField extends StatelessWidget {
   String label;
   String hint;
   bool isPassword;
+  bool readOnly;
   TextInputType keyboardType;
-
+  Widget? icon;
   MyValidator validator;
   TextEditingController controller;
   int lines;
+  bool? enabled;
+  OnTap? onTap;
 
   CustomFormField(
       {required this.label,
       required this.validator,
       required this.controller,
       required this.hint,
+      this.enabled = true,
+      this.readOnly = false,
+      this.icon,
+      this.onTap,
       this.isPassword = false,
       this.keyboardType = TextInputType.text,
       this.lines = 1});
@@ -42,10 +50,14 @@ class CustomFormField extends StatelessWidget {
             validator: validator,
             keyboardType: keyboardType,
             obscureText: isPassword,
+            readOnly: readOnly,
+            enabled: enabled,
+            onTap: onTap,
             cursorColor: Theme.of(context).primaryColor,
             decoration: InputDecoration(
               fillColor: Colors.white,
               filled: true,
+              icon: icon,
               hintText: hint,
               hintStyle: TextStyle(color: Colors.black),
               focusedBorder: OutlineInputBorder(

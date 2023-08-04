@@ -1,4 +1,13 @@
+import 'package:hatly/domain/models/login_response_dto.dart';
+
+import '../models/register_response_dto.dart';
+
 abstract class AuthDataSource {
-  Future<void> register(String email, String password);
-  Future<void> login(String email, String password);
+  Future<RegisterResponseDto> register(
+      {String? name,
+      String? email,
+      String? phone,
+      String? image,
+      String? password});
+  Future<LoginResponseDto> login(String email, String password);
 }
