@@ -1,12 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/ui/home/tabs/home/home_tab.dart';
 import 'package:hatly/ui/login/login_screen.dart';
 import 'package:hatly/ui/register/register_screen.dart';
 
-class WelcomeScreen extends StatelessWidget {
+import '../../providers/auth_provider.dart';
+
+class WelcomeScreen extends StatefulWidget {
   static const String routeName = 'Welcome';
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    late String token;
+
+    UserProvider userProvider =
+        BlocProvider.of<UserProvider>(context, listen: false);
+
+// Check if the current state is LoggedInState and then access the token
+    if (userProvider.state is LoggedInState) {
+      LoggedInState loggedInState = userProvider.state as LoggedInState;
+      token = loggedInState.token;
+      Navigator.pushNamed(context, HomeTab.routeName);
+    } else {
+      print(
+          'User is not logged in.'); // Handle the scenario where the user is not logged in.
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

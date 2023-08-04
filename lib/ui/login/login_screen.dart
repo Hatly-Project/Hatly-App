@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hatly/providers/auth_provider.dart';
+import 'package:hatly/ui/home/home_screen.dart';
 import 'package:hatly/ui/login/login_viewmodel.dart';
-
-import '../../utils copy/dialog_utils.dart';
+import '../../utils/dialog_utils.dart';
 import '../../utils/validation_utils.dart';
 import '../components/custom_text_field.dart';
 import '../register/register_screen.dart';
@@ -54,8 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
           print('load');
         } else if (state is LoginSuccessState) {
           print('success');
-          DialogUtils.getDialog('Success', 'Logged in', context);
-
+          Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+          UserProvider userProvider =
+              BlocProvider.of<UserProvider>(context, listen: false);
+          userProvider.login(LoggedInState(
+              user: state.loginResponseDto.user!,
+              token: state.loginResponseDto.token!));
           // Navigator.pushNamed(context, LoginScreen.routeName);
         }
       },

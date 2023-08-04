@@ -194,8 +194,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     fontSize: 17, color: Colors.white),
                               ),
                               onPressed: () {
-                                // Navigator.pushNamed(
-                                //     context, LoginScreen.routeName);
+                                Navigator.pushNamed(
+                                    context, LoginScreen.routeName);
                               },
                             ),
                           ),
@@ -216,12 +216,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           DialogUtils.getDialog('Loading', state.loadingMessage, context);
           print('load');
         } else if (state is RegisterSuccessState) {
-          createUserInDb(
-              nameController.text,
-              mobileController.text,
-              emailController.text,
-              passwordController.text,
-              passwordConfirmationController.text);
+          // createUserInDb(
+          //     nameController.text,
+          //     mobileController.text,
+          //     emailController.text,
+          //     passwordController.text,
+          //     passwordConfirmationController.text);
           print('success');
           Navigator.pushNamed(context, LoginScreen.routeName);
         }
@@ -229,16 +229,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void createUserInDb(String fullName, String mobileNo, String email,
-      String password, String rePassword) async {
-    User user = User(
-        fullName: fullName,
-        mobileNo: mobileNo,
-        email: email,
-        password: password,
-        rePassword: rePassword);
-    viewModel.createUserInDb(user);
-  }
+  // void createUserInDb(String fullName, String mobileNo, String email,
+  //     String password, String rePassword) async {
+  //   User user = User(
+  //       fullName: fullName,
+  //       mobileNo: mobileNo,
+  //       email: email,
+  //       password: password,
+  //       rePassword: rePassword);
+  //   viewModel.createUserInDb(user);
+  // }
 
   void register() {
     // async - await
@@ -246,7 +246,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    viewModel.register(emailController.text, passwordController.text);
+    viewModel.register(
+        name: nameController.text,
+        email: emailController.text,
+        phone: mobileController.text,
+        password: passwordController.text);
     // loginViewModel.register(emailController.text, passwordController.text);
   }
 }

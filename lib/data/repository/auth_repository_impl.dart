@@ -1,6 +1,8 @@
+import 'package:hatly/domain/models/login_response_dto.dart';
 import 'package:hatly/domain/repository/auth_repository.dart';
 
 import '../../domain/datasource/auth_datasource.dart';
+import '../../domain/models/register_response_dto.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthDataSource authDataSource;
@@ -8,12 +10,22 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this.authDataSource);
 
   @override
-  Future<void> register(String email, String password) async {
-    await authDataSource.register(email, password);
+  Future<RegisterResponseDto> register(
+      {String? name,
+      String? email,
+      String? phone,
+      String? image,
+      String? password}) async {
+    return authDataSource.register(
+        name: name,
+        email: email,
+        phone: phone,
+        image: image,
+        password: password);
   }
 
   @override
-  Future<void> login(String email, String password) async {
-    await authDataSource.login(email, password);
+  Future<LoginResponseDto> login(String email, String password) async {
+    return authDataSource.login(email, password);
   }
 }

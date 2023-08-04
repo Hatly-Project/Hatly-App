@@ -1,19 +1,35 @@
 import 'package:hatly/domain/datasource/auth_datasource.dart';
+import 'package:hatly/domain/models/login_response_dto.dart';
+import 'package:hatly/domain/models/register_response_dto.dart';
 
-import '../firebase/firebase_manager.dart';
+import '../api/api_manager.dart';
 
 class AuthDataSourceImpl implements AuthDataSource {
-  FirebaseManager firebaseManager;
+  ApiManager apiManager;
 
-  AuthDataSourceImpl(this.firebaseManager);
+  AuthDataSourceImpl(this.apiManager);
 
   @override
-  Future<void> register(String email, String password) async {
-    await firebaseManager.registerUser(email, password);
+  Future<RegisterResponseDto> register(
+      {String? name,
+      String? email,
+      String? phone,
+      String? image,
+      String? password}) async {
+    var response = await apiManager.registerUser(
+        name: name,
+        email: email,
+        phone: phone,
+        image: image,
+        password: password);
+
+    return response.toRegisterDto();
   }
 
   @override
-  Future<void> login(String email, String password) async {
-    await firebaseManager.loginUser(email, password);
+  Future<LoginResponseDto> login(String email, String password) async {
+    var response = await apiManager.loginUser(email, password);
+
+    return response.toLoginDto();
   }
 }

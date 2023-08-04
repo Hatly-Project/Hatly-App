@@ -1,3 +1,4 @@
+import 'package:hatly/domain/models/login_response_dto.dart';
 import 'package:hatly/domain/repository/auth_repository.dart';
 
 class LoginUseCase {
@@ -5,7 +6,7 @@ class LoginUseCase {
 
   LoginUseCase(this.authRepository);
 
-  Future<void> invoke(String email, String password) async {
-    await authRepository.login(email, password);
+  Future<LoginResponseDto> invoke(String email, String password) async {
+    return authRepository.login(email, password);
   }
 }

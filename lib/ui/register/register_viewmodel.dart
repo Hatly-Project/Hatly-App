@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/data/datasource/auth_datasoruce_impl.dart';
-import 'package:hatly/data/firebase/firebase_manager.dart';
+import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/data/repository/auth_repository_impl.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/datasource/auth_datasource.dart';
@@ -11,22 +11,32 @@ import 'package:hatly/domain/usecase/register_usecase.dart';
 import '../../domain/models/user_model.dart';
 
 class RegisterViewModel extends Cubit<RegisterViewState> {
-  late FirebaseManager firebaseManager;
+  late ApiManager apiManager;
   late AuthRepository authRepository;
   late AuthDataSource authDataSource;
   late RegisterUseCase registerUseCase;
   RegisterViewModel() : super(RegisterInitialState()) {
-    firebaseManager = FirebaseManager();
-    authDataSource = AuthDataSourceImpl(firebaseManager);
+    apiManager = ApiManager();
+    authDataSource = AuthDataSourceImpl(apiManager);
     authRepository = AuthRepositoryImpl(authDataSource);
     registerUseCase = RegisterUseCase(authRepository);
   }
 
-  Future<void> register(String email, String password) async {
+  void register(
+      {String? name,
+      String? email,
+      String? phone,
+      String? image,
+      String? password}) async {
     emit(RegisterLoadingState('Loading...'));
 
     try {
-      await registerUseCase.invoke(email, password);
+      await registerUseCase.invoke(
+          name: name,
+          email: email,
+          phone: phone,
+          image: image,
+          password: password);
       // createUserInDb(user);
       emit(RegisterSuccessState());
     } on ServerErrorException catch (e) {
@@ -34,19 +44,19 @@ class RegisterViewModel extends Cubit<RegisterViewState> {
     }
   }
 
-  void createUserInDb(User user) async {
-    var database = FirebaseFirestore.instance;
+  // void createUserInDb(User user) async {
+  //   var database = FirebaseFirestore.instance;
 
-    final docRef = database
-        .collection('users')
-        .withConverter(
-          fromFirestore: User.fromFirestore,
-          toFirestore: (user, options) => user.toFirestore(),
-        )
-        .doc(user.email);
+  //   final docRef = database
+  //       .collection('users')
+  //       .withConverter(
+  //         fromFirestore: User.fromFirestore,
+  //         toFirestore: (user, options) => user.toFirestore(),
+  //       )
+  //       .doc(user.email);
 
-    await docRef.set(user);
-  }
+  //   await docRef.set(user);
+  // }
 }
 
 abstract class RegisterViewState {}
