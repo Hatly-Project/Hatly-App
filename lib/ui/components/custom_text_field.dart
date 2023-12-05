@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 typedef MyValidator = String? Function(String?);
 typedef OnTap = void Function()?;
+typedef OnChange = void Function(String)?;
 
 class CustomFormField extends StatelessWidget {
   String label;
@@ -15,6 +16,7 @@ class CustomFormField extends StatelessWidget {
   int lines;
   bool? enabled;
   OnTap? onTap;
+  OnChange? onChange;
 
   CustomFormField(
       {required this.label,
@@ -27,6 +29,7 @@ class CustomFormField extends StatelessWidget {
       this.onTap,
       this.isPassword = false,
       this.keyboardType = TextInputType.text,
+      this.onChange,
       this.lines = 1});
 
   @override
@@ -53,9 +56,10 @@ class CustomFormField extends StatelessWidget {
             readOnly: readOnly,
             enabled: enabled,
             onTap: onTap,
+            onChanged: onChange,
             cursorColor: Theme.of(context).primaryColor,
             decoration: InputDecoration(
-              fillColor: Colors.white,
+              fillColor: Colors.grey[300],
               filled: true,
               icon: icon,
               hintText: hint,

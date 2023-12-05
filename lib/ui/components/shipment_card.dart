@@ -2,9 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class ShipmentCard extends StatelessWidget {
-  const ShipmentCard({super.key});
+  String title;
+  String from;
+  String to;
+  DateTime date;
+  Image? userImage;
+  Image? shipImage;
+
+  String userName;
+  String? userReview;
+  String bonus;
+  ShipmentCard(
+      {required this.title,
+      required this.from,
+      required this.to,
+      required this.bonus,
+      required this.date,
+      this.userImage,
+      this.shipImage,
+      required this.userName,
+      this.userReview});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +38,7 @@ class ShipmentCard extends StatelessWidget {
           color: Colors.white,
           child: Container(
             width: MediaQuery.of(context).size.width * .95,
-            height: MediaQuery.of(context).size.height * .29,
+            // height: MediaQuery.of(context).size.height * .29,
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
             child: Padding(
               padding: const EdgeInsets.all(10.0),
@@ -29,22 +49,27 @@ class ShipmentCard extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        'images/ihpone.jpg',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.fitHeight,
-                      ),
+                      shipImage == null
+                          ? Container(
+                              width: 100,
+                              height: 100,
+                              color: Colors.grey[300],
+                            )
+                          : shipImage!,
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
                             margin: EdgeInsets.only(left: 10),
-                            child: Text(
-                              'Iphone 14',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 20, fontWeight: FontWeight.w700),
+                            child: FittedBox(
+                              fit: BoxFit.fitWidth,
+                              child: Text(
+                                title,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 20, fontWeight: FontWeight.w700),
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -55,7 +80,7 @@ class ShipmentCard extends StatelessWidget {
                               Container(
                                 margin: EdgeInsets.only(left: 10),
                                 child: Text(
-                                  'Dubai',
+                                  from,
                                   style: GoogleFonts.poppins(
                                       fontSize: 15, color: Colors.grey[600]),
                                 ),
@@ -71,7 +96,7 @@ class ShipmentCard extends StatelessWidget {
                               Container(
                                 margin: EdgeInsets.only(left: 10),
                                 child: Text(
-                                  'Cairo',
+                                  to,
                                   style: GoogleFonts.poppins(
                                       fontSize: 15, color: Colors.grey[600]),
                                 ),
@@ -84,7 +109,7 @@ class ShipmentCard extends StatelessWidget {
                           Container(
                             margin: EdgeInsets.only(left: 10),
                             child: Text(
-                              'Before 24 Jul 2023',
+                              DateFormat('dd MMMM yyyy').format(date),
                               style: GoogleFonts.poppins(
                                   fontSize: 10, color: Colors.grey[600]),
                             ),
@@ -107,21 +132,21 @@ class ShipmentCard extends StatelessWidget {
                           Container(
                             margin: EdgeInsets.only(top: 10),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: Image.asset(
-                                'images/me.jpg',
-                                width: 50,
-                                height: 50,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                                borderRadius: BorderRadius.circular(25),
+                                child: userImage != null
+                                    ? userImage!
+                                    : Container(
+                                        width: 50,
+                                        height: 50,
+                                        color: Colors.grey[300],
+                                      )),
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(
-                                'Alaa',
+                                userName,
                                 style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     color: Colors.black,
@@ -153,23 +178,21 @@ class ShipmentCard extends StatelessWidget {
                       )
                     ],
                   ),
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 5),
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height * .045,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Theme.of(context).primaryColor),
-                      child: Center(
-                        child: Text(
-                          'Shipping Bonus 50.5 \$',
-                          // textAlign: TextAlign.start,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold),
-                        ),
+                  Container(
+                    margin: EdgeInsets.only(top: 5),
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * .045,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor),
+                    child: Center(
+                      child: Text(
+                        'Shipping Bonus 50.5 \$',
+                        // textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),

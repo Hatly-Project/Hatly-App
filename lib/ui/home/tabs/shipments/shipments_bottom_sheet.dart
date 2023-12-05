@@ -1,48 +1,68 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:country_state_city_pro/country_state_city_pro.dart';
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/ui/components/shipment_item.dart';
+import 'package:hatly/ui/home/tabs/shipments/shipment_fees_bottom.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipment_item_bottom.dart';
 import 'package:intl/intl.dart';
-
 import '../../../components/custom_text_field.dart';
 
 class AddShipmentBottomSheet extends StatefulWidget {
-  AddShipmentBottomSheet({super.key});
+  Function onError;
+  Function done;
+
+  AddShipmentBottomSheet({required this.onError, required this.done});
 
   @override
   State<AddShipmentBottomSheet> createState() => _AddShipmentBottomSheetState();
 }
 
 class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
-  var fromCountryValue = '';
-  String? fromStateValue;
+  String countryValue = "";
+  String stateValue = "";
+  String cityValue = "";
+
   String itemItile = '';
   String itemPrice = '';
+  String totalItems = '1';
+  String totalWeight = '';
+  String bonus = '';
+  String fees = '';
+  String image = '';
+  Image? shipmentImage;
+
   int index = 0;
 
-  var toCountryValue = '';
-  String? toStateValue;
+  String toCountryValue = '';
+  String toStateValue = '';
   double _bottomSheetPadding = 20.0;
-  List<ShipmentItem> list = [];
+  List<ItemDto> items = [];
+  TextEditingController country = TextEditingController();
+  TextEditingController state = TextEditingController();
+  TextEditingController city = TextEditingController();
+
   var dateController = TextEditingController(text: '');
+  var nameController = TextEditingController(text: '');
+  var noteController = TextEditingController(text: '');
+  var weightController = TextEditingController(text: '');
+  var bonusController = TextEditingController(text: '');
+
   var formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedPadding(
-      padding: EdgeInsets.only(
-          bottom:
-              MediaQuery.of(context).viewInsets.bottom + _bottomSheetPadding),
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeInOut,
-      child: SingleChildScrollView(
+    GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey();
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Form(
@@ -95,14 +115,12 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   citySearchPlaceholder: "City",
 
                   ///labels for dropdown
-                  countryDropdownLabel: "Country",
-                  stateDropdownLabel: "State",
-                  cityDropdownLabel: "City",
+                  countryDropdownLabel: "*Country",
+                  stateDropdownLabel: "*State",
+                  cityDropdownLabel: "*City",
 
                   ///Default Country
-                  ///defaultCountry: CscCountry.India,
-
-                  ///Country Filter [OPTIONAL PARAMETER]
+                  //defaultCountry: CscCountry.India,
 
                   ///Disable country dropdown (Note: use it with default country)
                   //disableCountry: true,
@@ -135,7 +153,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   onCountryChanged: (value) {
                     setState(() {
                       ///store value in country variable
-                      fromCountryValue = value;
+                      countryValue = value;
                     });
                   },
 
@@ -143,13 +161,29 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   onStateChanged: (value) {
                     setState(() {
                       ///store value in state variable
-                      fromStateValue = value;
+                      stateValue = value ?? "";
                     });
                   },
 
-                  ///Show only specific countries using country filter
-                  // countryFilter: ["United States", "Canada", "Mexico"],
+                  ///triggers once city selected in dropdown
+                  onCityChanged: (value) {
+                    setState(() {
+                      ///store value in city variable
+                      cityValue = value ?? "";
+                    });
+                  },
                 ),
+                // CountryStateCityPicker(
+                //     country: country,
+                //     state: state,
+                //     city: city,
+                //     dialogColor: Colors.grey.shade200,
+                //     textFieldDecoration: InputDecoration(
+                //         fillColor: Colors.blueGrey.shade100,
+                //         filled: true,
+                //         suffixIcon: const Icon(Icons.arrow_downward_rounded),
+                //         border: const OutlineInputBorder(
+                //             borderSide: BorderSide.none))),
                 Text(
                   'To',
                   style: GoogleFonts.poppins(
@@ -185,14 +219,12 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   citySearchPlaceholder: "City",
 
                   ///labels for dropdown
-                  countryDropdownLabel: "Country",
-                  stateDropdownLabel: "State",
-                  cityDropdownLabel: "City",
+                  countryDropdownLabel: "*Country",
+                  stateDropdownLabel: "*State",
+                  cityDropdownLabel: "*City",
 
                   ///Default Country
-                  ///defaultCountry: CscCountry.India,
-
-                  ///Country Filter [OPTIONAL PARAMETER]
+                  //defaultCountry: CscCountry.India,
 
                   ///Disable country dropdown (Note: use it with default country)
                   //disableCountry: true,
@@ -225,7 +257,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   onCountryChanged: (value) {
                     setState(() {
                       ///store value in country variable
-                      fromCountryValue = value;
+                      toCountryValue = value;
                     });
                   },
 
@@ -233,18 +265,22 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   onStateChanged: (value) {
                     setState(() {
                       ///store value in state variable
-                      fromStateValue = value;
+                      toStateValue = value ?? "";
                     });
                   },
 
-                  ///Show only specific countries using country filter
-                  // countryFilter: ["United States", "Canada", "Mexico"],
+                  ///triggers once city selected in dropdown
+                  onCityChanged: (value) {
+                    setState(() {
+                      ///store value in city variable
+                      cityValue = value ?? "";
+                    });
+                  },
                 ),
                 CustomFormField(
                   controller: dateController,
                   label: 'Email Address',
                   hint: 'I want it before',
-                  keyboardType: TextInputType.emailAddress,
                   readOnly: true,
                   icon: Icon(Icons.local_shipping_rounded),
                   validator: (date) {
@@ -258,10 +294,10 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   },
                 ),
                 CustomFormField(
-                  controller: dateController,
+                  controller: nameController,
                   label: 'Email Address',
                   hint: 'Shipment Name',
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.text,
                   validator: (name) {
                     if (name == null || name.trim().isEmpty) {
                       return 'please enter shipment name';
@@ -269,24 +305,47 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   },
                 ),
                 CustomFormField(
-                  controller: dateController,
+                  controller: noteController,
                   label: 'Email Address',
                   hint: 'Shipment Note',
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.text,
                   validator: (note) {
                     if (note == null || note.trim().isEmpty) {
                       return 'please enter shipment note';
                     }
                   },
                 ),
+                // CustomFormField(
+                //   controller: weightController,
+                //   label: 'Email Address',
+                //   hint: 'Shipment Weight',
+                //   keyboardType: TextInputType.text,
+                //   validator: (note) {
+                //     if (note == null || note.trim().isEmpty) {
+                //       return 'please enter shipment weight';
+                //     }
+                //   },
+                // ),
+                // CustomFormField(
+                //   controller: bonusController,
+                //   label: 'Email Address',
+                //   hint: 'Shipping Bonus',
+                //   keyboardType: TextInputType.number,
+                //   validator: (note) {
+                //     if (note == null || note.trim().isEmpty) {
+                //       return 'please enter shipping bonus';
+                //     }
+                //   },
+                // ),
                 ListView.builder(
                   shrinkWrap: true,
                   primary: false,
-                  itemCount: list.length,
+                  itemCount: items.length,
                   itemBuilder: (context, index) {
                     return ShipmentItem(
-                      itemTitle: list[index].itemTitle,
-                      itemPrice: list[index].itemPrice,
+                      itemTitle: items[index].name!,
+                      itemPrice: items[index].price.toString(),
+                      shipImage: shipmentImage,
                     );
                   },
                 ),
@@ -306,10 +365,36 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                             Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        showShipmentItemBottomSheet(context);
+                        add(widget.onError);
                       },
                       child: Text(
                         'Add shipment item',
+                        style: GoogleFonts.poppins(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 15),
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        fixedSize: MaterialStatePropertyAll(
+                            Size(MediaQuery.of(context).size.width * .6, 50)),
+                        shape: MaterialStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                        ),
+                        backgroundColor: MaterialStatePropertyAll(
+                            Theme.of(context).primaryColor),
+                      ),
+                      onPressed: () {
+                        showShipmentFeesBottomSheet(context);
+                      },
+                      child: Text(
+                        'Done',
                         style: GoogleFonts.poppins(
                             fontSize: 15, fontWeight: FontWeight.bold),
                       ),
@@ -339,20 +424,21 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   Future<void> _selectDate(BuildContext context) async {
     DateTime selectedDate = DateTime.now();
     if (Platform.isIOS) {
-      await showCupertinoModalPopup<void>(
+      await showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
-          return Container(
+          return SizedBox(
             height: 300,
+            width: double.infinity,
             child: CupertinoDatePicker(
               mode: CupertinoDatePickerMode.date,
               initialDateTime: selectedDate,
               onDateTimeChanged: (DateTime newDate) {
                 setState(() {
                   selectedDate = newDate;
-                  final formattedDate = DateFormat('yyyy-MM-dd')
+                  final formattedDate = DateFormat('dd MMMM yyyy')
                       .format(selectedDate); // Format the date
-                  dateController.text = formattedDate;
+                  dateController.text = selectedDate.toIso8601String();
                 });
               },
             ),
@@ -370,27 +456,75 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
       if (picked != null && picked != selectedDate) {
         setState(() {
           selectedDate = picked;
-          final formattedDate =
-              DateFormat('yyyy-MM-dd').format(selectedDate); // Format the date
-          dateController.text = formattedDate;
+          final formattedDate = DateFormat('dd MMMM yyyy')
+              .format(selectedDate); // Format the date
+          dateController.text = selectedDate.toIso8601String();
         });
       }
     }
   }
 
-  void addItem(String title, String price) {
+  void done(Function done, String bonus) {
+    done(
+        countryValue,
+        stateValue,
+        toStateValue,
+        toCountryValue,
+        dateController.text,
+        nameController.text,
+        noteController.text,
+        bonus,
+        items);
+  }
+
+  void confirm() {
+    // totalWeight = weight;
+    // bonus = bonus;
+    // fees = fees;
+
+    done(widget.done, bonus);
+  }
+
+  void addItem(String title, String price, String link, String baseImage,
+      String weight) {
     itemItile = title;
     itemPrice = price;
-    list.add(ShipmentItem(itemTitle: itemItile, itemPrice: itemPrice));
-    print('shipment Item $title , $price');
+    items.add(ItemDto(
+        name: itemItile,
+        price: double.tryParse(itemPrice),
+        link: link,
+        weight: double.tryParse(weight),
+        photo: baseImage));
+    print('shipment weight $weight');
+    totalItems = items.length.toString();
+    bonus = '200';
+    fees = '90';
+    image = baseImage;
+    Image imageWidget = base64ToImage(baseImage);
+    shipmentImage = imageWidget;
+    items.forEach((item) {
+      totalWeight += item.weight.toString();
+      print('tot $totalWeight');
+    });
     setState(() {});
+  }
+
+  Image base64ToImage(String base64String) {
+    Uint8List bytes = base64.decode(base64String);
+    return Image.memory(
+      bytes,
+      fit: BoxFit.fitHeight,
+      width: 100,
+      height: 100,
+    );
   }
 
   void showShipmentItemBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => ShipmentItemBottomSheet(
+      builder: (BuildContext bottomSheetContext) => ShipmentItemBottomSheet(
         addItem: addItem,
+        onError: widget.onError,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -399,5 +533,74 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
         ),
       ),
     );
+  }
+
+  void showError(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        content: Container(
+          padding: EdgeInsets.all(16),
+          height: 90,
+          decoration: BoxDecoration(
+              color: Colors.red, borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Oh! Fail',
+                style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              Text(
+                'Please choose country',
+                style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showShipmentFeesBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bottomSheetContext) => ShipmentFeesBottomSheet(
+        confrim: confirm,
+        totalItems: totalItems,
+        totalWeight: totalWeight,
+        bonus: bonus,
+        fees: fees,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void add(Function onError) async {
+    // async - await
+    if (formKey.currentState?.validate() == false) {
+      return;
+    } else if (formKey.currentState?.validate() == true &&
+            (countryValue.isEmpty || stateValue.isEmpty) ||
+        (toCountryValue.isEmpty || toStateValue.isEmpty)) {
+      onError(context, 'Please choose a country');
+      return;
+    }
+    showShipmentItemBottomSheet(context);
+    // viewModel.login(emailController.text, passwordController.text);
   }
 }
