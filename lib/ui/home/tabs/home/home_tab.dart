@@ -70,6 +70,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  // a method for caching the shipments list
   Future<void> cacheShipments(List<ShipmentDto> shipments) async {
     final box = await Hive.openBox('shipments');
 
