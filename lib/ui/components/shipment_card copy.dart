@@ -3,12 +3,19 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ShipmentItem extends StatelessWidget {
-  String itemTitle;
-  String itemPrice;
+class MyShipmentCard extends StatelessWidget {
+  String title;
+  String from;
+  String to;
+  String date;
   Image? shipImage;
-  ShipmentItem(
-      {required this.itemTitle, required this.itemPrice, this.shipImage});
+
+  MyShipmentCard(
+      {required this.title,
+      required this.from,
+      required this.to,
+      required this.date,
+      this.shipImage});
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +47,14 @@ class ShipmentItem extends StatelessWidget {
                         children: [
                           Container(
                             margin: EdgeInsets.only(left: 10),
-                            child: Text(
-                              itemTitle,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 20, fontWeight: FontWeight.w700),
+                            child: FittedBox(
+                              fit: BoxFit.fitWidth,
+                              child: Text(
+                                title,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 20, fontWeight: FontWeight.w700),
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -54,7 +65,7 @@ class ShipmentItem extends StatelessWidget {
                               Container(
                                 margin: EdgeInsets.only(left: 10),
                                 child: Text(
-                                  'Dubai',
+                                  from,
                                   style: GoogleFonts.poppins(
                                       fontSize: 15, color: Colors.grey[600]),
                                 ),
@@ -70,7 +81,7 @@ class ShipmentItem extends StatelessWidget {
                               Container(
                                 margin: EdgeInsets.only(left: 10),
                                 child: Text(
-                                  'Cairo',
+                                  to,
                                   style: GoogleFonts.poppins(
                                       fontSize: 15, color: Colors.grey[600]),
                                 ),
@@ -83,7 +94,7 @@ class ShipmentItem extends StatelessWidget {
                           Container(
                             margin: EdgeInsets.only(left: 10),
                             child: Text(
-                              itemPrice,
+                              'Before $date',
                               style: GoogleFonts.poppins(
                                   fontSize: 10, color: Colors.grey[600]),
                             ),
@@ -152,23 +163,21 @@ class ShipmentItem extends StatelessWidget {
                   //     )
                   //   ],
                   // ),
-                  // Expanded(
-                  //   child: Container(
-                  //     margin: EdgeInsets.only(top: 5),
-                  //     width: double.infinity,
-                  //     height: MediaQuery.of(context).size.height * .045,
-                  //     decoration: BoxDecoration(
-                  //         borderRadius: BorderRadius.circular(10),
-                  //         color: Theme.of(context).primaryColor),
-                  //     child: Center(
-                  //       child: Text(
-                  //         'Shipping Bonus 50.5 \$',
-                  //         // textAlign: TextAlign.start,
-                  //         style: TextStyle(
-                  //             color: Colors.white,
-                  //             fontSize: 15,
-                  //             fontWeight: FontWeight.bold),
-                  //       ),
+                  // Container(
+                  //   margin: EdgeInsets.only(top: 5),
+                  //   width: double.infinity,
+                  //   height: MediaQuery.of(context).size.height * .045,
+                  //   decoration: BoxDecoration(
+                  //       borderRadius: BorderRadius.circular(10),
+                  //       color: Theme.of(context).primaryColor),
+                  //   child: Center(
+                  //     child: Text(
+                  //       'Shipping Bonus 50.5 \$',
+                  //       // textAlign: TextAlign.start,
+                  //       style: TextStyle(
+                  //           color: Colors.white,
+                  //           fontSize: 15,
+                  //           fontWeight: FontWeight.bold),
                   //     ),
                   //   ),
                   // ),

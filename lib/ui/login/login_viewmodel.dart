@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/data/datasource/auth_datasoruce_impl.dart';
 import 'package:hatly/data/api/api_manager.dart';

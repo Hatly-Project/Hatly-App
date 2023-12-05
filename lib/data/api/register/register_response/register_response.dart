@@ -49,6 +49,6 @@ class RegisterResponse {
         name: user?.name,
         phone: user?.phone,
         email: user?.email,
-        imageUrl: user?.imageUrl);
+        profilePhoto: user?.profilePhoto);
   }
 }

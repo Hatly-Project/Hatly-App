@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-class UserDto {
+import '../../../../domain/models/user_model.dart';
+
+class User {
   String? name;
   String? email;
   dynamic phone;
@@ -8,15 +10,16 @@ class UserDto {
   int? id;
   List<dynamic>? review;
 
-  UserDto(
-      {required this.name,
-      required this.phone,
-      required this.email,
-      required this.profilePhoto,
-      this.id,
-      this.review});
+  User({
+    this.name,
+    this.email,
+    this.phone,
+    this.profilePhoto,
+    this.id,
+    this.review,
+  });
 
-  factory UserDto.fromMap(Map<String, dynamic> data) => UserDto(
+  factory User.fromMap(Map<String, dynamic> data) => User(
         name: data['name'] as String?,
         email: data['email'] as String?,
         phone: data['phone'] as dynamic,
@@ -37,12 +40,17 @@ class UserDto {
   /// `dart:convert`
   ///
   /// Parses the string and returns the resulting Json object as [User].
-  factory UserDto.fromJson(String data) {
-    return UserDto.fromMap(json.decode(data) as Map<String, dynamic>);
+  factory User.fromJson(String data) {
+    return User.fromMap(json.decode(data) as Map<String, dynamic>);
   }
 
   /// `dart:convert`
   ///
   /// Converts [User] to a JSON string.
   String toJson() => json.encode(toMap());
+
+  UserDto toUserDto() {
+    return UserDto(
+        name: name, phone: phone, email: email, profilePhoto: profilePhoto);
+  }
 }

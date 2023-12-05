@@ -3,25 +3,37 @@ import 'dart:convert';
 import 'package:hatly/domain/models/user_model.dart';
 
 class User {
-  String? email;
   String? name;
-  String? phone;
-  String? imageUrl;
+  String? email;
+  dynamic phone;
+  String? profilePhoto;
+  int? id;
+  List<dynamic>? review;
 
-  User({this.email, this.name, this.phone, this.imageUrl});
-
+  User({
+    this.name,
+    this.email,
+    this.phone,
+    this.profilePhoto,
+    this.id,
+    this.review,
+  });
   factory User.fromMap(Map<String, dynamic> data) => User(
-        email: data['email'] as String?,
         name: data['name'] as String?,
-        phone: data['phone'] as String?,
-        imageUrl: data['imageUrl'] as String?,
+        email: data['email'] as String?,
+        phone: data['phone'] as dynamic,
+        profilePhoto: data['ProfilePhoto'] as String?,
+        id: data['id'] as int?,
+        review: data['review'] as List<dynamic>?,
       );
 
   Map<String, dynamic> toMap() => {
-        'email': email,
         'name': name,
+        'email': email,
         'phone': phone,
-        'imageUrl': imageUrl,
+        'ProfilePhoto': profilePhoto,
+        'id': id,
+        'review': review,
       };
 
   /// `dart:convert`
@@ -37,6 +49,7 @@ class User {
   String toJson() => json.encode(toMap());
 
   UserDto toUserDto() {
-    return UserDto(name: name, phone: phone, email: email, imageUrl: imageUrl);
+    return UserDto(
+        name: name, phone: phone, email: email, profilePhoto: profilePhoto);
   }
 }

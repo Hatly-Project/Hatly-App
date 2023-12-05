@@ -1,11 +1,14 @@
 import 'dart:ffi';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hatly/data/api/login/login_request.dart';
 import 'package:hatly/data/api/login/login_response/login_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
 import 'package:hatly/data/api/register/register_request.dart';
+import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment_request.dart';
+import 'package:hatly/data/api/shipments/create_shipment_request/item.dart';
+import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
+import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
+import 'package:hatly/domain/models/item_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -68,6 +71,62 @@ class ApiManager {
       return loginResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
+    }
+  }
+
+  Future<GetShipmentsResponse> getAllShipments() async {
+    try {
+      var url = Uri.https(baseUrl, 'shipment/getAll');
+      var response =
+          await client.get(url, headers: {'content-type': 'application/json'});
+
+      var getResponse = GetShipmentsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(getResponse.message!);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    }
+  }
+
+  Future<CreateShipmentsResponse> createShipment(
+      {String? title,
+      String? note,
+      String? from,
+      String? to,
+      String? date,
+      double? reward,
+      List<Item>? items,
+      required String token}) async {
+    try {
+      print('item api: $note');
+      var url = Uri.https(baseUrl, 'shipment/new');
+      var requestBody = CreateShipmentRequest(
+          title: title,
+          from: from,
+          to: to,
+          note: note,
+          expectedDate: date,
+          items: items,
+          reward: reward);
+
+      var response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {
+            'content-type': 'application/json',
+            'authorization': 'Bearer $token'
+          });
+      var shipmentResponse = CreateShipmentsResponse.fromJson(response.body);
+
+      if (shipmentResponse.status == false) {
+        throw ServerErrorException(shipmentResponse.message!);
+      }
+      return shipmentResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on FormatException catch (e) {
+      throw ServerErrorException(e.message);
     }
   }
 }

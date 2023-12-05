@@ -1,19 +1,19 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../../components/custom_text_field.dart';
 
 class ShipmentItemBottomSheet extends StatefulWidget {
   Function addItem;
-  ShipmentItemBottomSheet({required this.addItem});
+  Function onError;
+
+  ShipmentItemBottomSheet({required this.addItem, required this.onError});
 
   @override
   State<ShipmentItemBottomSheet> createState() =>
@@ -23,104 +23,163 @@ class ShipmentItemBottomSheet extends StatefulWidget {
 class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
   var fromCountryValue = '';
   String? fromStateValue;
+  String? base64Image;
   var toCountryValue = '';
   String? toStateValue;
   double _bottomSheetPadding = 20.0;
   var dateController = TextEditingController(text: '');
-  var priceController = TextEditingController(text: '');
+  var weightController = TextEditingController(text: '');
 
+  var linkController = TextEditingController(text: '');
+
+  var priceController = TextEditingController(text: '');
+  XFile? image;
   var formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedPadding(
-      padding: EdgeInsets.only(
-          bottom:
-              MediaQuery.of(context).viewInsets.bottom + _bottomSheetPadding),
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeInOut,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'Add shipment Item',
-                    style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: AnimatedPadding(
+        padding: EdgeInsets.only(
+            bottom:
+                MediaQuery.of(context).viewInsets.bottom + _bottomSheetPadding),
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'Add shipment Item',
+                      style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor),
+                    ),
                   ),
-                ),
-                CustomFormField(
-                  controller: dateController,
-                  label: 'Email Address',
-                  hint: 'Item title',
-                  keyboardType: TextInputType.text,
-                  // readOnly: true,
-                  // icon: Icon(Icons.local_shipping_rounded),
-                  validator: (date) {
-                    if (date == null || date.trim().isEmpty) {
-                      return 'please enter the title';
-                    }
-                  },
-                ),
-                CustomFormField(
-                  controller: priceController,
-                  label: 'Email Address',
-                  hint: 'Item price',
-                  keyboardType: TextInputType.text,
-                  validator: (name) {
-                    if (name == null || name.trim().isEmpty) {
-                      return 'please enter shipment name';
-                    }
-                  },
-                ),
+                  CustomFormField(
+                    controller: dateController,
+                    label: 'Email Address',
+                    hint: 'Item title',
+                    keyboardType: TextInputType.text,
+                    // readOnly: true,
+                    // icon: Icon(Icons.local_shipping_rounded),
+                    validator: (date) {
+                      if (date == null || date.trim().isEmpty) {
+                        return 'please enter the title';
+                      }
+                    },
+                  ),
+                  CustomFormField(
+                    controller: linkController,
+                    label: 'Email Address',
+                    hint: 'Item link',
+                    keyboardType: TextInputType.text,
+                    // readOnly: true,
+                    // icon: Icon(Icons.local_shipping_rounded),
+                    validator: (date) {
+                      if (date == null || date.trim().isEmpty) {
+                        return 'please enter the link';
+                      }
+                    },
+                  ),
+                  CustomFormField(
+                    controller: priceController,
+                    label: 'Email Address',
+                    hint: 'Item price',
+                    keyboardType: TextInputType.text,
+                    validator: (name) {
+                      if (name == null || name.trim().isEmpty) {
+                        return 'please enter item price';
+                      }
+                    },
+                  ),
+                  CustomFormField(
+                    controller: weightController,
+                    label: 'Email Address',
+                    hint: 'Item weight',
+                    keyboardType: TextInputType.text,
+                    validator: (name) {
+                      if (name == null || name.trim().isEmpty) {
+                        return 'please enter item weight';
+                      }
+                    },
+                  ),
 
-                Container(
-                  margin: EdgeInsets.only(top: 15),
-                  child: Center(
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        fixedSize: MaterialStatePropertyAll(
-                            Size(MediaQuery.of(context).size.width * .5, 50)),
-                        shape: MaterialStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(17),
+                  Container(
+                    margin: EdgeInsets.only(top: 25),
+                    child: Center(
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          fixedSize: MaterialStatePropertyAll(
+                              Size(MediaQuery.of(context).size.width * .5, 50)),
+                          shape: MaterialStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(17),
+                            ),
                           ),
+                          backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).primaryColor),
                         ),
-                        backgroundColor: MaterialStatePropertyAll(
-                            Theme.of(context).primaryColor),
-                      ),
-                      onPressed: () {
-                        add(widget.addItem);
-                      },
-                      child: Text(
-                        'Add Item',
-                        style: GoogleFonts.poppins(
-                            fontSize: 17, fontWeight: FontWeight.bold),
+                        onPressed: () {
+                          pickPhoto(widget.onError);
+                        },
+                        child: Text(
+                          'Pick Photo',
+                          style: GoogleFonts.poppins(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                // TextField(
-                //   controller: dateController,
-                //   readOnly: true,
-                //   decoration: InputDecoration(
-                //     hintText: 'I want it before',
-                //     icon: Icon(Icons.local_shipping),
-                //   ),
-                //   onTap: () {
-                //     DateTime selectedDate = DateTime.now();
-                //     _selectDate(context);
-                //   },
-                // )
-              ],
+
+                  Container(
+                    margin: EdgeInsets.only(top: 25),
+                    child: Center(
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          fixedSize: MaterialStatePropertyAll(
+                              Size(MediaQuery.of(context).size.width * .5, 50)),
+                          shape: MaterialStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(17),
+                            ),
+                          ),
+                          backgroundColor: MaterialStatePropertyAll(
+                              Theme.of(context).primaryColor),
+                        ),
+                        onPressed: () {
+                          add(widget.addItem, context, widget.onError);
+                        },
+                        child: Text(
+                          'Add Item',
+                          style: GoogleFonts.poppins(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // TextField(
+                  //   controller: dateController,
+                  //   readOnly: true,
+                  //   decoration: InputDecoration(
+                  //     hintText: 'I want it before',
+                  //     icon: Icon(Icons.local_shipping),
+                  //   ),
+                  //   onTap: () {
+                  //     DateTime selectedDate = DateTime.now();
+                  //     _selectDate(context);
+                  //   },
+                  // )
+                ],
+              ),
             ),
           ),
         ),
@@ -170,12 +229,40 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
     }
   }
 
-  void add(Function addItem) async {
+  void add(Function addItem, BuildContext context, Function onError) async {
     // async - await
     if (formKey.currentState?.validate() == false) {
       return;
+    } else if (image == null) {
+      onError(context, 'Please add item picture');
+      return;
     }
-    addItem(dateController.text, priceController.text);
+
+    addItem(dateController.text, priceController.text, linkController.text,
+        base64Image, weightController.text);
+    Navigator.of(context).pop();
     // viewModel.login(emailController.text, passwordController.text);
+  }
+
+  void pickPhoto(Function onError) async {
+    final ImagePicker picker = ImagePicker();
+
+    // Pick an image.
+    image = await picker.pickImage(
+        source: ImageSource.gallery, maxWidth: 100, maxHeight: 100);
+
+    if (image != null) {
+      // Read the image file as bytes.
+      List<int> imageBytes = await image!.readAsBytes();
+
+      // Convert the image bytes to a Base64 encoded string.
+      base64Image = base64Encode(imageBytes);
+
+      // Now you have the image as a Base64 string.
+      print('Base64 encoded image: $base64Image');
+      setState(() {});
+    } else {
+      onError(context);
+    }
   }
 }
