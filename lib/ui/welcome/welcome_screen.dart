@@ -78,7 +78,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, LoginScreen.routeName);
+                      Navigator.pushReplacementNamed(
+                          context, LoginScreen.routeName);
                     },
                     style: ElevatedButton.styleFrom(
                         // minimumSize: Size(double.infinity, 10),
@@ -100,7 +101,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, RegisterScreen.routeName);
+                      Navigator.pushReplacementNamed(
+                          context, RegisterScreen.routeName);
                     },
                     style: ElevatedButton.styleFrom(
                         // minimumSize: Size(double.infinity, 10),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -208,9 +210,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       },
       listener: (context, state) {
         if (state is RegisterFailState) {
-          DialogUtils.getDialog('Fail', state.failMessage, context);
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Loading',
+                alertContent: state.failMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Loading',
+                alertContent: state.failMessage,
+                context: context);
+          }
         } else if (state is RegisterLoadingState) {
-          DialogUtils.getDialog('Loading', state.loadingMessage, context);
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          }
           print('load');
         } else if (state is RegisterSuccessState) {
           // createUserInDb(
