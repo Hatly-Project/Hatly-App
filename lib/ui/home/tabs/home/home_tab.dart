@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:ffi';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
@@ -21,6 +23,7 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   late TabController tabController;
+  bool shipmentsIsEmpty = false;
   int selectedTab = 0;
   List<ShipmentDto> shipments = [];
 
@@ -101,9 +104,29 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       bloc: viewModel,
       listener: (context, state) {
         if (state is GetAllShipsLoadingState) {
-          DialogUtils.getDialog('Loading', state.loadingMessage, context);
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          }
         } else if (state is GetAllShipsFailState) {
-          DialogUtils.getDialog('Fail', state.failMessage, context);
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Fail',
+                alertContent: state.failMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Fail',
+                alertContent: state.failMessage,
+                context: context);
+          }
         }
       },
       listenWhen: (previous, current) {
@@ -119,19 +142,19 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       builder: (context, state) {
         if (state is GetAllShipsSuccessState) {
           shipments = state.responseDto.shipments!;
-          cacheShipments(shipments);
-          print('success ${shipments[0].items![0].photo}');
+          if (shipments.isEmpty) {
+            shipmentsIsEmpty = true;
+            print("emptyyyy");
+          } else {
+            shipmentsIsEmpty = false;
+            cacheShipments(shipments);
+            print('success ${shipments[0].items![0].photo}');
+          }
         }
         return RefreshIndicator(
           onRefresh: () async {
             await viewModel.create();
-
-            final box = await Hive.openBox('shipments');
-            final shipmentMaps =
-                shipments.map((shipment) => shipment.toJson()).toList();
-            await box.clear();
-            await box.addAll(shipmentMaps);
-
+            cacheShipments(shipments);
             setState(() {});
           },
           child: Scaffold(
@@ -210,6 +233,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold),
                                   labelColor: Colors.black,
+                                  indicatorSize: TabBarIndicatorSize.tab,
                                   indicator: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(4),
@@ -262,30 +286,61 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => selectedTab == 0
-                        ? ShipmentCard(
-                            title: shipments[index].title!,
-                            from: shipments[index].from!,
-                            to: shipments[index].to!,
-                            date: shipments[index].expectedDate!,
-                            userName: shipments[index].user!.name!,
-                            shipImage: shipments[index].items![0].photo == null
-                                ? null
-                                : base64ToImage(
-                                    shipments[index].items![0].photo!),
-                            userImage:
-                                shipments[index].user!.profilePhoto == null
-                                    ? null
-                                    : base64ToUserImage(
-                                        shipments[index].user!.profilePhoto!),
-                            bonus: shipments[index].reward.toString(),
-                          )
-                        : Container(),
-                    childCount: shipments.length,
-                  ),
-                )
+                shipmentsIsEmpty
+                    ? SliverToBoxAdapter(
+                        child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              child: Image.asset(
+                                'images/no_all_shipments.png',
+                                width: 350,
+                                height: 330,
+                              ),
+                            ),
+                            Container(
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Text(
+                                  "There are not any shipments\n right now!",
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 21,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ))
+                    : SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => selectedTab == 0
+                              ? ShipmentCard(
+                                  title: shipments[index].title!,
+                                  from: shipments[index].from!,
+                                  to: shipments[index].to!,
+                                  date: shipments[index].expectedDate!,
+                                  userName: shipments[index].user!.name!,
+                                  shipImage: shipments[index].items![0].photo ==
+                                          null
+                                      ? null
+                                      : base64ToImage(
+                                          shipments[index].items![0].photo!),
+                                  userImage: shipments[index]
+                                              .user!
+                                              .profilePhoto ==
+                                          null
+                                      ? null
+                                      : base64ToUserImage(
+                                          shipments[index].user!.profilePhoto!),
+                                  bonus: shipments[index].reward.toString(),
+                                )
+                              : Container(),
+                          childCount: shipments.length,
+                        ),
+                      )
               ],
             ),
           ),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -49,9 +51,29 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       listener: (context, state) {
         if (state is LoginFailState) {
-          DialogUtils.getDialog('Fail', state.failMessage, context);
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Fail',
+                alertContent: state.failMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Fail',
+                alertContent: state.failMessage,
+                context: context);
+          }
         } else if (state is LoginLoadingState) {
-          DialogUtils.getDialog('Loading', state.loadingMessage, context);
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          }
           print('load');
         } else if (state is LoginSuccessState) {
           print('success');

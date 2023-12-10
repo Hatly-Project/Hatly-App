@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -55,9 +56,29 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
       bloc: viewModel,
       listener: (context, state) {
         if (state is CreateShipLoadingState) {
-          DialogUtils.getDialog('Loading', state.loadingMessage, context);
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          }
         } else if (state is CreateShipFailState) {
-          DialogUtils.getDialog('Fail', state.failMessage, context);
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Loading',
+                alertContent: state.failMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Loading',
+                alertContent: state.failMessage,
+                context: context);
+          }
         }
       },
       listenWhen: (previous, current) {

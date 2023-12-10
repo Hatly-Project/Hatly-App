@@ -16,7 +16,7 @@ import 'package:http/http.dart';
 import 'interceptor/LoggingInterceptor.dart';
 
 class ApiManager {
-  static const String baseUrl = 'hatly.vercel.app';
+  static const String baseUrl = 'hatly-api.vercel.app';
   Client client = InterceptedClient.build(
     interceptors: [
       LoggingInterceptor(),
@@ -47,8 +47,8 @@ class ApiManager {
         throw ServerErrorException(registerResponse.message!);
       }
       return registerResponse;
-    } on ServerErrorException catch (e) {
-      throw ServerErrorException(e.errorMessage);
+    } on FormatException catch (e) {
+      throw ServerErrorException(e.message);
     }
   }
 
@@ -69,8 +69,8 @@ class ApiManager {
         throw ServerErrorException(loginResponse.message!);
       }
       return loginResponse;
-    } on ServerErrorException catch (e) {
-      throw ServerErrorException(e.errorMessage);
+    } on FormatException catch (e) {
+      throw ServerErrorException(e.message);
     }
   }
 
