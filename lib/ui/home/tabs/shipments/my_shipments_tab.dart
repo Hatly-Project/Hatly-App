@@ -11,6 +11,7 @@ import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/ui/components/shipment_card%20copy.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipments_bottom_sheet.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../domain/models/item_dto.dart';
@@ -28,26 +29,71 @@ class MyShipmentsTab extends StatefulWidget {
 
 class _MyShipmentsTabState extends State<MyShipmentsTab> {
   MyShipmentsScreenViewModel viewModel = MyShipmentsScreenViewModel();
-  List<ShipmentDto> shipments = [];
+  List<ShipmentDto> myShipments = [];
   late String token;
   Image? shipImage;
+  late LoggedInState loggedInState;
 
   @override
   void initState() {
     super.initState();
+
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
 
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
-      LoggedInState loggedInState = userProvider.state as LoggedInState;
+      loggedInState = userProvider.state as LoggedInState;
       token = loggedInState.token;
       // Now you can use the 'token' variable as needed in your code.
       print('User token: $token');
+      print('user email ${loggedInState.user.email}');
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
+
+    // Check for cached shipments when initializing
+    Future.delayed(Duration(milliseconds: 300), () {
+      getCachedMyShipments().then((cachedShipments) {
+        if (cachedShipments.isNotEmpty) {
+          print('exist');
+          setState(() {
+            myShipments = cachedShipments;
+          });
+        } else {
+          print('no Exist'); // Fetch from API if cache is empty
+        }
+      });
+    });
+  }
+
+  // a method for caching the shipments list
+  Future<void> cacheMyShipments(List<ShipmentDto> shipments) async {
+    final box = await Hive.openBox(
+        'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
+
+    // Convert List<ShipmentDto> to List<Map<String, dynamic>>
+    final shipmentMaps =
+        shipments.map((shipment) => shipment.toJson()).toList();
+
+    // Clear existing data and store the new data in the box
+    print('done caching');
+    await box.clear();
+    await box.addAll(shipmentMaps);
+  }
+
+  Future<List<ShipmentDto>> getCachedMyShipments() async {
+    final box = await Hive.openBox(
+        'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
+    final shipmentMaps = box.values.toList();
+
+    // Convert List<Map<String, dynamic>> to List<ShipmentDto>
+    final shipments = shipmentMaps
+        .map((shipmentMap) => ShipmentDto.fromJson(shipmentMap))
+        .toList();
+
+    return shipments;
   }
 
   @override
@@ -70,12 +116,12 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
         } else if (state is CreateShipFailState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
-                alertMsg: 'Loading',
+                alertMsg: 'Fail',
                 alertContent: state.failMessage,
                 context: context);
           } else {
             DialogUtils.showDialogAndroid(
-                alertMsg: 'Loading',
+                alertMsg: 'Fail',
                 alertContent: state.failMessage,
                 context: context);
           }
@@ -93,8 +139,9 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
       },
       builder: (context, state) {
         if (state is CreateShipSuccessState) {
-          shipments.add(state.responseDto.shipment!);
-          print('ship ${shipments.last.title}');
+          myShipments.add(state.responseDto.shipment!);
+          cacheMyShipments(myShipments);
+          print('ship ${myShipments.last.title}');
           // setState(() {});
         }
         return Scaffold(
@@ -103,17 +150,24 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
             backgroundColor: Theme.of(context).primaryColor,
             centerTitle: true,
             automaticallyImplyLeading: false,
-            title: const Text('My Shipments'),
+            title: Text(
+              'My Shipments',
+              style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
             actions: [
               IconButton(
                 onPressed: () => showShipmentBottomSheet(context),
                 icon: const Icon(
                   Icons.add,
+                  color: Colors.white,
                 ),
               ),
             ],
           ),
-          body: shipments.isEmpty
+          body: myShipments.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SingleChildScrollView(
@@ -132,15 +186,15 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                   ),
                 )
               : ListView.builder(
-                  itemCount: shipments.length,
+                  itemCount: myShipments.length,
                   itemBuilder: (context, index) => MyShipmentCard(
-                    title: shipments[index].title!,
-                    from: shipments[index].from!,
-                    to: shipments[index].to!,
+                    title: myShipments[index].title!,
+                    from: myShipments[index].from!,
+                    to: myShipments[index].to!,
                     date: DateFormat('dd MMMM yyyy')
-                        .format(shipments[index].expectedDate!),
+                        .format(myShipments[index].expectedDate!),
                     shipImage: base64ToImage(
-                        shipments[index].items?.first.photo ?? ''), //
+                        myShipments[index].items?.first.photo ?? ''), //
                   ),
                 ),
         );

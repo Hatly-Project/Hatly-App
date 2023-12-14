@@ -279,7 +279,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                 ),
                 CustomFormField(
                   controller: dateController,
-                  label: 'Email Address',
+                  label: '',
                   hint: 'I want it before',
                   readOnly: true,
                   icon: Icon(Icons.local_shipping_rounded),
@@ -295,7 +295,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                 ),
                 CustomFormField(
                   controller: nameController,
-                  label: 'Email Address',
+                  label: '',
                   hint: 'Shipment Name',
                   keyboardType: TextInputType.text,
                   validator: (name) {
@@ -306,7 +306,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                 ),
                 CustomFormField(
                   controller: noteController,
-                  label: 'Email Address',
+                  label: '',
                   hint: 'Shipment Note',
                   keyboardType: TextInputType.text,
                   validator: (note) {
@@ -370,7 +370,9 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                       child: Text(
                         'Add shipment item',
                         style: GoogleFonts.poppins(
-                            fontSize: 15, fontWeight: FontWeight.bold),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                     ),
                   ),
@@ -396,7 +398,9 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                       child: Text(
                         'Done',
                         style: GoogleFonts.poppins(
-                            fontSize: 15, fontWeight: FontWeight.bold),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                     ),
                   ),

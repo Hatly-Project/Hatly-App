@@ -286,61 +286,66 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                shipmentsIsEmpty
-                    ? SliverToBoxAdapter(
-                        child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          children: [
-                            Container(
-                              child: Image.asset(
-                                'images/no_all_shipments.png',
-                                width: 350,
-                                height: 330,
-                              ),
-                            ),
-                            Container(
-                              child: FittedBox(
-                                fit: BoxFit.fitWidth,
-                                child: Text(
-                                  "There are not any shipments\n right now!",
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 21,
-                                      fontWeight: FontWeight.bold),
+                selectedTab == 0
+                    ? shipmentsIsEmpty
+                        ? SliverToBoxAdapter(
+                            child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Column(
+                              children: [
+                                Container(
+                                  child: Image.asset(
+                                    'images/no_all_shipments.png',
+                                    width: 350,
+                                    height: 330,
+                                  ),
                                 ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ))
-                    : SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => selectedTab == 0
-                              ? ShipmentCard(
-                                  title: shipments[index].title!,
-                                  from: shipments[index].from!,
-                                  to: shipments[index].to!,
-                                  date: shipments[index].expectedDate!,
-                                  userName: shipments[index].user!.name!,
-                                  shipImage: shipments[index].items![0].photo ==
-                                          null
-                                      ? null
-                                      : base64ToImage(
-                                          shipments[index].items![0].photo!),
-                                  userImage: shipments[index]
-                                              .user!
-                                              .profilePhoto ==
-                                          null
-                                      ? null
-                                      : base64ToUserImage(
-                                          shipments[index].user!.profilePhoto!),
-                                  bonus: shipments[index].reward.toString(),
+                                Container(
+                                  child: FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text(
+                                      "There are not any shipments\n right now!",
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 21,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                 )
-                              : Container(),
-                          childCount: shipments.length,
-                        ),
-                      )
+                              ],
+                            ),
+                          ))
+                        : SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => selectedTab == 0
+                                  ? ShipmentCard(
+                                      title: shipments[index].title!,
+                                      from: shipments[index].from!,
+                                      to: shipments[index].to!,
+                                      date: shipments[index].expectedDate!,
+                                      userName: shipments[index].user!.name!,
+                                      shipImage:
+                                          shipments[index].items![0].photo ==
+                                                  null
+                                              ? null
+                                              : base64ToImage(shipments[index]
+                                                  .items![0]
+                                                  .photo!),
+                                      userImage: shipments[index]
+                                                  .user!
+                                                  .profilePhoto ==
+                                              null
+                                          ? null
+                                          : base64ToUserImage(shipments[index]
+                                              .user!
+                                              .profilePhoto!),
+                                      bonus: shipments[index].reward.toString(),
+                                    )
+                                  : Container(),
+                              childCount: shipments.length,
+                            ),
+                          )
+                    : SliverToBoxAdapter(child: Container())
               ],
             ),
           ),

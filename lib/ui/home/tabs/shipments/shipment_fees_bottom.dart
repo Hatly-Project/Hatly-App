@@ -193,7 +193,9 @@ class _ShipmentFeesBottomSheetState extends State<ShipmentFeesBottomSheet> {
                       child: Text(
                         'Confirm',
                         style: GoogleFonts.poppins(
-                            fontSize: 17, fontWeight: FontWeight.bold),
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                     ),
                   ),

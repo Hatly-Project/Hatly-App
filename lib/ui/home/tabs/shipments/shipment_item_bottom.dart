@@ -66,7 +66,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
                   ),
                   CustomFormField(
                     controller: dateController,
-                    label: 'Email Address',
+                    label: '',
                     hint: 'Item title',
                     keyboardType: TextInputType.text,
                     // readOnly: true,
@@ -79,7 +79,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
                   ),
                   CustomFormField(
                     controller: linkController,
-                    label: 'Email Address',
+                    label: '',
                     hint: 'Item link',
                     keyboardType: TextInputType.text,
                     // readOnly: true,
@@ -92,7 +92,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
                   ),
                   CustomFormField(
                     controller: priceController,
-                    label: 'Email Address',
+                    label: '',
                     hint: 'Item price',
                     keyboardType: TextInputType.text,
                     validator: (name) {
@@ -103,7 +103,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
                   ),
                   CustomFormField(
                     controller: weightController,
-                    label: 'Email Address',
+                    label: '',
                     hint: 'Item weight',
                     keyboardType: TextInputType.text,
                     validator: (name) {
