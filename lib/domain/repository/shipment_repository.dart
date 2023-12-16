@@ -1,4 +1,5 @@
 import 'package:hatly/domain/models/get_all_shipments_dto.dart';
+import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
 
 import '../models/create_shipment_response_dto.dart';
 import '../models/item_dto.dart';
@@ -15,4 +16,5 @@ abstract class ShipmentRepository {
       required String token});
 
   Future<GetAllShipmentResponseDto> getAllShipments();
+  Future<GetUserShipmentsDto> getUserShipments({required String token});
 }

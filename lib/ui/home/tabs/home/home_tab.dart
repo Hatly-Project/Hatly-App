@@ -23,6 +23,7 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   late TabController tabController;
+  ScrollController scrollController = ScrollController();
   bool shipmentsIsEmpty = false;
   int selectedTab = 0;
   List<ShipmentDto> shipments = [];
@@ -160,16 +161,46 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
           child: Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: CustomScrollView(
+              controller: scrollController,
+              physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
                   expandedHeight: MediaQuery.of(context).size.height * .244,
-                  floating: true,
+                  floating: false,
                   pinned: true,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Theme.of(context).primaryColor,
                   elevation: 0,
+                  title: Text(
+                    'Hatly',
+                    style: GoogleFonts.poppins(
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  actions: [
+                    Container(
+                      margin: EdgeInsets.only(right: 10),
+                      child: Row(
+                        // mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                              // margin: EdgeInsets.only(right: 20),
+                              ),
+                          Icon(
+                            Icons.search,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  centerTitle: true,
                   automaticallyImplyLeading: false,
                   flexibleSpace: FlexibleSpaceBar(
                     background: Container(
+                      margin: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.13),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
                         borderRadius: const BorderRadius.only(
@@ -178,43 +209,10 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                         ),
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Container(
-                            margin: EdgeInsets.only(
-                                top: MediaQuery.of(context).size.height * .05),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.only(
-                                      left: MediaQuery.of(context).size.width *
-                                          .05),
-                                ),
-                                Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Hatly',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 35,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.search,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 25),
+                            // margin: EdgeInsets.only(top: 30),
                             width: MediaQuery.of(context).size.width * 0.7,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
@@ -374,7 +372,7 @@ Image base64ToUserImage(String base64String) {
     height: 50,
   );
 }
-  
+
 /*   @override
   Widget build(BuildContext context) {
     const title = 'Floating App Bar';

@@ -62,6 +62,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
             myShipments = cachedShipments;
           });
         } else {
+          viewModel.getMyShipments(token: token);
           print('no Exist'); // Fetch from API if cache is empty
         }
       });
@@ -126,77 +127,113 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                 context: context);
           }
         }
+        if (state is GetMyShipmentsLoadingState) {
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Loading',
+                alertContent: state.loadingMessage,
+                context: context);
+          }
+        } else if (state is GetMyShipmentsFailState) {
+          if (Platform.isIOS) {
+            DialogUtils.showDialogIos(
+                alertMsg: 'Fail',
+                alertContent: state.failMessage,
+                context: context);
+          } else {
+            DialogUtils.showDialogAndroid(
+                alertMsg: 'Fail',
+                alertContent: state.failMessage,
+                context: context);
+          }
+        }
       },
       listenWhen: (previous, current) {
         if (previous is CreateShipLoadingState) {
           DialogUtils.hideDialog(context);
         }
+        if (previous is GetMyShipmentsLoadingState) {
+          DialogUtils.hideDialog(context);
+        }
         if (current is CreateShipLoadingState ||
-            current is CreateShipFailState) {
+            current is CreateShipFailState ||
+            current is GetMyShipmentsLoadingState ||
+            current is GetMyShipmentsFailState) {
           return true;
         }
         return false;
       },
       builder: (context, state) {
-        if (state is CreateShipSuccessState) {
-          myShipments.add(state.responseDto.shipment!);
+        if (state is GetMyShipmentsSuccessState) {
+          print('getSuccess');
+          myShipments = state.responseDto.shipments!;
           cacheMyShipments(myShipments);
-          print('ship ${myShipments.last.title}');
-          // setState(() {});
         }
-        return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            automaticallyImplyLeading: false,
-            title: Text(
-              'My Shipments',
-              style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-            actions: [
-              IconButton(
-                onPressed: () => showShipmentBottomSheet(context),
-                icon: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
+        return RefreshIndicator(
+          onRefresh: () async {
+            await viewModel.getMyShipments(token: token);
+            cacheMyShipments(myShipments);
+            setState(() {});
+          },
+          child: Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).primaryColor,
+              centerTitle: true,
+              automaticallyImplyLeading: false,
+              title: Text(
+                'My Shipments',
+                style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
-            ],
-          ),
-          body: myShipments.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Image.asset('images/no_shipments.png'),
-                        Text(
-                          "You don't have any shipments, press the add button to add a shipment",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        )
-                      ],
+              actions: [
+                IconButton(
+                  onPressed: () => showShipmentBottomSheet(context),
+                  icon: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            body: myShipments.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Image.asset('images/no_shipments.png'),
+                          Text(
+                            "You don't have any shipments, press the add button to add a shipment",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: myShipments.length,
+                    itemBuilder: (context, index) => MyShipmentCard(
+                      title: myShipments[index].title!,
+                      from: myShipments[index].from!,
+                      to: myShipments[index].to!,
+                      date: DateFormat('dd MMMM yyyy')
+                          .format(myShipments[index].expectedDate!),
+                      shipImage: base64ToImage(
+                          myShipments[index].items?.first.photo ?? ''), //
                     ),
                   ),
-                )
-              : ListView.builder(
-                  itemCount: myShipments.length,
-                  itemBuilder: (context, index) => MyShipmentCard(
-                    title: myShipments[index].title!,
-                    from: myShipments[index].from!,
-                    to: myShipments[index].to!,
-                    date: DateFormat('dd MMMM yyyy')
-                        .format(myShipments[index].expectedDate!),
-                    shipImage: base64ToImage(
-                        myShipments[index].items?.first.photo ?? ''), //
-                  ),
-                ),
+          ),
         );
       },
     );
