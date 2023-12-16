@@ -9,6 +9,7 @@ import 'package:hatly/data/api/shipments/create_shipments_response/create_shipme
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/models/item_dto.dart';
+import 'package:hatly/data/api/shipments/user_shipments.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -76,7 +77,7 @@ class ApiManager {
 
   Future<GetShipmentsResponse> getAllShipments() async {
     try {
-      var url = Uri.https(baseUrl, 'shipment/getAll');
+      var url = Uri.https(baseUrl, 'shipment/all');
       var response =
           await client.get(url, headers: {'content-type': 'application/json'});
 
@@ -84,6 +85,31 @@ class ApiManager {
       if (getResponse.status == false) {
         throw ServerErrorException(getResponse.message!);
       }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    }
+  }
+
+  Future<UserShipmentsResponse> getUserShipments(
+      {required String token}) async {
+    try {
+      var url = Uri.https(baseUrl, 'user/shipments');
+      var response = await client.get(
+        url,
+        headers: {
+          'content-type': 'application/json',
+          'authorization': 'Bearer $token'
+        },
+      );
+
+      var getResponse = UserShipmentsResponse.fromJson(response.body);
+      print('apiii');
+
+      if (getResponse.status == false) {
+        throw ServerErrorException(getResponse.message!);
+      }
+
       return getResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
