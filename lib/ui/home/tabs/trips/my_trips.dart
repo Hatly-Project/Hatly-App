@@ -18,16 +18,16 @@ import '../../../../domain/models/item_dto.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../utils/dialog_utils.dart';
 
-class MyShipmentsTab extends StatefulWidget {
+class MyTripsTab extends StatefulWidget {
   static const String routeName = 'MyShipments';
 
-  MyShipmentsTab({super.key});
+  MyTripsTab({super.key});
 
   @override
-  State<MyShipmentsTab> createState() => _MyShipmentsTabState();
+  State<MyTripsTab> createState() => _MyTripsTabState();
 }
 
-class _MyShipmentsTabState extends State<MyShipmentsTab> {
+class _MyTripsTabState extends State<MyTripsTab> {
   MyShipmentsScreenViewModel viewModel = MyShipmentsScreenViewModel();
   List<ShipmentDto> myShipments = [];
   late String token;
@@ -172,10 +172,6 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
         if (state is GetMyShipmentsSuccessState) {
           print('getSuccess');
           myShipments = state.responseDto.shipments!;
-          cacheMyShipments(myShipments);
-        }
-        if (state is CreateShipSuccessState) {
-          myShipments.add(state.responseDto.shipment!);
           cacheMyShipments(myShipments);
         }
         return RefreshIndicator(
