@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../../../../domain/models/user_model.dart';
+import 'package:hatly/domain/models/user_model.dart';
 
 class User {
   String? name;

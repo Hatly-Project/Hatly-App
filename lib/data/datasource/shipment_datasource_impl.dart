@@ -46,6 +46,6 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
     var response = await apiManager.getUserShipments(token: token);
     print('datasource');
 
-    return response.toUserShipmentsDto();
+    return response.toUserShipmentDto();
   }
 }

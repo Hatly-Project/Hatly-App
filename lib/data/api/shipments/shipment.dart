@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/data/api/shipments/item.dart';
+import 'package:hatly/data/api/shipments/user.dart';
 
-import 'item.dart';
-import 'user.dart';
+import '../../../domain/models/shipment_dto.dart';
 
 class Shipment {
   int? id;
@@ -77,7 +77,6 @@ class Shipment {
   ///
   /// Converts [Shipment] to a JSON string.
   String toJson() => json.encode(toMap());
-
   ShipmentDto toShipmentDto() {
     return ShipmentDto(
         id: id,

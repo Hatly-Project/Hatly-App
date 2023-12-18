@@ -4,41 +4,40 @@ import 'package:hatly/domain/models/item_dto.dart';
 
 class Item {
   int? id;
+  String? name;
   double? price;
   double? weight;
-
   String? photo;
   String? link;
-  String? name;
-
   int? shipmentId;
 
-  Item(
-      {this.id,
-      this.price,
-      this.photo,
-      this.link,
-      this.shipmentId,
-      this.name,
-      this.weight});
+  Item({
+    this.id,
+    this.name,
+    this.price,
+    this.photo,
+    this.link,
+    this.weight,
+    this.shipmentId,
+  });
 
   factory Item.fromMap(Map<String, dynamic> data) => Item(
         id: data['id'] as int?,
+        name: data['name'] as String?,
         price: (data['price'] as num?)?.toDouble(),
-        weight: (data['itemWeight'] as num?)?.toDouble(),
+        weight: (data['weight'] as num?)?.toDouble(),
         photo: data['photo'] as String?,
         link: data['link'] as String?,
-        name: data['name'] as String?,
         shipmentId: data['shipmentId'] as int?,
       );
 
   Map<String, dynamic> toMap() => {
         'id': id,
+        'name': name,
         'price': price,
-        'itemWeight': weight,
         'photo': photo,
         'link': link,
-        'name': name,
+        'weight': weight,
         'shipmentId': shipmentId,
       };
 
@@ -55,6 +54,13 @@ class Item {
   String toJson() => json.encode(toMap());
 
   ItemDto toItemDto() {
-    return ItemDto(price: price, photo: photo, link: link, weight: weight);
+    return ItemDto(
+        price: price,
+        photo: photo,
+        link: link,
+        id: id,
+        shipmentId: shipmentId,
+        name: name,
+        weight: weight);
   }
 }

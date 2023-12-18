@@ -36,6 +36,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   String bonus = '';
   String fees = '';
   String image = '';
+  bool isDoneBtnShown = false;
   Image? shipmentImage;
 
   int index = 0;
@@ -365,7 +366,9 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                             Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        add(widget.onError);
+                        add(
+                          widget.onError,
+                        );
                       },
                       child: Text(
                         'Add shipment item',
@@ -377,34 +380,36 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                     ),
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(top: 15),
-                  child: Center(
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        fixedSize: MaterialStatePropertyAll(
-                            Size(MediaQuery.of(context).size.width * .6, 50)),
-                        shape: MaterialStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(17),
+                isDoneBtnShown
+                    ? Container(
+                        margin: EdgeInsets.only(top: 15),
+                        child: Center(
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              fixedSize: MaterialStatePropertyAll(Size(
+                                  MediaQuery.of(context).size.width * .6, 50)),
+                              shape: MaterialStatePropertyAll(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(17),
+                                ),
+                              ),
+                              backgroundColor: MaterialStatePropertyAll(
+                                  Theme.of(context).primaryColor),
+                            ),
+                            onPressed: () {
+                              showShipmentFeesBottomSheet(context);
+                            },
+                            child: Text(
+                              'Done',
+                              style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
                           ),
                         ),
-                        backgroundColor: MaterialStatePropertyAll(
-                            Theme.of(context).primaryColor),
-                      ),
-                      onPressed: () {
-                        showShipmentFeesBottomSheet(context);
-                      },
-                      child: Text(
-                        'Done',
-                        style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
+                      )
+                    : Container()
                 // TextField(
                 //   controller: dateController,
                 //   readOnly: true,
@@ -468,6 +473,12 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
     }
   }
 
+  void showDoneBtn() {
+    setState(() {
+      isDoneBtnShown = true;
+    });
+  }
+
   void done(Function done, String bonus) {
     done(
         countryValue,
@@ -510,7 +521,9 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
       totalWeight += item.weight.toString();
       print('tot $totalWeight');
     });
-    setState(() {});
+    setState(() {
+      showDoneBtn();
+    });
   }
 
   Image base64ToImage(String base64String) {

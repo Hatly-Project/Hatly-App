@@ -1,4 +1,3 @@
-import 'package:hatly/data/api/shipments/create_shipments_response/shipment.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 
 class GetUserShipmentsDto {
