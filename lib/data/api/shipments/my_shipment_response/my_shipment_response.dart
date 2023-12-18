@@ -1,19 +1,18 @@
 import 'dart:convert';
 
-import 'package:hatly/domain/models/get_all_shipments_dto.dart';
+import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
 
 import '../shipment.dart';
 
-class GetShipmentsResponse {
+class MyShipmentResponse {
   bool? status;
+  List<Shipment>? shipments;
   String? message;
 
-  List<Shipment>? shipments;
+  MyShipmentResponse({this.status, this.shipments, this.message});
 
-  GetShipmentsResponse({this.status, this.shipments, this.message});
-
-  factory GetShipmentsResponse.fromMap(Map<String, dynamic> data) {
-    return GetShipmentsResponse(
+  factory MyShipmentResponse.fromMap(Map<String, dynamic> data) {
+    return MyShipmentResponse(
       status: data['status'] as bool?,
       message: data['message'] as String?,
       shipments: (data['shipments'] as List<dynamic>?)
@@ -30,19 +29,19 @@ class GetShipmentsResponse {
 
   /// `dart:convert`
   ///
-  /// Parses the string and returns the resulting Json object as [GetShipmentsResponse].
-  factory GetShipmentsResponse.fromJson(String data) {
-    return GetShipmentsResponse.fromMap(
+  /// Parses the string and returns the resulting Json object as [MyShipmentResponse].
+  factory MyShipmentResponse.fromJson(String data) {
+    return MyShipmentResponse.fromMap(
         json.decode(data) as Map<String, dynamic>);
   }
 
   /// `dart:convert`
   ///
-  /// Converts [GetShipmentsResponse] to a JSON string.
+  /// Converts [MyShipmentResponse] to a JSON string.
   String toJson() => json.encode(toMap());
 
-  GetAllShipmentResponseDto toGetAllShipmetnsDto() {
-    return GetAllShipmentResponseDto(
+  GetUserShipmentsDto toUserShipmentDto() {
+    return GetUserShipmentsDto(
         shipments:
             shipments?.map((shipment) => shipment.toShipmentDto()).toList(),
         status: status,

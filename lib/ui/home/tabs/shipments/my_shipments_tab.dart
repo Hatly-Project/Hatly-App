@@ -32,6 +32,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
   List<ShipmentDto> myShipments = [];
   late String token;
   Image? shipImage;
+  bool isMyshipmentEmpty = false;
   late LoggedInState loggedInState;
 
   @override
@@ -172,7 +173,13 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
         if (state is GetMyShipmentsSuccessState) {
           print('getSuccess');
           myShipments = state.responseDto.shipments!;
-          cacheMyShipments(myShipments);
+          if (myShipments.isEmpty) {
+            isMyshipmentEmpty = true;
+            print('empty');
+          } else {
+            isMyshipmentEmpty = false;
+            cacheMyShipments(myShipments);
+          }
         }
         if (state is CreateShipSuccessState) {
           myShipments.add(state.responseDto.shipment!);
@@ -207,7 +214,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                 ),
               ],
             ),
-            body: myShipments.isEmpty
+            body: isMyshipmentEmpty
                 ? Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SingleChildScrollView(

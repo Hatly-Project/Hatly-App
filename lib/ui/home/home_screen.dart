@@ -25,7 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: tabs[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        // iconSize: 25,
+        // iconSize: 10,
+        enableFeedback: true,
         backgroundColor: Theme.of(context).primaryColor,
         currentIndex: selectedIndex,
         elevation: 0,
@@ -37,15 +38,15 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
               icon: BottomNavIcon('home', selectedIndex == 0),
-              label: ''),
+              label: 'Home'),
           BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
               icon: BottomNavIcon('fast', selectedIndex == 1),
-              label: ''),
+              label: 'My Shipments'),
           BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
               icon: BottomNavIcon('airplane', selectedIndex == 2),
-              label: ''),
+              label: 'My Trips'),
           BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
               icon: BottomNavIcon('profile', selectedIndex == 3),
