@@ -8,6 +8,7 @@ import 'package:hatly/data/api/shipments/create_shipment_request/item.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
+import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_response.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/models/item_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
@@ -82,6 +83,21 @@ class ApiManager {
           await client.get(url, headers: {'content-type': 'application/json'});
 
       var getResponse = GetShipmentsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(getResponse.message!);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    }
+  }
+
+  Future<GetAllTripsResponse> getAllTrips() async {
+    try {
+      var url = Uri.https(baseUrl, 'trip/all');
+      var response = await client.get(url);
+
+      var getResponse = GetAllTripsResponse.fromJson(response.body);
       if (getResponse.status == false) {
         throw ServerErrorException(getResponse.message!);
       }

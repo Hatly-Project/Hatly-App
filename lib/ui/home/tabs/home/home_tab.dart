@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/trips_dto.dart';
+import 'package:hatly/ui/components/trip_card.dart';
 import 'package:hatly/ui/home/tabs/home/home_tab_viewmodel.dart';
 import 'package:hive/hive.dart';
 
@@ -25,8 +27,10 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   late TabController tabController;
   ScrollController scrollController = ScrollController();
   bool shipmentsIsEmpty = false;
+  bool tripsIsEmpty = false;
   int selectedTab = 0;
   List<ShipmentDto> shipments = [];
+  List<TripsDto> trips = [];
 
   HomeScreenViewModel viewModel = HomeScreenViewModel();
   @override
@@ -99,6 +103,29 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     return shipments;
   }
 
+  // a method for caching the trips list
+  Future<void> cacheTrips(List<TripsDto> trips) async {
+    final box = await Hive.openBox('trips');
+
+    // Convert List<ShipmentDto> to List<Map<String, dynamic>>
+    final tripsMaps = trips.map((trip) => trip.toJson()).toList();
+
+    // Clear existing data and store the new data in the box
+    await box.clear();
+    await box.addAll(tripsMaps);
+  }
+
+  Future<List<TripsDto>> getChachedtrips() async {
+    final box = await Hive.openBox('trips');
+    final tripsMaps = box.values.toList();
+
+    // Convert List<Map<String, dynamic>> to List<ShipmentDto>
+    final trips =
+        tripsMaps.map((tripsMaps) => TripsDto.fromJson(tripsMaps)).toList();
+
+    return trips;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer(
@@ -150,6 +177,16 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             shipmentsIsEmpty = false;
             cacheShipments(shipments);
             print('success ${shipments[0].items![0].photo}');
+          }
+        }
+        if (state is GetAllTripsSuccessState) {
+          trips = state.responseDto.trips!;
+          if (trips.isEmpty) {
+            tripsIsEmpty = true;
+            print('trips empty');
+          } else {
+            tripsIsEmpty = false;
+            cacheTrips(trips);
           }
         }
         return RefreshIndicator(
@@ -343,7 +380,13 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                               childCount: shipments.length,
                             ),
                           )
-                    : SliverToBoxAdapter(child: Container())
+                    : SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) =>
+                              selectedTab == 1 ? TripCard() : Container(),
+                          childCount: 1,
+                        ),
+                      )
               ],
             ),
           ),
