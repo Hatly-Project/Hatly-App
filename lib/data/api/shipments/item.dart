@@ -25,7 +25,7 @@ class Item {
         id: data['id'] as int?,
         name: data['name'] as String?,
         price: (data['price'] as num?)?.toDouble(),
-        weight: (data['weight'] as num?)?.toDouble(),
+        weight: (data['itemWeight'] as num?)?.toDouble(),
         photo: data['photo'] as String?,
         link: data['link'] as String?,
         shipmentId: data['shipmentId'] as int?,
@@ -37,7 +37,7 @@ class Item {
         'price': price,
         'photo': photo,
         'link': link,
-        'weight': weight,
+        'itemWeight': weight,
         'shipmentId': shipmentId,
       };
 
