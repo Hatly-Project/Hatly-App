@@ -19,7 +19,7 @@ import '../../../../providers/auth_provider.dart';
 import '../../../../utils/dialog_utils.dart';
 
 class MyTripsTab extends StatefulWidget {
-  static const String routeName = 'MyShipments';
+  static const String routeName = 'MyTrips';
 
   MyTripsTab({super.key});
 
@@ -54,48 +54,48 @@ class _MyTripsTabState extends State<MyTripsTab> {
     }
 
     // Check for cached shipments when initializing
-    Future.delayed(Duration(milliseconds: 300), () {
-      getCachedMyShipments().then((cachedShipments) {
-        if (cachedShipments.isNotEmpty) {
-          print('exist');
-          setState(() {
-            myShipments = cachedShipments;
-          });
-        } else {
-          viewModel.getMyShipments(token: token);
-          print('no Exist'); // Fetch from API if cache is empty
-        }
-      });
-    });
+    // Future.delayed(Duration(milliseconds: 300), () {
+    //   getCachedMyShipments().then((cachedShipments) {
+    //     if (cachedShipments.isNotEmpty) {
+    //       print('exist');
+    //       setState(() {
+    //         myShipments = cachedShipments;
+    //       });
+    //     } else {
+    //       viewModel.getMyShipments(token: token);
+    //       print('no Exist'); // Fetch from API if cache is empty
+    //     }
+    //   });
+    // });
   }
 
-  // a method for caching the shipments list
-  Future<void> cacheMyShipments(List<ShipmentDto> shipments) async {
-    final box = await Hive.openBox(
-        'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
+  // // a method for caching the shipments list
+  // Future<void> cacheMyShipments(List<ShipmentDto> shipments) async {
+  //   final box = await Hive.openBox(
+  //       'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
 
-    // Convert List<ShipmentDto> to List<Map<String, dynamic>>
-    final shipmentMaps =
-        shipments.map((shipment) => shipment.toJson()).toList();
+  //   // Convert List<ShipmentDto> to List<Map<String, dynamic>>
+  //   final shipmentMaps =
+  //       shipments.map((shipment) => shipment.toJson()).toList();
 
-    // Clear existing data and store the new data in the box
-    print('done caching');
-    await box.clear();
-    await box.addAll(shipmentMaps);
-  }
+  //   // Clear existing data and store the new data in the box
+  //   print('done caching');
+  //   await box.clear();
+  //   await box.addAll(shipmentMaps);
+  // }
 
-  Future<List<ShipmentDto>> getCachedMyShipments() async {
-    final box = await Hive.openBox(
-        'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
-    final shipmentMaps = box.values.toList();
+  // Future<List<ShipmentDto>> getCachedMyShipments() async {
+  //   final box = await Hive.openBox(
+  //       'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
+  //   final shipmentMaps = box.values.toList();
 
-    // Convert List<Map<String, dynamic>> to List<ShipmentDto>
-    final shipments = shipmentMaps
-        .map((shipmentMap) => ShipmentDto.fromJson(shipmentMap))
-        .toList();
+  //   // Convert List<Map<String, dynamic>> to List<ShipmentDto>
+  //   final shipments = shipmentMaps
+  //       .map((shipmentMap) => ShipmentDto.fromJson(shipmentMap))
+  //       .toList();
 
-    return shipments;
-  }
+  //   return shipments;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -172,12 +172,12 @@ class _MyTripsTabState extends State<MyTripsTab> {
         if (state is GetMyShipmentsSuccessState) {
           print('getSuccess');
           myShipments = state.responseDto.shipments!;
-          cacheMyShipments(myShipments);
+          // cacheMyShipments(myShipments);
         }
         return RefreshIndicator(
           onRefresh: () async {
             await viewModel.getMyShipments(token: token);
-            cacheMyShipments(myShipments);
+            // cacheMyShipments(myShipments);
             setState(() {});
           },
           child: Scaffold(
@@ -187,7 +187,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
               centerTitle: true,
               automaticallyImplyLeading: false,
               title: Text(
-                'My Shipments',
+                'My Trips',
                 style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

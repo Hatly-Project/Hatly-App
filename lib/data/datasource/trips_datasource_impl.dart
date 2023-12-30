@@ -8,8 +8,8 @@ class TripsDatasourceImpl implements TripsDatasource {
   TripsDatasourceImpl(this.apiManager);
 
   @override
-  Future<GetAllTripsResponseDto> getAllTrips() async {
-    var response = await apiManager.getAllTrips();
+  Future<GetAllTripsResponseDto> getAllTrips(String token) async {
+    var response = await apiManager.getAllTrips(token: token);
 
     return response.toAllTripsResponseDto();
   }

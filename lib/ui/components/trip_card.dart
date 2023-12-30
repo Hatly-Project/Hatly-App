@@ -3,7 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TripCard extends StatelessWidget {
-  const TripCard({super.key});
+  String? origin, destination, username;
+  DateTime? date;
+  int? availableWeight, consumedWeight;
+  Image? userImage;
+
+  TripCard(
+      {required this.origin,
+      required this.destination,
+      required this.username,
+      required this.availableWeight,
+      required this.consumedWeight,
+      required this.date,
+      required this.userImage});
 
   @override
   Widget build(BuildContext context) {

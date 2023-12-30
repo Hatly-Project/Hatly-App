@@ -36,8 +36,8 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   }
 
   @override
-  Future<GetAllShipmentResponseDto> getAllShipments() async {
-    var response = await apiManager.getAllShipments();
+  Future<GetAllShipmentResponseDto> getAllShipments(String token) async {
+    var response = await apiManager.getAllShipments(token: token);
     return response.toGetAllShipmetnsDto();
   }
 

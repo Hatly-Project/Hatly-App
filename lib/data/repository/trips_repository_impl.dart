@@ -8,7 +8,7 @@ class TripsRepositoryImpl implements TripsRepository {
   TripsRepositoryImpl(this.tripsDatasource);
 
   @override
-  Future<GetAllTripsResponseDto> getAllTrips() {
-    return tripsDatasource.getAllTrips();
+  Future<GetAllTripsResponseDto> getAllTrips(String token) {
+    return tripsDatasource.getAllTrips(token);
   }
 }

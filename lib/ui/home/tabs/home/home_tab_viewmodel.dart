@@ -37,11 +37,11 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
     getAllTripsUsecase = GetAllTripsUsecase(tripsRepository);
   }
 
-  Future<void> create() async {
+  Future<void> create(String token) async {
     emit(GetAllShipsLoadingState('Loading...'));
 
     try {
-      var response = await getAllShipmentsUsecase.invoke();
+      var response = await getAllShipmentsUsecase.invoke(token);
       // createUserInDb(user);
       emit(GetAllShipsSuccessState(response));
     } on ServerErrorException catch (e) {
@@ -49,11 +49,11 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
     }
   }
 
-  Future<void> getAlltrips() async {
+  Future<void> getAlltrips(String token) async {
     emit(GetAllTripsLoadingState('Loading... '));
 
     try {
-      var response = await getAllTripsUsecase.invoke();
+      var response = await getAllTripsUsecase.invoke(token);
       emit(GetAllTripsSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(GetAllTripsFailState(e.errorMessage));
