@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:hatly/domain/models/user_model.dart';
+
 class User {
   int? id;
   String? name;
   String? email;
-  dynamic phone;
-  dynamic profilePhoto;
+  String? phone;
+  String? profilePhoto;
   List<dynamic>? reviewed;
 
   User({
@@ -21,8 +23,8 @@ class User {
         id: data['id'] as int?,
         name: data['name'] as String?,
         email: data['email'] as String?,
-        phone: data['phone'] as dynamic,
-        profilePhoto: data['profilePhoto'] as dynamic,
+        phone: data['phone'] as String?,
+        profilePhoto: data['profilePhoto'] as String?,
         reviewed: data['reviewed'] as List<dynamic>?,
       );
 
@@ -46,4 +48,9 @@ class User {
   ///
   /// Converts [User] to a JSON string.
   String toJson() => json.encode(toMap());
+
+  UserDto toUserDto() {
+    return UserDto(
+        name: name, phone: phone, email: email, profilePhoto: profilePhoto);
+  }
 }
