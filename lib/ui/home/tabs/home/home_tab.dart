@@ -211,6 +211,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             current is GetAllShipsFailState ||
             current is GetAllTripsLoadingState ||
             current is GetAllTripsFailState) {
+          print(current);
           return true;
         }
         return false;
@@ -226,16 +227,20 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             cacheShipments(shipments);
             print('success ${shipments[0].items![0].photo}');
           }
+          shimmerIsLoading = false;
         }
         if (state is GetAllTripsSuccessState) {
+          print('tripss');
           trips = state.responseDto.trips!;
           if (trips.isEmpty) {
             tripsIsEmpty = true;
             print('trips empty');
           } else {
+            print('tripss success');
             tripsIsEmpty = false;
             cacheTrips(trips);
           }
+          shimmerIsLoading = false;
         }
         return RefreshIndicator(
           onRefresh: () async {
@@ -338,8 +343,17 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                     selectedTab = index;
                                     print('index $index');
                                     if (selectedTab == 1) {
-                                      setState(() {
-                                        viewModel.getAlltrips(token);
+                                      getChachedtrips().then((cachedTrips) {
+                                        if (cachedTrips.isNotEmpty) {
+                                          print('trips exist');
+                                          setState(() {
+                                            trips = cachedTrips;
+                                          });
+                                        } else {
+                                          setState(() {
+                                            viewModel.getAlltrips(token);
+                                          });
+                                        }
                                       });
                                     }
                                   },

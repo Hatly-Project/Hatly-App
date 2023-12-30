@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,7 +40,7 @@ class TripCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'United states',
+                      origin!,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.poppins(
                           fontSize: 16, fontWeight: FontWeight.w700),
@@ -54,7 +57,7 @@ class TripCard extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.topRight,
                       child: Text(
-                        'Cairo',
+                        destination ?? '',
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.poppins(
                             fontSize: 16, fontWeight: FontWeight.w700),
@@ -68,7 +71,7 @@ class TripCard extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    'Departs on 22 December 2023',
+                    'Departs At ${date!.toIso8601String().replaceRange(10, null, '')}',
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       color: Colors.grey[600],
@@ -89,7 +92,7 @@ class TripCard extends StatelessWidget {
                         filterQuality: FilterQuality.high,
                       ),
                       Text(
-                        '9Kg Available',
+                        '${availableWeight.toString()} Available Kg',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           color: Colors.grey[600],
@@ -107,7 +110,7 @@ class TripCard extends StatelessWidget {
                         filterQuality: FilterQuality.high,
                       ),
                       Text(
-                        '0Kg Consumed',
+                        '${consumedWeight.toString()} Consumed Kg',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           color: Colors.grey[600],
@@ -133,13 +136,13 @@ class TripCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: Container(
-                          height: 50,
-                          width: 50,
-                          color: Colors.grey[300],
-                        ),
-                      ),
+                          borderRadius: BorderRadius.circular(25),
+                          child: userImage ??
+                              Container(
+                                height: 50,
+                                width: 50,
+                                color: Colors.grey[300],
+                              )),
                       const SizedBox(
                         width: 10,
                       ),
@@ -147,7 +150,7 @@ class TripCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Alaa Hosni',
+                            username!,
                             style: GoogleFonts.poppins(
                               fontSize: 13,
                               color: Colors.black,
@@ -195,6 +198,16 @@ class TripCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Image base64ToUserImage(String base64String) {
+    Uint8List bytes = base64.decode(base64String);
+    return Image.memory(
+      bytes,
+      fit: BoxFit.cover,
+      width: 50,
+      height: 50,
     );
   }
 }

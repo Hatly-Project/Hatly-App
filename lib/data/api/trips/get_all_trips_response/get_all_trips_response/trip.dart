@@ -1,8 +1,9 @@
 import 'dart:convert';
 
 import 'package:hatly/data/api/shipments/shipment.dart';
-import 'package:hatly/data/api/shipments/user.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
+
+import 'user.dart';
 
 class Trip {
   int? id;
@@ -14,8 +15,8 @@ class Trip {
   String? addressMeeting;
   DateTime? departDate;
   String? notNeed;
-  List<Shipment>? shipments;
   User? user;
+  List<Shipment>? shipments;
 
   Trip({
     this.id,
@@ -27,8 +28,8 @@ class Trip {
     this.addressMeeting,
     this.departDate,
     this.notNeed,
-    this.shipments,
     this.user,
+    this.shipments,
   });
 
   factory Trip.fromMap(Map<String, dynamic> data) => Trip(
@@ -43,10 +44,12 @@ class Trip {
             ? null
             : DateTime.parse(data['DepartDate'] as String),
         notNeed: data['notNeed'] as String?,
-        shipments: data['shipments'] as List<Shipment>?,
         user: data['user'] == null
             ? null
             : User.fromMap(data['user'] as Map<String, dynamic>),
+        shipments: (data['shipments'] as List<dynamic>?)
+            ?.map((e) => Shipment.fromMap(e as Map<String, dynamic>))
+            .toList(),
       );
 
   Map<String, dynamic> toMap() => {
@@ -59,8 +62,8 @@ class Trip {
         'addressMeeting': addressMeeting,
         'DepartDate': departDate?.toIso8601String(),
         'notNeed': notNeed,
-        'shipments': shipments,
         'user': user?.toMap(),
+        'shipments': shipments,
       };
 
   /// `dart:convert`
@@ -83,11 +86,11 @@ class Trip {
         totalWight: totalWight,
         available: available,
         note: note,
+        notNeed: notNeed,
         addressMeeting: addressMeeting,
         departDate: departDate,
-        notNeed: notNeed,
+        user: user?.toUserDto(),
         shipments:
-            shipments?.map((shipment) => shipment.toShipmentDto()).toList(),
-        user: user?.toUserDto());
+            shipments?.map((shipment) => shipment.toShipmentDto()).toList());
   }
 }

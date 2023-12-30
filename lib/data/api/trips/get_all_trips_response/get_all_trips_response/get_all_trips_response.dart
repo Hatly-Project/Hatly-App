@@ -13,11 +13,12 @@ class GetAllTripsResponse {
 
   factory GetAllTripsResponse.fromMap(Map<String, dynamic> data) {
     return GetAllTripsResponse(
-        status: data['status'] as bool?,
-        trips: (data['trips'] as List<dynamic>?)
-            ?.map((e) => Trip.fromMap(e as Map<String, dynamic>))
-            .toList(),
-        message: data['message'] as String?);
+      status: data['status'] as bool?,
+      message: data['message'] as String?,
+      trips: (data['trips'] as List<dynamic>?)
+          ?.map((e) => Trip.fromMap(e as Map<String, dynamic>))
+          .toList(),
+    );
   }
 
   Map<String, dynamic> toMap() => {
@@ -39,11 +40,10 @@ class GetAllTripsResponse {
   /// Converts [GetAllTripsResponse] to a JSON string.
   String toJson() => json.encode(toMap());
 
-  GetAllTripsResponseDto toAllTripsResponseDto() {
+  GetAllTripsResponseDto toTripsResponseDto() {
     return GetAllTripsResponseDto(
-      status: status,
-      trips: trips?.map((trip) => trip.toTripsDto()).toList(),
-      message: message,
-    );
+        status: status,
+        trips: trips?.map((trip) => trip.toTripsDto()).toList(),
+        message: message);
   }
 }

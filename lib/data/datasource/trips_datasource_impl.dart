@@ -11,6 +11,6 @@ class TripsDatasourceImpl implements TripsDatasource {
   Future<GetAllTripsResponseDto> getAllTrips(String token) async {
     var response = await apiManager.getAllTrips(token: token);
 
-    return response.toAllTripsResponseDto();
+    return response.toTripsResponseDto();
   }
 }
