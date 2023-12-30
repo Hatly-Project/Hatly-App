@@ -76,11 +76,13 @@ class ApiManager {
     }
   }
 
-  Future<GetShipmentsResponse> getAllShipments() async {
+  Future<GetShipmentsResponse> getAllShipments({required String token}) async {
     try {
       var url = Uri.https(baseUrl, 'shipment/all');
-      var response =
-          await client.get(url, headers: {'content-type': 'application/json'});
+      var response = await client.get(url, headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $token'
+      });
 
       var getResponse = GetShipmentsResponse.fromJson(response.body);
       if (getResponse.status == false) {
@@ -92,10 +94,11 @@ class ApiManager {
     }
   }
 
-  Future<GetAllTripsResponse> getAllTrips() async {
+  Future<GetAllTripsResponse> getAllTrips({required String token}) async {
     try {
       var url = Uri.https(baseUrl, 'trip/all');
-      var response = await client.get(url);
+      var response =
+          await client.get(url, headers: {'authorization': 'Bearer $token'});
 
       var getResponse = GetAllTripsResponse.fromJson(response.body);
       if (getResponse.status == false) {

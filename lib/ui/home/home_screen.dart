@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/ui/components/shipment_card.dart';
 import 'package:hatly/ui/home/tabs/home/home_tab.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_tab.dart';
+import 'package:hatly/ui/home/tabs/trips/my_trips.dart';
 
 import 'bottom_nav_icon.dart';
 
@@ -19,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var selectedIndex = 0;
   var isSelected = false;
-  var tabs = [HomeTab(), MyShipmentsTab()];
+  var tabs = [HomeTab(), MyShipmentsTab(), MyTripsTab()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

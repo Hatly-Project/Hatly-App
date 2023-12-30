@@ -15,6 +15,6 @@ abstract class ShipmentRepository {
       List<ItemDto>? items,
       required String token});
 
-  Future<GetAllShipmentResponseDto> getAllShipments();
+  Future<GetAllShipmentResponseDto> getAllShipments(String token);
   Future<GetUserShipmentsDto> getUserShipments({required String token});
 }

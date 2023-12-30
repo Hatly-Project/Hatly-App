@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
+import 'package:hatly/ui/components/shimmer_card.dart';
 import 'package:hatly/ui/components/trip_card.dart';
 import 'package:hatly/ui/home/tabs/home/home_tab_viewmodel.dart';
 import 'package:hive/hive.dart';
@@ -27,29 +28,41 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   late TabController tabController;
   ScrollController scrollController = ScrollController();
   bool shipmentsIsEmpty = false;
-  bool tripsIsEmpty = false;
+  bool tripsIsEmpty = true;
   int selectedTab = 0;
   List<ShipmentDto> shipments = [];
   List<TripsDto> trips = [];
+  late String token;
+  bool shimmerIsLoading = true;
 
   HomeScreenViewModel viewModel = HomeScreenViewModel();
   @override
   void initState() {
-    late String token;
-
     super.initState();
     // Check for cached shipments when initializing
-    Future.delayed(Duration(milliseconds: 300), () {
+    Future.delayed(Duration(milliseconds: 400), () {
       getCachedShipments().then((cachedShipments) {
         if (cachedShipments.isNotEmpty) {
           print('exist');
           setState(() {
             shipments = cachedShipments;
+            shimmerIsLoading = false;
           });
         } else {
-          viewModel.create(); // Fetch from API if cache is empty
+          viewModel.create(token); // Fetch from API if cache is empty
         }
       });
+
+      // getChachedtrips().then((cachedTrips) {
+      //   if (cachedTrips.isNotEmpty) {
+      //     print('trips exist');
+      //     setState(() {
+      //       trips = cachedTrips;
+      //     });
+      //   } else {
+      //     viewModel.getAlltrips(token);
+      //   }
+      // });
     });
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
@@ -132,18 +145,49 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       bloc: viewModel,
       listener: (context, state) {
         if (state is GetAllShipsLoadingState) {
+          shimmerIsLoading = true;
+          // if (Platform.isIOS) {
+          //   DialogUtils.showDialogIos(
+          //       alertMsg: 'Loading',
+          //       alertContent: state.loadingMessage,
+          //       context: context);
+          // } else {
+          //   DialogUtils.showDialogAndroid(
+          //       alertMsg: 'Loading',
+          //       alertContent: state.loadingMessage,
+          //       context: context);
+          // }
+        } else if (state is GetAllShipsFailState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
-                alertMsg: 'Loading',
-                alertContent: state.loadingMessage,
+                alertMsg: 'Fail',
+                alertContent: state.failMessage,
                 context: context);
           } else {
             DialogUtils.showDialogAndroid(
-                alertMsg: 'Loading',
-                alertContent: state.loadingMessage,
+                alertMsg: 'Fail',
+                alertContent: state.failMessage,
                 context: context);
           }
-        } else if (state is GetAllShipsFailState) {
+        }
+        if (state is GetAllTripsLoadingState) {
+          shimmerIsLoading = true;
+          // ListView.builder(
+          //   itemCount: 2,
+          //   itemBuilder: (context, index) => const ShimmerCard(),
+          // );
+          // if (Platform.isIOS) {
+          //   DialogUtils.showDialogIos(
+          //       alertMsg: 'Loading',
+          //       alertContent: state.loadingMessage,
+          //       context: context);
+          // } else {
+          //   DialogUtils.showDialogAndroid(
+          //       alertMsg: 'Loading',
+          //       alertContent: state.loadingMessage,
+          //       context: context);
+          // }
+        } else if (state is GetAllTripsFailState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
                 alertMsg: 'Fail',
@@ -158,11 +202,15 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         }
       },
       listenWhen: (previous, current) {
-        if (previous is GetAllShipsLoadingState) {
-          DialogUtils.hideDialog(context);
+        if (previous is GetAllShipsLoadingState ||
+            previous is GetAllTripsLoadingState) {
+          shimmerIsLoading = false;
+          // DialogUtils.hideDialog(context);
         }
         if (current is GetAllShipsLoadingState ||
-            current is GetAllShipsFailState) {
+            current is GetAllShipsFailState ||
+            current is GetAllTripsLoadingState ||
+            current is GetAllTripsFailState) {
           return true;
         }
         return false;
@@ -191,8 +239,21 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         }
         return RefreshIndicator(
           onRefresh: () async {
-            await viewModel.create();
-            cacheShipments(shipments);
+            if (selectedTab == 0) {
+              await viewModel.create(token);
+              cacheShipments(shipments);
+            } else {
+              getChachedtrips().then((cachedTrips) {
+                if (cachedTrips.isNotEmpty) {
+                  print('trips exist');
+                  setState(() {
+                    trips = cachedTrips;
+                  });
+                } else {
+                  viewModel.getAlltrips(token);
+                }
+              });
+            }
             setState(() {});
           },
           child: Scaffold(
@@ -276,9 +337,13 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                   onTap: (index) {
                                     selectedTab = index;
                                     print('index $index');
-                                    setState(() {});
+                                    if (selectedTab == 1) {
+                                      setState(() {
+                                        viewModel.getAlltrips(token);
+                                      });
+                                    }
                                   },
-                                  tabs: [
+                                  tabs: const [
                                     Tab(
                                       child: Text('Shipments'),
                                     ),
@@ -322,71 +387,134 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                   ),
                 ),
                 selectedTab == 0
-                    ? shipmentsIsEmpty
-                        ? SliverToBoxAdapter(
-                            child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Column(
-                              children: [
-                                Container(
-                                  child: Image.asset(
-                                    'images/no_all_shipments.png',
-                                    width: 350,
-                                    height: 330,
-                                  ),
-                                ),
-                                Container(
-                                  child: FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Text(
-                                      "There are not any shipments\n right now!",
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 21,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ))
-                        : SliverList(
+                    ? shimmerIsLoading
+                        ? SliverList(
                             delegate: SliverChildBuilderDelegate(
-                              (context, index) => selectedTab == 0
-                                  ? ShipmentCard(
-                                      title: shipments[index].title!,
-                                      from: shipments[index].from!,
-                                      to: shipments[index].to!,
-                                      date: shipments[index].expectedDate!,
-                                      userName: shipments[index].user!.name!,
-                                      shipImage:
-                                          shipments[index].items![0].photo ==
+                              (context, index) => ShimmerCard(),
+                              childCount: 2,
+                            ),
+                          )
+                        : shipmentsIsEmpty
+                            ? SliverToBoxAdapter(
+                                child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      child: Image.asset(
+                                        'images/no_all_shipments.png',
+                                        width: 350,
+                                        height: 330,
+                                      ),
+                                    ),
+                                    Container(
+                                      child: FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: Text(
+                                          "There are not any shipments\n right now!",
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 21,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ))
+                            : SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) => selectedTab == 0
+                                      ? ShipmentCard(
+                                          title: shipments[index].title!,
+                                          from: shipments[index].from!,
+                                          to: shipments[index].to!,
+                                          date: shipments[index].expectedDate!,
+                                          userName:
+                                              shipments[index].user!.name!,
+                                          shipImage: shipments[index]
+                                                      .items![0]
+                                                      .photo ==
                                                   null
                                               ? null
                                               : base64ToImage(shipments[index]
                                                   .items![0]
                                                   .photo!),
-                                      userImage: shipments[index]
-                                                  .user!
-                                                  .profilePhoto ==
-                                              null
-                                          ? null
-                                          : base64ToUserImage(shipments[index]
-                                              .user!
-                                              .profilePhoto!),
-                                      bonus: shipments[index].reward.toString(),
-                                    )
-                                  : Container(),
-                              childCount: shipments.length,
+                                          userImage: shipments[index]
+                                                      .user!
+                                                      .profilePhoto ==
+                                                  null
+                                              ? null
+                                              : base64ToUserImage(
+                                                  shipments[index]
+                                                      .user!
+                                                      .profilePhoto!),
+                                          bonus: shipments[index]
+                                              .reward
+                                              .toString(),
+                                        )
+                                      : Container(),
+                                  childCount: shipments.length,
+                                ),
+                              )
+                    : shimmerIsLoading
+                        ? SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => ShimmerCard(),
+                              childCount: 2,
                             ),
                           )
-                    : SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) =>
-                              selectedTab == 1 ? TripCard() : Container(),
-                          childCount: 1,
-                        ),
-                      )
+                        : tripsIsEmpty
+                            ? SliverToBoxAdapter(
+                                child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      child: Image.asset(
+                                        'images/no_trips.png',
+                                        width: 350,
+                                        height: 330,
+                                      ),
+                                    ),
+                                    Container(
+                                      child: FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: Text(
+                                          "There are not any trips\n right now!",
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 21,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ))
+                            : SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) => selectedTab == 1
+                                      ? TripCard(
+                                          origin: trips[index].origin,
+                                          destination: trips[index].destination,
+                                          username: trips[index].user?.name,
+                                          availableWeight:
+                                              trips[index].available,
+                                          consumedWeight:
+                                              trips[index].totalWight,
+                                          date: trips[index].departDate,
+                                          userImage:
+                                              trips[index].user?.profilePhoto ==
+                                                      null
+                                                  ? null
+                                                  : base64ToImage(trips[index]
+                                                      .user!
+                                                      .profilePhoto!))
+                                      : Container(),
+                                  childCount: trips.length,
+                                ),
+                              )
               ],
             ),
           ),

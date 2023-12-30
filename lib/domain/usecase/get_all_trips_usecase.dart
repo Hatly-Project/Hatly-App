@@ -6,7 +6,7 @@ class GetAllTripsUsecase {
 
   GetAllTripsUsecase(this.tripsRepository);
 
-  Future<GetAllTripsResponseDto> invoke() {
-    return tripsRepository.getAllTrips();
+  Future<GetAllTripsResponseDto> invoke(String token) {
+    return tripsRepository.getAllTrips(token);
   }
 }
