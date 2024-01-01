@@ -8,6 +8,8 @@ import 'package:hatly/data/api/shipments/create_shipment_request/item.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
+import 'package:hatly/data/api/trips/create_trip_request/create_trip_request.dart';
+import 'package:hatly/data/api/trips/create_trip_response/create_trip_response.dart';
 import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_response/get_all_trips_response.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/models/item_dto.dart';
@@ -130,6 +132,42 @@ class ApiManager {
       }
 
       return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    }
+  }
+
+  Future<CreateTripResponse> createTrip(
+      {String? origin,
+      String? destination,
+      int? available,
+      String? note,
+      String? addressMeeting,
+      String? departDate,
+      String? notNeed,
+      required String token}) async {
+    try {
+      var url = Uri.https(baseUrl, 'trip/new');
+      var requestBody = CreateTripRequest(
+          origin: origin,
+          destination: destination,
+          available: available,
+          notNeed: notNeed,
+          note: note,
+          addressMeeting: addressMeeting,
+          departData: departDate);
+      var response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {
+            'content-type': 'application/json',
+            'authorization': 'Bearer $token'
+          });
+
+      var tripResponse = CreateTripResponse.fromJson(response.body);
+      if (tripResponse.status == false) {
+        throw ServerErrorException(tripResponse.message!);
+      }
+      return tripResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
     }

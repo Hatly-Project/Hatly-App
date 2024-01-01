@@ -5,20 +5,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class TripCard extends StatelessWidget {
+class MyTripCard extends StatelessWidget {
   String? origin, destination, username;
   String? date;
   int? availableWeight, consumedWeight;
   Image? userImage;
 
-  TripCard(
+  MyTripCard(
       {required this.origin,
       required this.destination,
-      required this.username,
+      this.username,
       required this.availableWeight,
       required this.consumedWeight,
       required this.date,
-      required this.userImage});
+      this.userImage});
 
   @override
   Widget build(BuildContext context) {
@@ -129,71 +129,6 @@ class TripCard extends StatelessWidget {
               const SizedBox(
                 height: 10,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                          borderRadius: BorderRadius.circular(25),
-                          child: userImage ??
-                              Container(
-                                height: 50,
-                                width: 50,
-                                color: Colors.grey[300],
-                              )),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            username!,
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * .01,
-                          ),
-                          Text(
-                            '4.3 Reviews',
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      shape: MaterialStatePropertyAll(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      backgroundColor: MaterialStatePropertyAll(
-                          Theme.of(context).primaryColor),
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      'Send Request',
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                ],
-              )
             ],
           ),
         ),

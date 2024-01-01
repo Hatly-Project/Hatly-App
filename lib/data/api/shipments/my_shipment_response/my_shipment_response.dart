@@ -1,8 +1,7 @@
 import 'dart:convert';
 
+import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
-
-import '../shipment.dart';
 
 class MyShipmentResponse {
   bool? status;

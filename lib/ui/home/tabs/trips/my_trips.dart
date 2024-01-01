@@ -8,9 +8,13 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/domain/models/trips_dto.dart';
+import 'package:hatly/ui/components/my_trip_card.dart';
 import 'package:hatly/ui/components/shipment_card%20copy.dart';
+import 'package:hatly/ui/components/trip_card.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipments_bottom_sheet.dart';
+import 'package:hatly/ui/home/tabs/trips/my_trips_viewmodel.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
@@ -28,9 +32,11 @@ class MyTripsTab extends StatefulWidget {
 }
 
 class _MyTripsTabState extends State<MyTripsTab> {
-  MyShipmentsScreenViewModel viewModel = MyShipmentsScreenViewModel();
-  List<ShipmentDto> myShipments = [];
+  MyTripsViewmodel viewModel = MyTripsViewmodel();
+  List<TripsDto> myTrips = [];
   late String token;
+  ScrollController scrollController = ScrollController();
+  bool isMyTripsEmpty = false;
   Image? shipImage;
   late LoggedInState loggedInState;
 
@@ -59,7 +65,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
     //     if (cachedShipments.isNotEmpty) {
     //       print('exist');
     //       setState(() {
-    //         myShipments = cachedShipments;
+    //         myTrips = cachedShipments;
     //       });
     //     } else {
     //       viewModel.getMyShipments(token: token);
@@ -69,40 +75,37 @@ class _MyTripsTabState extends State<MyTripsTab> {
     // });
   }
 
-  // // a method for caching the shipments list
-  // Future<void> cacheMyShipments(List<ShipmentDto> shipments) async {
-  //   final box = await Hive.openBox(
-  //       'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
+  // a method for caching the shipments list
+  Future<void> cacheMytrips(List<TripsDto> trips) async {
+    final box = await Hive.openBox(
+        'trips${loggedInState.user.email!.replaceAll('@', '_at_')}');
 
-  //   // Convert List<ShipmentDto> to List<Map<String, dynamic>>
-  //   final shipmentMaps =
-  //       shipments.map((shipment) => shipment.toJson()).toList();
+    // Convert List<ShipmentDto> to List<Map<String, dynamic>>
+    final tripsMaps = trips.map((trip) => trip.toJson()).toList();
 
-  //   // Clear existing data and store the new data in the box
-  //   print('done caching');
-  //   await box.clear();
-  //   await box.addAll(shipmentMaps);
-  // }
+    // Clear existing data and store the new data in the box
+    print('done caching');
+    await box.clear();
+    await box.addAll(tripsMaps);
+  }
 
-  // Future<List<ShipmentDto>> getCachedMyShipments() async {
-  //   final box = await Hive.openBox(
-  //       'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
-  //   final shipmentMaps = box.values.toList();
+  Future<List<TripsDto>> getCachedMyShipments() async {
+    final box = await Hive.openBox(
+        'trips${loggedInState.user.email!.replaceAll('@', '_at_')}');
+    final tripsMaps = box.values.toList();
 
-  //   // Convert List<Map<String, dynamic>> to List<ShipmentDto>
-  //   final shipments = shipmentMaps
-  //       .map((shipmentMap) => ShipmentDto.fromJson(shipmentMap))
-  //       .toList();
+    // Convert List<Map<String, dynamic>> to List<ShipmentDto>
+    final trips = tripsMaps.map((trip) => TripsDto.fromJson(trip)).toList();
 
-  //   return shipments;
-  // }
+    return trips;
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer(
       bloc: viewModel,
       listener: (context, state) {
-        if (state is CreateShipLoadingState) {
+        if (state is CreateTripLoadingState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
                 alertMsg: 'Loading',
@@ -114,32 +117,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
                 alertContent: state.loadingMessage,
                 context: context);
           }
-        } else if (state is CreateShipFailState) {
-          if (Platform.isIOS) {
-            DialogUtils.showDialogIos(
-                alertMsg: 'Fail',
-                alertContent: state.failMessage,
-                context: context);
-          } else {
-            DialogUtils.showDialogAndroid(
-                alertMsg: 'Fail',
-                alertContent: state.failMessage,
-                context: context);
-          }
-        }
-        if (state is GetMyShipmentsLoadingState) {
-          if (Platform.isIOS) {
-            DialogUtils.showDialogIos(
-                alertMsg: 'Loading',
-                alertContent: state.loadingMessage,
-                context: context);
-          } else {
-            DialogUtils.showDialogAndroid(
-                alertMsg: 'Loading',
-                alertContent: state.loadingMessage,
-                context: context);
-          }
-        } else if (state is GetMyShipmentsFailState) {
+        } else if (state is CreateTripFailState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
                 alertMsg: 'Fail',
@@ -154,87 +132,87 @@ class _MyTripsTabState extends State<MyTripsTab> {
         }
       },
       listenWhen: (previous, current) {
-        if (previous is CreateShipLoadingState) {
+        if (previous is CreateTripLoadingState) {
           DialogUtils.hideDialog(context);
         }
-        if (previous is GetMyShipmentsLoadingState) {
-          DialogUtils.hideDialog(context);
-        }
-        if (current is CreateShipLoadingState ||
-            current is CreateShipFailState ||
-            current is GetMyShipmentsLoadingState ||
-            current is GetMyShipmentsFailState) {
+        if (current is CreateTripLoadingState ||
+            current is CreateTripFailState) {
           return true;
         }
         return false;
       },
       builder: (context, state) {
-        if (state is GetMyShipmentsSuccessState) {
+        if (state is CreateTripSuccessState) {
           print('getSuccess');
-          myShipments = state.responseDto.shipments!;
-          // cacheMyShipments(myShipments);
+          TripsDto? trip = state.responseDto.trip;
+          myTrips.add(trip!);
+          cacheMytrips(myTrips);
+          // cacheMyShipments(myTrips);
         }
-        return RefreshIndicator(
-          onRefresh: () async {
-            await viewModel.getMyShipments(token: token);
-            // cacheMyShipments(myShipments);
-            setState(() {});
-          },
-          child: Scaffold(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).primaryColor,
-              centerTitle: true,
-              automaticallyImplyLeading: false,
-              title: Text(
-                'My Trips',
-                style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              actions: [
-                IconButton(
-                  onPressed: () => showShipmentBottomSheet(context),
-                  icon: const Icon(
-                    Icons.add,
-                    color: Colors.white,
+        return Platform.isIOS
+            ? Scaffold(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                appBar: AppBar(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  centerTitle: true,
+                  automaticallyImplyLeading: false,
+                  title: Text(
+                    'My Trips',
+                    style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
-                ),
-              ],
-            ),
-            body: myShipments.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset('images/no_shipments.png'),
-                          Text(
-                            "You don't have any shipments, press the add button to add a shipment",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          )
-                        ],
+                  actions: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
                       ),
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: myShipments.length,
-                    itemBuilder: (context, index) => MyShipmentCard(
-                      title: myShipments[index].title!,
-                      from: myShipments[index].from!,
-                      to: myShipments[index].to!,
-                      date: DateFormat('dd MMMM yyyy')
-                          .format(myShipments[index].expectedDate!),
-                      shipImage: base64ToImage(
-                          myShipments[index].items?.first.photo ?? ''), //
-                    ),
-                  ),
-          ),
-        );
+                  ],
+                ),
+                body: CustomScrollView(
+                  controller: scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    isMyTripsEmpty
+                        ? SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Image.asset('images/no_user_trip.png'),
+                                    Text(
+                                      "You don't have any trips, press the add button to add a trip",
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        : SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => MyTripCard(
+                                origin: myTrips[index].origin,
+                                destination: myTrips[index].destination,
+                                availableWeight: myTrips[index].available,
+                                date: DateFormat('dd MMMM yyyy')
+                                    .format(myTrips[index].departDate!),
+                                consumedWeight: myTrips[index].consumed,
+                              ),
+                            ),
+                          )
+                  ],
+                ))
+            : Container();
       },
     );
   }
@@ -287,44 +265,44 @@ class _MyTripsTabState extends State<MyTripsTab> {
     );
   }
 
-  void done(
-      String fromCountry,
-      String fromState,
-      String toState,
-      String toCountry,
-      String date,
-      String name,
-      String note,
-      String bonus,
-      List<ItemDto> items) {
-    viewModel.create(
-        token: token,
-        from: fromCountry,
-        to: toCountry,
-        date: date,
-        title: name,
-        note: note,
-        reward: double.tryParse(bonus),
-        items: items);
-    print(
-        '$name , $note , $fromCountry , $fromState , $toCountry , $toState , $bonus , $date itemWeighttt ${items.first.weight}');
-    setState(() {});
-    Navigator.of(context).pop();
-  }
+  // void done(
+  //     String fromCountry,
+  //     String fromState,
+  //     String toState,
+  //     String toCountry,
+  //     String date,
+  //     String name,
+  //     String note,
+  //     String bonus,
+  //     List<ItemDto> items) {
+  //   viewModel.create(
+  //       token: token,
+  //       from: fromCountry,
+  //       to: toCountry,
+  //       date: date,
+  //       title: name,
+  //       note: note,
+  //       reward: double.tryParse(bonus),
+  //       items: items);
+  //   print(
+  //       '$name , $note , $fromCountry , $fromState , $toCountry , $toState , $bonus , $date itemWeighttt ${items.first.weight}');
+  //   setState(() {});
+  //   Navigator.of(context).pop();
+  // }
 
-  void showShipmentBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => AddShipmentBottomSheet(
-        onError: onError,
-        done: done,
-      ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-    );
-  }
+  // void showShipmentBottomSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (context) => AddShipmentBottomSheet(
+  //       onError: onError,
+  //       done: done,
+  //     ),
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.only(
+  //         topLeft: Radius.circular(20),
+  //         topRight: Radius.circular(20),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

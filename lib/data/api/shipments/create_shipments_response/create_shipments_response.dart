@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/shipments/shipment.dart';
+import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/domain/models/create_shipment_response_dto.dart';
 
 class CreateShipmentsResponse {

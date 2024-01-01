@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:hatly/domain/models/get_all_trips_response_dto.dart';
 
-import 'trip.dart';
+import '../../../trip.dart';
 
 class GetAllTripsResponse {
   bool? status;
