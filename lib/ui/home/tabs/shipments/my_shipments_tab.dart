@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -31,6 +32,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
   MyShipmentsScreenViewModel viewModel = MyShipmentsScreenViewModel();
   List<ShipmentDto> myShipments = [];
   late String token;
+  ScrollController scrollController = ScrollController();
   Image? shipImage;
   bool isMyshipmentEmpty = false;
   late LoggedInState loggedInState;
@@ -172,7 +174,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
       builder: (context, state) {
         if (state is GetMyShipmentsSuccessState) {
           print('getSuccess');
-          myShipments = state.responseDto.shipments!;
+          myShipments = state.responseDto.shipments ?? [];
           if (myShipments.isEmpty) {
             isMyshipmentEmpty = true;
             print('empty');
@@ -182,70 +184,147 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
           }
         }
         if (state is CreateShipSuccessState) {
+          print('done create ${state.responseDto.shipment?.title}');
           myShipments.add(state.responseDto.shipment!);
+          isMyshipmentEmpty = false;
           cacheMyShipments(myShipments);
         }
-        return RefreshIndicator(
-          onRefresh: () async {
-            await viewModel.getMyShipments(token: token);
-            cacheMyShipments(myShipments);
-            setState(() {});
-          },
-          child: Scaffold(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).primaryColor,
-              centerTitle: true,
-              automaticallyImplyLeading: false,
-              title: Text(
-                'My Shipments',
-                style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              actions: [
-                IconButton(
-                  onPressed: () => showShipmentBottomSheet(context),
-                  icon: const Icon(
-                    Icons.add,
-                    color: Colors.white,
+        return Platform.isIOS
+            ? Scaffold(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                appBar: AppBar(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  centerTitle: true,
+                  automaticallyImplyLeading: false,
+                  title: Text(
+                    'My Shipments',
+                    style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
-                ),
-              ],
-            ),
-            body: isMyshipmentEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset('images/no_shipments.png'),
-                          Text(
-                            "You don't have any shipments, press the add button to add a shipment",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          )
-                        ],
+                  actions: [
+                    IconButton(
+                      onPressed: () => showShipmentBottomSheet(context),
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.white,
                       ),
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: myShipments.length,
-                    itemBuilder: (context, index) => MyShipmentCard(
-                      title: myShipments[index].title!,
-                      from: myShipments[index].from!,
-                      to: myShipments[index].to!,
-                      date: DateFormat('dd MMMM yyyy')
-                          .format(myShipments[index].expectedDate!),
-                      shipImage: base64ToImage(
-                          myShipments[index].items?.first.photo ?? ''), //
+                  ],
+                ),
+                body: CustomScrollView(
+                  controller: scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    CupertinoSliverRefreshControl(
+                      onRefresh: () async {
+                        await viewModel.getMyShipments(token: token);
+                        cacheMyShipments(myShipments);
+                        setState(() {});
+                      },
                     ),
+                    isMyshipmentEmpty
+                        ? SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Image.asset('images/no_shipments.png'),
+                                  Text(
+                                    "You don't have any shipments, press the add button to add a shipment",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                        : SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                                (context, index) => MyShipmentCard(
+                                      title: myShipments[index].title!,
+                                      from: myShipments[index].from!,
+                                      to: myShipments[index].to!,
+                                      date: DateFormat('dd MMMM yyyy').format(
+                                          myShipments[index].expectedDate!),
+                                      shipImage: base64ToImage(
+                                          myShipments[index]
+                                                  .items
+                                                  ?.first
+                                                  .photo ??
+                                              ''), //
+                                    ),
+                                childCount: myShipments.length),
+                          ),
+                  ],
+                ),
+              )
+            : RefreshIndicator(
+                onRefresh: () async {
+                  await viewModel.getMyShipments(token: token);
+                  cacheMyShipments(myShipments);
+                  setState(() {});
+                },
+                child: Scaffold(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  appBar: AppBar(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    centerTitle: true,
+                    automaticallyImplyLeading: false,
+                    title: Text(
+                      'My Shipments',
+                      style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                    actions: [
+                      IconButton(
+                        onPressed: () => showShipmentBottomSheet(context),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-          ),
-        );
+                  body: isMyshipmentEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Image.asset('images/no_shipments.png'),
+                                Text(
+                                  "You don't have any shipments, press the add button to add a shipment",
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: myShipments.length,
+                          itemBuilder: (context, index) => MyShipmentCard(
+                            title: myShipments[index].title!,
+                            from: myShipments[index].from!,
+                            to: myShipments[index].to!,
+                            date: DateFormat('dd MMMM yyyy')
+                                .format(myShipments[index].expectedDate!),
+                            shipImage: base64ToImage(
+                                myShipments[index].items?.first.photo ?? ''), //
+                          ),
+                        ),
+                ),
+              );
       },
     );
   }
@@ -317,6 +396,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
         note: note,
         reward: double.tryParse(bonus),
         items: items);
+    print('done ship');
     print(
         '$name , $note , $fromCountry , $fromState , $toCountry , $toState , $bonus , $date itemWeighttt ${items.first.weight}');
     setState(() {});

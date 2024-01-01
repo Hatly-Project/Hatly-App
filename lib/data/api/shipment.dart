@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/shipments/item.dart';
-import 'package:hatly/data/api/shipments/user.dart';
+import 'package:hatly/data/api/item.dart';
+import 'package:hatly/data/api/user.dart';
 
 import '../../../domain/models/shipment_dto.dart';
 

@@ -7,8 +7,8 @@ class TripsDto {
   int? id;
   String? origin;
   String? destination;
-  int? totalWight;
   int? available;
+  int? consumed;
   String? note;
   String? addressMeeting;
   DateTime? departDate;
@@ -20,8 +20,8 @@ class TripsDto {
     this.id,
     this.origin,
     this.destination,
-    this.totalWight,
     this.available,
+    this.consumed,
     this.note,
     this.addressMeeting,
     this.departDate,
@@ -34,8 +34,8 @@ class TripsDto {
         id: data['id'] as int?,
         origin: data['origin'] as String?,
         destination: data['destination'] as String?,
-        totalWight: data['total_wight'] as int?,
         available: data['available'] as int?,
+        consumed: data['consumed'] as int?,
         note: data['note'] as String?,
         addressMeeting: data['addressMeeting'] as String?,
         departDate: data['DepartDate'] == null
@@ -52,8 +52,8 @@ class TripsDto {
         'id': id,
         'origin': origin,
         'destination': destination,
-        'total_wight': totalWight,
         'available': available,
+        'consumed': consumed,
         'note': note,
         'addressMeeting': addressMeeting,
         'DepartDate': departDate?.toIso8601String(),

@@ -1,15 +1,13 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/shipments/shipment.dart';
+import 'package:hatly/data/api/shipment.dart';
+import 'package:hatly/data/api/user.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
-
-import 'user.dart';
 
 class Trip {
   int? id;
   String? origin;
   String? destination;
-  int? totalWight;
   int? available;
   String? note;
   String? addressMeeting;
@@ -22,7 +20,6 @@ class Trip {
     this.id,
     this.origin,
     this.destination,
-    this.totalWight,
     this.available,
     this.note,
     this.addressMeeting,
@@ -36,7 +33,6 @@ class Trip {
         id: data['id'] as int?,
         origin: data['origin'] as String?,
         destination: data['destination'] as String?,
-        totalWight: data['total_wight'] as int?,
         available: data['available'] as int?,
         note: data['note'] as String?,
         addressMeeting: data['addressMeeting'] as String?,
@@ -56,7 +52,6 @@ class Trip {
         'id': id,
         'origin': origin,
         'destination': destination,
-        'total_wight': totalWight,
         'available': available,
         'note': note,
         'addressMeeting': addressMeeting,
@@ -83,7 +78,6 @@ class Trip {
         id: id,
         origin: origin,
         destination: destination,
-        totalWight: totalWight,
         available: available,
         note: note,
         notNeed: notNeed,
