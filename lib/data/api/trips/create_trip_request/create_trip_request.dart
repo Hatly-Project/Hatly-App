@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:hatly/data/api/book_info.dart';
+import 'package:hatly/data/api/items_not_allowed.dart';
+
 class CreateTripRequest {
   String? origin;
   String? destination;
@@ -7,7 +10,8 @@ class CreateTripRequest {
   String? note;
   String? addressMeeting;
   String? departData;
-  String? notNeed;
+  BookInfo? bookInfo;
+  List<ItemsNotAllowed>? itemsNotAllowed;
 
   CreateTripRequest({
     this.origin,
@@ -16,7 +20,8 @@ class CreateTripRequest {
     this.note,
     this.addressMeeting,
     this.departData,
-    this.notNeed,
+    this.bookInfo,
+    this.itemsNotAllowed,
   });
 
   factory CreateTripRequest.fromMap(Map<String, dynamic> data) {
@@ -26,8 +31,13 @@ class CreateTripRequest {
       available: data['available'] as int?,
       note: data['note'] as String?,
       addressMeeting: data['addressMeeting'] as String?,
-      departData: data['DepartData'] as String?,
-      notNeed: data['notNeed'] as String?,
+      departData: data['departData'] as String?,
+      bookInfo: data['bookInfo'] == null
+          ? null
+          : BookInfo.fromMap(data['bookInfo'] as Map<String, dynamic>),
+      itemsNotAllowed: (data['itemsNotAllowed'] as List<dynamic>?)
+          ?.map((e) => ItemsNotAllowed.fromMap(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -37,8 +47,9 @@ class CreateTripRequest {
         'available': available,
         'note': note,
         'addressMeeting': addressMeeting,
-        'DepartData': departData,
-        'notNeed': notNeed,
+        'departData': departData,
+        'bookInfo': bookInfo?.toMap(),
+        'itemsNotAllowed': itemsNotAllowed?.map((e) => e.toMap()).toList(),
       };
 
   /// `dart:convert`

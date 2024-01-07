@@ -6,6 +6,7 @@ class DialogUtils {
       {String? alertMsg, String? alertContent, required BuildContext context}) {
     showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
             title: Text(alertMsg!),
@@ -20,6 +21,7 @@ class DialogUtils {
       {required BuildContext context, String? alertMsg, String? alertContent}) {
     showCupertinoModalPopup<void>(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) => CupertinoAlertDialog(
         title: Text(
           alertMsg!,

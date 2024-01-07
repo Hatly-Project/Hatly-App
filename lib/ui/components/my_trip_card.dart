@@ -8,7 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 class MyTripCard extends StatelessWidget {
   String? origin, destination, username;
   String? date;
-  int? availableWeight, consumedWeight;
+  int? availableWeight;
+  int? consumedWeight;
   Image? userImage;
 
   MyTripCard(
@@ -87,7 +88,7 @@ class MyTripCard extends StatelessWidget {
                     children: [
                       Image.asset(
                         'images/bag.png',
-                        width: 15,
+                        width: 20,
                         height: 50,
                         filterQuality: FilterQuality.high,
                       ),
@@ -105,7 +106,7 @@ class MyTripCard extends StatelessWidget {
                     children: [
                       Image.asset(
                         'images/bag.png',
-                        width: 15,
+                        width: 20,
                         height: 50,
                         filterQuality: FilterQuality.high,
                       ),
@@ -119,6 +120,44 @@ class MyTripCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        'images/package.png',
+                        width: 20,
+                        height: 50,
+                        filterQuality: FilterQuality.high,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '0 Deals',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        '${'\$0.00 Earnings'}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
               Divider(

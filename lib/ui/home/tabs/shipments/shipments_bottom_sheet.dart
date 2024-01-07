@@ -45,6 +45,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   String toStateValue = '';
   double _bottomSheetPadding = 20.0;
   List<ItemDto> items = [];
+  String date = '';
   TextEditingController country = TextEditingController();
   TextEditingController state = TextEditingController();
   TextEditingController city = TextEditingController();
@@ -440,14 +441,24 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
             height: 300,
             width: double.infinity,
             child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.date,
+              mode: CupertinoDatePickerMode.dateAndTime,
               initialDateTime: selectedDate,
               onDateTimeChanged: (DateTime newDate) {
                 setState(() {
                   selectedDate = newDate;
                   final formattedDate = DateFormat('dd MMMM yyyy')
                       .format(selectedDate); // Format the date
-                  dateController.text = selectedDate.toIso8601String();
+                  final time = TimeOfDay.fromDateTime(selectedDate);
+                  // Format the date
+                  var formattedTime = time.format(context);
+                  dateController.text =
+                      '${formattedDate + ' ' + formattedTime}';
+
+                  date = selectedDate.toIso8601String();
+
+                  //                   final formattedDate = TimeOfDay.fromDateTime(selectedDate);
+                  // // Format the date
+                  // dateController.text = formattedDate.format(context);
                 });
               },
             ),
@@ -480,16 +491,8 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   }
 
   void done(Function done, String bonus) {
-    done(
-        countryValue,
-        stateValue,
-        toStateValue,
-        toCountryValue,
-        dateController.text,
-        nameController.text,
-        noteController.text,
-        bonus,
-        items);
+    done(countryValue, stateValue, toStateValue, toCountryValue, date,
+        nameController.text, noteController.text, bonus, items);
   }
 
   void confirm() {

@@ -40,146 +40,143 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: AnimatedPadding(
-        padding: EdgeInsets.only(
-            bottom:
-                MediaQuery.of(context).viewInsets.bottom + _bottomSheetPadding),
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeInOut,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      'Add shipment Item',
-                      style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor),
-                    ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    'Add shipment Item',
+                    style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor),
                   ),
-                  CustomFormField(
-                    controller: dateController,
-                    label: '',
-                    hint: 'Item title',
-                    keyboardType: TextInputType.text,
-                    // readOnly: true,
-                    // icon: Icon(Icons.local_shipping_rounded),
-                    validator: (date) {
-                      if (date == null || date.trim().isEmpty) {
-                        return 'please enter the title';
-                      }
-                    },
-                  ),
-                  CustomFormField(
-                    controller: linkController,
-                    label: '',
-                    hint: 'Item link',
-                    keyboardType: TextInputType.text,
-                    // readOnly: true,
-                    // icon: Icon(Icons.local_shipping_rounded),
-                    validator: (date) {
-                      if (date == null || date.trim().isEmpty) {
-                        return 'please enter the link';
-                      }
-                    },
-                  ),
-                  CustomFormField(
-                    controller: priceController,
-                    label: '',
-                    hint: 'Item price',
-                    keyboardType: TextInputType.text,
-                    validator: (name) {
-                      if (name == null || name.trim().isEmpty) {
-                        return 'please enter item price';
-                      }
-                    },
-                  ),
-                  CustomFormField(
-                    controller: weightController,
-                    label: '',
-                    hint: 'Item weight',
-                    keyboardType: TextInputType.text,
-                    validator: (name) {
-                      if (name == null || name.trim().isEmpty) {
-                        return 'please enter item weight';
-                      }
-                    },
-                  ),
+                ),
+                CustomFormField(
+                  controller: dateController,
+                  label: '',
+                  hint: 'Item title',
+                  keyboardType: TextInputType.text,
+                  // readOnly: true,
+                  // icon: Icon(Icons.local_shipping_rounded),
+                  validator: (date) {
+                    if (date == null || date.trim().isEmpty) {
+                      return 'please enter the title';
+                    }
+                  },
+                ),
+                CustomFormField(
+                  controller: linkController,
+                  label: '',
+                  hint: 'Item link',
+                  keyboardType: TextInputType.text,
+                  // readOnly: true,
+                  // icon: Icon(Icons.local_shipping_rounded),
+                  validator: (date) {
+                    if (date == null || date.trim().isEmpty) {
+                      return 'please enter the link';
+                    }
+                  },
+                ),
+                CustomFormField(
+                  controller: priceController,
+                  label: '',
+                  hint: 'Item price',
+                  keyboardType: TextInputType.text,
+                  validator: (name) {
+                    if (name == null || name.trim().isEmpty) {
+                      return 'please enter item price';
+                    }
+                  },
+                ),
+                CustomFormField(
+                  controller: weightController,
+                  label: '',
+                  hint: 'Item weight',
+                  keyboardType: TextInputType.text,
+                  validator: (name) {
+                    if (name == null || name.trim().isEmpty) {
+                      return 'please enter item weight';
+                    }
+                  },
+                ),
 
-                  Container(
-                    margin: EdgeInsets.only(top: 25),
-                    child: Center(
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                          fixedSize: MaterialStatePropertyAll(
-                              Size(MediaQuery.of(context).size.width * .5, 50)),
-                          shape: MaterialStatePropertyAll(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(17),
-                            ),
+                Container(
+                  margin: EdgeInsets.only(top: 25),
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        fixedSize: MaterialStatePropertyAll(
+                            Size(MediaQuery.of(context).size.width * .5, 50)),
+                        shape: MaterialStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
                           ),
-                          backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).primaryColor),
                         ),
-                        onPressed: () {
-                          pickPhoto(widget.onError);
-                        },
-                        child: Text(
-                          'Pick Photo',
-                          style: GoogleFonts.poppins(
-                              fontSize: 17, fontWeight: FontWeight.bold),
-                        ),
+                        backgroundColor: MaterialStatePropertyAll(
+                            Theme.of(context).primaryColor),
+                      ),
+                      onPressed: () {
+                        pickPhoto(widget.onError);
+                      },
+                      child: Text(
+                        'Pick Photo',
+                        style: GoogleFonts.poppins(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            textStyle: const TextStyle(color: Colors.white)),
                       ),
                     ),
                   ),
+                ),
 
-                  Container(
-                    margin: EdgeInsets.only(top: 25),
-                    child: Center(
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                          fixedSize: MaterialStatePropertyAll(
-                              Size(MediaQuery.of(context).size.width * .5, 50)),
-                          shape: MaterialStatePropertyAll(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(17),
-                            ),
+                Container(
+                  margin: EdgeInsets.only(top: 25),
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        fixedSize: MaterialStatePropertyAll(
+                            Size(MediaQuery.of(context).size.width * .5, 50)),
+                        shape: MaterialStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
                           ),
-                          backgroundColor: MaterialStatePropertyAll(
-                              Theme.of(context).primaryColor),
                         ),
-                        onPressed: () {
-                          add(widget.addItem, context, widget.onError);
-                        },
-                        child: Text(
-                          'Add Item',
-                          style: GoogleFonts.poppins(
-                              fontSize: 17, fontWeight: FontWeight.bold),
-                        ),
+                        backgroundColor: MaterialStatePropertyAll(
+                            Theme.of(context).primaryColor),
+                      ),
+                      onPressed: () {
+                        add(widget.addItem, context, widget.onError);
+                      },
+                      child: Text(
+                        'Add Item',
+                        style: GoogleFonts.poppins(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            textStyle: const TextStyle(color: Colors.white)),
                       ),
                     ),
                   ),
-                  // TextField(
-                  //   controller: dateController,
-                  //   readOnly: true,
-                  //   decoration: InputDecoration(
-                  //     hintText: 'I want it before',
-                  //     icon: Icon(Icons.local_shipping),
-                  //   ),
-                  //   onTap: () {
-                  //     DateTime selectedDate = DateTime.now();
-                  //     _selectDate(context);
-                  //   },
-                  // )
-                ],
-              ),
+                ),
+                // TextField(
+                //   controller: dateController,
+                //   readOnly: true,
+                //   decoration: InputDecoration(
+                //     hintText: 'I want it before',
+                //     icon: Icon(Icons.local_shipping),
+                //   ),
+                //   onTap: () {
+                //     DateTime selectedDate = DateTime.now();
+                //     _selectDate(context);
+                //   },
+                // )
+              ],
             ),
           ),
         ),

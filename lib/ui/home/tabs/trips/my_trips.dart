@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -14,6 +15,7 @@ import 'package:hatly/ui/components/shipment_card%20copy.dart';
 import 'package:hatly/ui/components/trip_card.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipments_bottom_sheet.dart';
+import 'package:hatly/ui/home/tabs/trips/create_trip_screen.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips_viewmodel.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -59,20 +61,20 @@ class _MyTripsTabState extends State<MyTripsTab> {
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
 
-    // Check for cached shipments when initializing
-    // Future.delayed(Duration(milliseconds: 300), () {
-    //   getCachedMyShipments().then((cachedShipments) {
-    //     if (cachedShipments.isNotEmpty) {
-    //       print('exist');
-    //       setState(() {
-    //         myTrips = cachedShipments;
-    //       });
-    //     } else {
-    //       viewModel.getMyShipments(token: token);
-    //       print('no Exist'); // Fetch from API if cache is empty
-    //     }
-    //   });
-    // });
+    //Check for cached shipments when initializing
+    Future.delayed(Duration(milliseconds: 300), () {
+      getCachedMyTrips().then((cachedTrips) {
+        if (cachedTrips.isNotEmpty) {
+          print('exist');
+          setState(() {
+            myTrips = cachedTrips;
+          });
+        } else {
+          viewModel.getMyTrip(token: token);
+          print('no Exist'); // Fetch from API if cache is empty
+        }
+      });
+    });
   }
 
   // a method for caching the shipments list
@@ -89,7 +91,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
     await box.addAll(tripsMaps);
   }
 
-  Future<List<TripsDto>> getCachedMyShipments() async {
+  Future<List<TripsDto>> getCachedMyTrips() async {
     final box = await Hive.openBox(
         'trips${loggedInState.user.email!.replaceAll('@', '_at_')}');
     final tripsMaps = box.values.toList();
@@ -105,7 +107,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
     return BlocConsumer(
       bloc: viewModel,
       listener: (context, state) {
-        if (state is CreateTripLoadingState) {
+        if (state is GetMyTripsLoadingState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
                 alertMsg: 'Loading',
@@ -117,7 +119,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
                 alertContent: state.loadingMessage,
                 context: context);
           }
-        } else if (state is CreateTripFailState) {
+        } else if (state is GetMyTripsFailState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
                 alertMsg: 'Fail',
@@ -132,22 +134,26 @@ class _MyTripsTabState extends State<MyTripsTab> {
         }
       },
       listenWhen: (previous, current) {
-        if (previous is CreateTripLoadingState) {
+        if (previous is GetMyTripsLoadingState) {
           DialogUtils.hideDialog(context);
         }
-        if (current is CreateTripLoadingState ||
-            current is CreateTripFailState) {
+        if (current is GetMyTripsLoadingState ||
+            current is GetMyTripsFailState) {
           return true;
         }
         return false;
       },
       builder: (context, state) {
-        if (state is CreateTripSuccessState) {
+        if (state is GetMyTripsSuccessState) {
           print('getSuccess');
-          TripsDto? trip = state.responseDto.trip;
-          myTrips.add(trip!);
-          cacheMytrips(myTrips);
-          // cacheMyShipments(myTrips);
+          List<TripsDto>? trips = state.responseDto.trips ?? [];
+          if (trips.isEmpty) {
+            isMyTripsEmpty = true;
+          } else {
+            myTrips = trips;
+            isMyTripsEmpty = false;
+            cacheMytrips(myTrips);
+          }
         }
         return Platform.isIOS
             ? Scaffold(
@@ -165,7 +171,10 @@ class _MyTripsTabState extends State<MyTripsTab> {
                   ),
                   actions: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, CreateTripScreen.routeName);
+                      },
                       icon: const Icon(
                         Icons.add,
                         color: Colors.white,
@@ -177,21 +186,32 @@ class _MyTripsTabState extends State<MyTripsTab> {
                   controller: scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: [
+                    CupertinoSliverRefreshControl(
+                      onRefresh: () async {
+                        viewModel.getMyTrip(token: token);
+                        cacheMytrips(myTrips);
+                        setState(() {});
+                      },
+                    ),
                     isMyTripsEmpty
                         ? SliverToBoxAdapter(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: SingleChildScrollView(
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Image.asset('images/no_user_trip.png'),
-                                    Text(
-                                      "You don't have any trips, press the add button to add a trip",
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
+                                    FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text(
+                                        "You don't have any trips,\npress the add button to add a trip",
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     )
                                   ],
                                 ),
@@ -206,13 +226,87 @@ class _MyTripsTabState extends State<MyTripsTab> {
                                 availableWeight: myTrips[index].available,
                                 date: DateFormat('dd MMMM yyyy')
                                     .format(myTrips[index].departDate!),
-                                consumedWeight: myTrips[index].consumed,
+                                consumedWeight: myTrips[index].consumed ?? 0,
                               ),
+                              childCount: myTrips.length,
                             ),
                           )
                   ],
                 ))
-            : Container();
+            : RefreshIndicator(
+                onRefresh: () async {
+                  viewModel.getMyTrip(token: token);
+                  cacheMytrips(myTrips);
+                  setState(() {});
+                },
+                child: Scaffold(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  appBar: AppBar(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    centerTitle: true,
+                    automaticallyImplyLeading: false,
+                    title: Text(
+                      'My Trips',
+                      style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                    actions: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                              context, CreateTripScreen.routeName);
+                        },
+                        icon: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  body: SingleChildScrollView(
+                    controller: scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: isMyTripsEmpty
+                        ? SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.asset('images/no_user_trip.png'),
+                                    FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text(
+                                        "You don't have any trips,\npress the add button to add a trip",
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: myTrips.length,
+                            itemBuilder: (context, index) => MyTripCard(
+                              origin: myTrips[index].origin,
+                              destination: myTrips[index].destination,
+                              availableWeight: myTrips[index].available,
+                              date: DateFormat('dd MMMM yyyy')
+                                  .format(myTrips[index].departDate!),
+                              consumedWeight: myTrips[index].consumed ?? 0,
+                            ),
+                          ),
+                  ),
+                ),
+              );
       },
     );
   }

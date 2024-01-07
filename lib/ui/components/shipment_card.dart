@@ -173,7 +173,13 @@ class ShipmentCard extends StatelessWidget {
                                 Theme.of(context).primaryColor),
                           ),
                           onPressed: () {},
-                          child: Text('Send Request'),
+                          child: Text(
+                            'Send Request',
+                            style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                       )
                     ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/ui/home/home_screen.dart';
+import 'package:hatly/ui/home/tabs/trips/create_trip_screen.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips.dart';
 import 'package:hatly/ui/login/login_screen.dart';
 import 'package:hatly/ui/register/register_screen.dart';
@@ -44,7 +45,8 @@ class MyApp extends StatelessWidget {
         RegisterScreen.routeName: (context) => RegisterScreen(),
         WelcomeScreen.routeName: (context) => WelcomeScreen(),
         MyTripsTab.routeName: (context) => MyTripsTab(),
-        HomeScreen.routeName: (context) => HomeScreen()
+        HomeScreen.routeName: (context) => HomeScreen(),
+        CreateTripScreen.routeName: (context) => CreateTripScreen()
       },
     );
   }
