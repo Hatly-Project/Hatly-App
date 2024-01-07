@@ -60,20 +60,24 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       });
     });
 
+    viewModel.create(token);
+
     // Check for cached shipments when initializing
-    Future.delayed(Duration(milliseconds: 400), () {
-      getCachedShipments().then((cachedShipments) {
-        if (cachedShipments.isNotEmpty) {
-          print('exist');
-          setState(() {
-            shipments = cachedShipments;
-            shimmerIsLoading = false;
-          });
-        } else {
-          viewModel.create(token); // Fetch from API if cache is empty
-        }
-      });
-    });
+    // Future.delayed(Duration(milliseconds: 400), () {
+    //   viewModel.create(token); // Fetch from API if cache is empty
+
+    //   // getCachedShipments().then((cachedShipments) {
+    //   //   if (cachedShipments.isNotEmpty) {
+    //   //     print('exist');
+    //   //     setState(() {
+    //   //       shipments = cachedShipments;
+    //   //       shimmerIsLoading = false;
+    //   //     });
+    //   //   } else {
+    //   //     viewModel.create(token); // Fetch from API if cache is empty
+    //   //   }
+    //   // });
+    // });
   }
 
   @override
@@ -215,7 +219,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               print("emptyyyy");
             } else {
               shipmentsIsEmpty = false;
-              cacheShipments(shipments);
+              // cacheShipments(shipments);
               print('success ${shipments[0].items![0].photo}');
             }
             shimmerIsLoading = false;
@@ -229,7 +233,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             } else {
               print('tripss success');
               tripsIsEmpty = false;
-              cacheTrips(trips);
+              // cacheTrips(trips);
             }
             shimmerIsLoading = false;
           }
@@ -508,7 +512,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                 availableWeight:
                                                     trips[index].available,
                                                 consumedWeight:
-                                                    trips[index].consumed,
+                                                    trips[index].consumed ?? 0,
                                                 date: DateFormat('dd MMMM yyyy')
                                                     .format(trips[index]
                                                         .departDate!),
@@ -837,32 +841,36 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   }
 
   void getTrips() {
-    getChachedtrips().then((cachedTrips) {
-      if (cachedTrips.isNotEmpty) {
-        print('trips exist');
-        setState(() {
-          trips = cachedTrips;
-        });
-      } else {
-        setState(() {
-          viewModel.getAlltrips(token);
-        });
-      }
-    });
+    viewModel.getAlltrips(token);
+
+    // getChachedtrips().then((cachedTrips) {
+    //   if (cachedTrips.isNotEmpty) {
+    //     print('trips exist');
+    //     setState(() {
+    //       trips = cachedTrips;
+    //     });
+    //   } else {
+    //     setState(() {
+    //       viewModel.getAlltrips(token);
+    //     });
+    //   }
+    // });
   }
 
   void getShipments() {
-    getCachedShipments().then((cachedShipments) {
-      if (cachedShipments.isNotEmpty) {
-        print('exist');
-        setState(() {
-          shipments = cachedShipments;
-          shimmerIsLoading = false;
-        });
-      } else {
-        viewModel.create(token); // Fetch from API if cache is empty
-      }
-    });
+    viewModel.create(token);
+
+    // getCachedShipments().then((cachedShipments) {
+    //   if (cachedShipments.isNotEmpty) {
+    //     print('exist');
+    //     setState(() {
+    //       shipments = cachedShipments;
+    //       shimmerIsLoading = false;
+    //     });
+    //   } else {
+    //     viewModel.create(token); // Fetch from API if cache is empty
+    //   }
+    // });
   }
 }
 

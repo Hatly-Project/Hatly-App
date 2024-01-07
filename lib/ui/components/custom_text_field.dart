@@ -5,13 +5,13 @@ typedef OnTap = void Function()?;
 typedef OnChange = void Function(String)?;
 
 class CustomFormField extends StatelessWidget {
-  String label;
+  String? label;
   String hint;
   bool isPassword;
   bool readOnly;
   TextInputType keyboardType;
   Widget? icon;
-  MyValidator validator;
+  MyValidator? validator;
   TextEditingController controller;
   int lines;
   bool? enabled;
@@ -19,8 +19,8 @@ class CustomFormField extends StatelessWidget {
   OnChange? onChange;
 
   CustomFormField(
-      {required this.label,
-      required this.validator,
+      {this.label,
+      this.validator,
       required this.controller,
       required this.hint,
       this.enabled = true,
@@ -39,13 +39,12 @@ class CustomFormField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(color: Colors.white),
-          ),
-          SizedBox(
-            height: 10,
-          ),
+          label != null
+              ? Text(
+                  label ?? '',
+                  style: TextStyle(color: Colors.white),
+                )
+              : Container(),
           TextFormField(
             maxLines: lines,
             minLines: lines,

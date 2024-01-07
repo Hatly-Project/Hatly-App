@@ -1,4 +1,6 @@
 import 'dart:ffi';
+import 'package:hatly/data/api/book_info.dart';
+import 'package:hatly/data/api/items_not_allowed.dart';
 import 'package:hatly/data/api/login/login_request.dart';
 import 'package:hatly/data/api/login/login_response/login_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
@@ -11,7 +13,9 @@ import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_respon
 import 'package:hatly/data/api/trips/create_trip_request/create_trip_request.dart';
 import 'package:hatly/data/api/trips/create_trip_response/create_trip_response.dart';
 import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_response/get_all_trips_response.dart';
+import 'package:hatly/data/api/trips/get_user_trip_response/get_user_trip_response.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
+import 'package:hatly/domain/models/book_info_dto.dart';
 import 'package:hatly/domain/models/item_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 import 'package:http/http.dart' as http;
@@ -137,6 +141,29 @@ class ApiManager {
     }
   }
 
+  Future<GetUserTripResponse> getUserTrips({required String token}) async {
+    try {
+      var url = Uri.https(baseUrl, 'user/trips');
+      var response = await client.get(
+        url,
+        headers: {
+          'content-type': 'application/json',
+          'authorization': 'Bearer $token'
+        },
+      );
+
+      var getResponse = GetUserTripResponse.fromJson(response.body);
+
+      if (getResponse.status == false) {
+        throw ServerErrorException(getResponse.message!);
+      }
+
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    }
+  }
+
   Future<CreateTripResponse> createTrip(
       {String? origin,
       String? destination,
@@ -144,7 +171,9 @@ class ApiManager {
       String? note,
       String? addressMeeting,
       String? departDate,
+      BookInfo? bookInfo,
       String? notNeed,
+      List<ItemsNotAllowed>? itemsNotAllowed,
       required String token}) async {
     try {
       var url = Uri.https(baseUrl, 'trip/new');
@@ -152,7 +181,8 @@ class ApiManager {
           origin: origin,
           destination: destination,
           available: available,
-          notNeed: notNeed,
+          bookInfo: bookInfo,
+          itemsNotAllowed: itemsNotAllowed,
           note: note,
           addressMeeting: addressMeeting,
           departData: departDate);
