@@ -12,8 +12,19 @@ import '../../../components/custom_text_field.dart';
 class ShipmentItemBottomSheet extends StatefulWidget {
   Function addItem;
   Function onError;
+  String? itemName, itemWeight, itemPrice, itemLink;
+  bool? update;
+  int? itemId;
 
-  ShipmentItemBottomSheet({required this.addItem, required this.onError});
+  ShipmentItemBottomSheet(
+      {required this.addItem,
+      required this.onError,
+      this.itemName,
+      this.itemPrice,
+      this.itemWeight,
+      this.itemLink,
+      required this.update,
+      this.itemId});
 
   @override
   State<ShipmentItemBottomSheet> createState() =>
@@ -27,7 +38,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
   var toCountryValue = '';
   String? toStateValue;
   double _bottomSheetPadding = 20.0;
-  var dateController = TextEditingController(text: '');
+  var nameController = TextEditingController(text: '');
   var weightController = TextEditingController(text: '');
 
   var linkController = TextEditingController(text: '');
@@ -35,6 +46,19 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
   var priceController = TextEditingController(text: '');
   XFile? image;
   var formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    nameController = TextEditingController(text: widget.itemName);
+    weightController = TextEditingController(text: widget.itemWeight);
+
+    linkController = TextEditingController(text: widget.itemLink);
+
+    priceController = TextEditingController(text: widget.itemPrice);
+    print('init ${widget.itemName}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +83,11 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
                   ),
                 ),
                 CustomFormField(
-                  controller: dateController,
+                  controller: nameController,
                   label: '',
                   hint: 'Item title',
                   keyboardType: TextInputType.text,
+
                   // readOnly: true,
                   // icon: Icon(Icons.local_shipping_rounded),
                   validator: (date) {
@@ -152,7 +177,9 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
                             Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        add(widget.addItem, context, widget.onError);
+                        add(widget.addItem, context, widget.onError,
+                            widget.itemId,
+                            update: widget.update);
                       },
                       child: Text(
                         'Add Item',
@@ -165,7 +192,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
                   ),
                 ),
                 // TextField(
-                //   controller: dateController,
+                //   controller: nameController,
                 //   readOnly: true,
                 //   decoration: InputDecoration(
                 //     hintText: 'I want it before',
@@ -200,7 +227,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
                   selectedDate = newDate;
                   final formattedDate = DateFormat('yyyy-MM-dd')
                       .format(selectedDate); // Format the date
-                  dateController.text = formattedDate;
+                  nameController.text = formattedDate;
                 });
               },
             ),
@@ -220,13 +247,15 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
           selectedDate = picked;
           final formattedDate =
               DateFormat('yyyy-MM-dd').format(selectedDate); // Format the date
-          dateController.text = formattedDate;
+          nameController.text = formattedDate;
         });
       }
     }
   }
 
-  void add(Function addItem, BuildContext context, Function onError) async {
+  void add(
+      Function addItem, BuildContext context, Function onError, int? itemId,
+      {bool? update = false}) async {
     // async - await
     if (formKey.currentState?.validate() == false) {
       return;
@@ -234,9 +263,9 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
       onError(context, 'Please add item picture');
       return;
     }
-
-    addItem(dateController.text, priceController.text, linkController.text,
-        base64Image, weightController.text);
+    print(update);
+    addItem(nameController.text, priceController.text, linkController.text,
+        base64Image, weightController.text, update, widget.itemId);
     Navigator.of(context).pop();
     // viewModel.login(emailController.text, passwordController.text);
   }

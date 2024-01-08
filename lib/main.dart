@@ -1,5 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hatly/firebase_options.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/ui/home/home_screen.dart';
 import 'package:hatly/ui/home/tabs/trips/create_trip_screen.dart';
@@ -16,6 +18,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Open the Hive box for shipments
   await Hive.openBox('shipments');

@@ -177,6 +177,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
           myShipments = state.responseDto.shipments ?? [];
           if (myShipments.isEmpty) {
             isMyshipmentEmpty = true;
+            clearData();
             print('empty');
           } else {
             isMyshipmentEmpty = false;
@@ -296,6 +297,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                       ? Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -375,6 +377,16 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
         ),
       ),
     );
+  }
+
+  void clearData() async {
+    final box = await Hive.openBox(
+        'shipments_${loggedInState.user.email!.replaceAll('@', '_at_')}');
+
+    // Clear existing data and store the new data in the box
+    print('cleared');
+    await box.clear();
+    await box.close();
   }
 
   void done(

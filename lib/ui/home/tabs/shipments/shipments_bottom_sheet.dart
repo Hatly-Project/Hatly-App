@@ -32,7 +32,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   String itemItile = '';
   String itemPrice = '';
   String totalItems = '1';
-  String totalWeight = '';
+  double totalWeight = 0;
   String bonus = '';
   String fees = '';
   String image = '';
@@ -347,7 +347,11 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                     return ShipmentItem(
                       itemTitle: items[index].name!,
                       itemPrice: items[index].price.toString(),
-                      shipImage: shipmentImage,
+                      itemLink: items[index].link!,
+                      weight: items[index].weight.toString(),
+                      shipImage: base64ToImage(items[index].photo!),
+                      id: items[index].id,
+                      update: update,
                     );
                   },
                 ),
@@ -504,15 +508,28 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   }
 
   void addItem(String title, String price, String link, String baseImage,
-      String weight) {
+      String weight, bool update, int? id) {
+    int itemID = 0;
     itemItile = title;
     itemPrice = price;
-    items.add(ItemDto(
-        name: itemItile,
-        price: double.tryParse(itemPrice),
-        link: link,
-        weight: double.tryParse(weight),
-        photo: baseImage));
+    totalWeight = 0;
+
+    print('id is $id');
+    update
+        ? items[items.indexWhere((item) => item.id == id)] = ItemDto(
+            name: itemItile,
+            price: double.tryParse(itemPrice),
+            link: link,
+            weight: double.tryParse(weight),
+            photo: baseImage,
+            id: id)
+        : items.add(ItemDto(
+            name: itemItile,
+            price: double.tryParse(itemPrice),
+            link: link,
+            weight: double.tryParse(weight),
+            photo: baseImage,
+            id: itemID++));
     print('shipment weight $weight');
     totalItems = items.length.toString();
     bonus = '200';
@@ -520,10 +537,11 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
     image = baseImage;
     Image imageWidget = base64ToImage(baseImage);
     shipmentImage = imageWidget;
-    items.forEach((item) {
-      totalWeight += item.weight.toString();
+    for (var item in items) {
+      print(item.name);
+      totalWeight += item.weight!;
       print('tot $totalWeight');
-    });
+    }
     setState(() {
       showDoneBtn();
     });
@@ -539,12 +557,25 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
     );
   }
 
-  void showShipmentItemBottomSheet(BuildContext context) {
+  void showShipmentItemBottomSheet(
+      {required BuildContext context,
+      String? itemName,
+      String? itemPrice,
+      String? itemLink,
+      String? itemWeight,
+      bool update = false,
+      int? id}) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext bottomSheetContext) => ShipmentItemBottomSheet(
         addItem: addItem,
         onError: widget.onError,
+        itemName: itemName,
+        itemLink: itemLink,
+        itemId: id,
+        itemPrice: itemPrice,
+        itemWeight: itemWeight,
+        update: update,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -597,7 +628,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
       builder: (BuildContext bottomSheetContext) => ShipmentFeesBottomSheet(
         confrim: confirm,
         totalItems: totalItems,
-        totalWeight: totalWeight,
+        totalWeight: totalWeight.toString(),
         bonus: bonus,
         fees: fees,
       ),
@@ -620,7 +651,19 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
       onError(context, 'Please choose a country');
       return;
     }
-    showShipmentItemBottomSheet(context);
+    showShipmentItemBottomSheet(context: context);
     // viewModel.login(emailController.text, passwordController.text);
+  }
+
+  void update(String? itemName, String? itemWeight, String? itemPrice,
+      String? itemLink, bool? update, int? id) {
+    showShipmentItemBottomSheet(
+        context: context,
+        itemName: itemName,
+        itemLink: itemLink,
+        itemPrice: itemPrice,
+        itemWeight: itemWeight,
+        update: update!,
+        id: id);
   }
 }
