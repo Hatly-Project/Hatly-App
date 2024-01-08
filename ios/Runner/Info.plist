@@ -49,5 +49,20 @@
 	<string>Please pick the item photo</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>CLIENT_ID</key>
+	<string>901080662696-1aqdtsham25g36gih3dt0onn61ubu4ig.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+<array>
+	<dict>
+		<key>CFBundleTypeRole</key>
+		<string>Editor</string>
+		<key>CFBundleURLSchemes</key>
+		<array>
+			<!-- TODO Replace this value: -->
+			<!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
+			<string>com.googleusercontent.apps.901080662696-1aqdtsham25g36gih3dt0onn61ubu4ig</string>
+		</array>
+	</dict>
+</array>
 </dict>
 </plist>

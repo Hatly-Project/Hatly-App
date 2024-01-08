@@ -12,6 +12,7 @@ class CustomFormField extends StatelessWidget {
   TextInputType keyboardType;
   Widget? icon;
   MyValidator? validator;
+  String? initialValue;
   TextEditingController controller;
   int lines;
   bool? enabled;
@@ -26,6 +27,7 @@ class CustomFormField extends StatelessWidget {
       this.enabled = true,
       this.readOnly = false,
       this.icon,
+      this.initialValue,
       this.onTap,
       this.isPassword = false,
       this.keyboardType = TextInputType.text,
@@ -47,6 +49,7 @@ class CustomFormField extends StatelessWidget {
               : Container(),
           TextFormField(
             maxLines: lines,
+            initialValue: initialValue,
             minLines: lines,
             controller: controller,
             validator: validator,

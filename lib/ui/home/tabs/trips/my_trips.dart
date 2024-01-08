@@ -17,6 +17,7 @@ import 'package:hatly/ui/home/tabs/shipments/my_shipments_screen_viewmodel.dart'
 import 'package:hatly/ui/home/tabs/shipments/shipments_bottom_sheet.dart';
 import 'package:hatly/ui/home/tabs/trips/create_trip_screen.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips_viewmodel.dart';
+import 'package:hatly/ui/login/login_screen.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
@@ -149,6 +150,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
           List<TripsDto>? trips = state.responseDto.trips ?? [];
           if (trips.isEmpty) {
             isMyTripsEmpty = true;
+            clearData();
           } else {
             myTrips = trips;
             isMyTripsEmpty = false;
@@ -172,7 +174,8 @@ class _MyTripsTabState extends State<MyTripsTab> {
                   actions: [
                     IconButton(
                       onPressed: () {
-                        Navigator.pushNamed(
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateTripScreen()));
+                        Navigator.pushReplacementNamed(
                             context, CreateTripScreen.routeName);
                       },
                       icon: const Icon(
@@ -265,46 +268,42 @@ class _MyTripsTabState extends State<MyTripsTab> {
                       ),
                     ],
                   ),
-                  body: SingleChildScrollView(
-                    controller: scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: isMyTripsEmpty
-                        ? SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Image.asset('images/no_user_trip.png'),
-                                    FittedBox(
-                                      fit: BoxFit.fitWidth,
-                                      child: Text(
-                                        "You don't have any trips,\npress the add button to add a trip",
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: myTrips.length,
-                            itemBuilder: (context, index) => MyTripCard(
-                              origin: myTrips[index].origin,
-                              destination: myTrips[index].destination,
-                              availableWeight: myTrips[index].available,
-                              date: DateFormat('dd MMMM yyyy')
-                                  .format(myTrips[index].departDate!),
-                              consumedWeight: myTrips[index].consumed ?? 0,
+                  body: isMyTripsEmpty
+                      ? SingleChildScrollView(
+                          controller: scrollController,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset('images/no_user_trip.png'),
+                                FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: Text(
+                                    "You don't have any trips,\npress the add button to add a trip",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
-                  ),
+                        )
+                      : ListView.builder(
+                          itemCount: myTrips.length,
+                          itemBuilder: (context, index) => MyTripCard(
+                            origin: myTrips[index].origin,
+                            destination: myTrips[index].destination,
+                            availableWeight: myTrips[index].available,
+                            date: DateFormat('dd MMMM yyyy')
+                                .format(myTrips[index].departDate!),
+                            consumedWeight: myTrips[index].consumed ?? 0,
+                          ),
+                        ),
                 ),
               );
       },
@@ -319,6 +318,14 @@ class _MyTripsTabState extends State<MyTripsTab> {
       width: 100,
       height: 100,
     );
+  }
+
+  void clearData() async {
+    final box = await Hive.openBox(
+        'trips${loggedInState.user.email!.replaceAll('@', '_at_')}');
+
+    await box.clear();
+    await box.close();
   }
 
   void onError(BuildContext context, String errorMessage) {

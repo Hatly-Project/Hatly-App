@@ -4,6 +4,9 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/ui/login/login_screen.dart';
+
+import '../home/tabs/trips/create_trip_screen.dart';
 
 class MyTripCard extends StatelessWidget {
   String? origin, destination, username;
@@ -30,6 +33,7 @@ class MyTripCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
+
         elevation: 0,
         child: Padding(
           padding: const EdgeInsets.all(10),

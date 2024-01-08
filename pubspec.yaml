@@ -47,6 +47,7 @@ dependencies:
   hive: ^2.2.3
   shimmer: ^3.0.0
   multi_dropdown: ^2.0.0
+  firebase_core: ^2.24.2
 
 
 dev_dependencies:

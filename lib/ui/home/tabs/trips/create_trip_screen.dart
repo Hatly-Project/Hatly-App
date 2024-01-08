@@ -176,8 +176,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
           // cacheMytrips(myTrips);
           // cacheMyShipments(myTrips);
         }
-        return Platform.isIOS
-            ? Scaffold(
+        return  Scaffold(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 appBar: AppBar(
                   backgroundColor: Theme.of(context).primaryColor,
@@ -652,8 +651,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                     ),
                   ),
                 ),
-              )
-            : Container();
+              );
       },
     );
   }
