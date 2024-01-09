@@ -176,482 +176,471 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
           // cacheMytrips(myTrips);
           // cacheMyShipments(myTrips);
         }
-        return  Scaffold(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                appBar: AppBar(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  iconTheme: IconThemeData(color: Colors.white),
-                  centerTitle: true,
-                  title: Text(
-                    'Create Trip',
-                    style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                ),
-                body: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Form(
-                      key: formKey,
+        return Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).primaryColor,
+            iconTheme: IconThemeData(color: Colors.white),
+            centerTitle: true,
+            title: Text(
+              'Create Trip',
+              style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'Trip route',
+                        style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15)),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Center(
-                            child: Text(
-                              'Trip route',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
+                          Text(
+                            'From',
+                            style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
                           ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
+                          CSCPicker(
+                            ///Enable disable state dropdown [OPTIONAL PARAMETER]
+                            showStates: true,
+
+                            /// Enable disable city drop down [OPTIONAL PARAMETER]
+                            showCities: false,
+
+                            ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
+                            flagState: CountryFlag.DISABLE,
+
+                            ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
+                            dropdownDecoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(15)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'From',
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                                CSCPicker(
-                                  ///Enable disable state dropdown [OPTIONAL PARAMETER]
-                                  showStates: true,
+                                border: Border.all(
+                                    color: Colors.grey.shade300, width: 1)),
 
-                                  /// Enable disable city drop down [OPTIONAL PARAMETER]
-                                  showCities: false,
+                            ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
+                            disabledDropdownDecoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                color: Colors.grey.shade300,
+                                border: Border.all(
+                                    color: Colors.grey.shade300, width: 1)),
 
-                                  ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
-                                  flagState: CountryFlag.DISABLE,
+                            ///placeholders for dropdown search field
+                            countrySearchPlaceholder: "Country",
+                            stateSearchPlaceholder: "State",
+                            citySearchPlaceholder: "City",
 
-                                  ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-                                  dropdownDecoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 1)),
+                            ///labels for dropdown
+                            countryDropdownLabel: "*Country",
+                            stateDropdownLabel: "*State",
+                            cityDropdownLabel: "*City",
 
-                                  ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-                                  disabledDropdownDecoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                      color: Colors.grey.shade300,
-                                      border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 1)),
+                            ///Default Country
+                            //defaultCountry: CscCountry.India,
 
-                                  ///placeholders for dropdown search field
-                                  countrySearchPlaceholder: "Country",
-                                  stateSearchPlaceholder: "State",
-                                  citySearchPlaceholder: "City",
+                            ///Disable country dropdown (Note: use it with default country)
+                            //disableCountry: true,
 
-                                  ///labels for dropdown
-                                  countryDropdownLabel: "*Country",
-                                  stateDropdownLabel: "*State",
-                                  cityDropdownLabel: "*City",
-
-                                  ///Default Country
-                                  //defaultCountry: CscCountry.India,
-
-                                  ///Disable country dropdown (Note: use it with default country)
-                                  //disableCountry: true,
-
-                                  ///selected item style [OPTIONAL PARAMETER]
-                                  selectedItemStyle: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                  ),
-
-                                  ///DropdownDialog Heading style [OPTIONAL PARAMETER]
-                                  dropdownHeadingStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
-
-                                  ///DropdownDialog Item style [OPTIONAL PARAMETER]
-                                  dropdownItemStyle: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                  ),
-
-                                  ///Dialog box radius [OPTIONAL PARAMETER]
-                                  dropdownDialogRadius: 10.0,
-
-                                  ///Search bar radius [OPTIONAL PARAMETER]
-                                  searchBarRadius: 10.0,
-
-                                  ///triggers once country selected in dropdown
-                                  onCountryChanged: (value) {
-                                    setState(() {
-                                      ///store value in country variable
-                                      fromCountry = value;
-                                    });
-                                  },
-
-                                  ///triggers once state selected in dropdown
-                                  onStateChanged: (value) {
-                                    setState(() {
-                                      ///store value in state variable
-                                      fromStateValue = value ?? "";
-                                    });
-                                  },
-
-                                  ///triggers once city selected in dropdown
-
-                                  onCityChanged: (value) {
-                                    setState(() {
-                                      fromCityValue = value ?? "";
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  'To',
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                                CSCPicker(
-                                  ///Enable disable state dropdown [OPTIONAL PARAMETER]
-                                  showStates: true,
-
-                                  /// Enable disable city drop down [OPTIONAL PARAMETER]
-                                  showCities: false,
-
-                                  ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
-                                  flagState: CountryFlag.DISABLE,
-
-                                  ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-                                  dropdownDecoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 1)),
-
-                                  ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-                                  disabledDropdownDecoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                      color: Colors.grey.shade300,
-                                      border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 1)),
-
-                                  ///placeholders for dropdown search field
-                                  countrySearchPlaceholder: "Country",
-                                  stateSearchPlaceholder: "State",
-                                  citySearchPlaceholder: "City",
-
-                                  ///labels for dropdown
-                                  countryDropdownLabel: "*Country",
-                                  stateDropdownLabel: "*State",
-                                  cityDropdownLabel: "*City",
-
-                                  ///Default Country
-                                  //defaultCountry: CscCountry.India,
-
-                                  ///Disable country dropdown (Note: use it with default country)
-                                  //disableCountry: true,
-
-                                  ///selected item style [OPTIONAL PARAMETER]
-                                  selectedItemStyle: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                  ),
-
-                                  ///DropdownDialog Heading style [OPTIONAL PARAMETER]
-                                  dropdownHeadingStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
-
-                                  ///DropdownDialog Item style [OPTIONAL PARAMETER]
-                                  dropdownItemStyle: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                  ),
-
-                                  ///Dialog box radius [OPTIONAL PARAMETER]
-                                  dropdownDialogRadius: 10.0,
-
-                                  ///Search bar radius [OPTIONAL PARAMETER]
-                                  searchBarRadius: 10.0,
-
-                                  ///triggers once country selected in dropdown
-                                  onCountryChanged: (value) {
-                                    setState(() {
-                                      ///store value in country variable
-                                      toCountry = value;
-                                    });
-                                  },
-
-                                  ///triggers once state selected in dropdown
-                                  onStateChanged: (value) {
-                                    setState(() {
-                                      ///store value in state variable
-                                      toStateValue = value ?? "";
-                                    });
-                                  },
-
-                                  onCityChanged: (value) {
-                                    setState(() {
-                                      toCityValue = value ?? "";
-                                    });
-                                  },
-                                ),
-                              ],
+                            ///selected item style [OPTIONAL PARAMETER]
+                            selectedItemStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
                             ),
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Divider(
-                            height: 2,
-                            thickness: 3,
-                            color: Colors.grey[500],
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Center(
-                            child: Text(
-                              'Trip details',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            margin: const EdgeInsets.only(top: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Column(
-                              children: [
-                                CustomFormField(
-                                  controller: departDateController,
-                                  // label: '',
-                                  hint: 'Depart date and time',
-                                  readOnly: true,
-                                  icon: Icon(Icons.date_range_rounded),
-                                  validator: (date) {
-                                    if (date == null || date.trim().isEmpty) {
-                                      return 'please choose date';
-                                    }
-                                  },
-                                  onTap: () {
-                                    DateTime selectedDate = DateTime.now();
-                                    _selectDate(context);
-                                  },
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: CustomFormField(
-                                    controller: availableWeightController,
-                                    keyboardType: TextInputType.number,
-                                    hint: 'Available weight in KG',
-                                    icon: Icon(Icons.monitor_weight_rounded),
-                                    validator: (text) {
-                                      if (text == null || text.trim().isEmpty) {
-                                        return 'please enter the available weight';
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Center(
-                            child: Text(
-                              'Ticket info',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            margin: const EdgeInsets.only(top: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Column(
-                              children: [
-                                CustomFormField(
-                                  controller: airlineController,
-                                  // label: '',
-                                  hint: 'Airline',
-                                  icon: Icon(Icons.flight),
-                                  validator: (date) {
-                                    if (date == null || date.trim().isEmpty) {
-                                      return 'please enter the airline name';
-                                    }
-                                  },
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: CustomFormField(
-                                    controller: bookingReferenceController,
-                                    keyboardType: TextInputType.number,
-                                    hint: 'Booking reference',
-                                    icon: Icon(Icons.airplane_ticket_rounded),
-                                    validator: (text) {
-                                      if (text == null || text.trim().isEmpty) {
-                                        return 'please enter your booking reference';
-                                      }
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: CustomFormField(
-                                    controller: firstNameController,
-                                    hint: 'First name on the ticket',
-                                    icon: Icon(Icons.airplane_ticket_rounded),
-                                    validator: (text) {
-                                      if (text == null || text.trim().isEmpty) {
-                                        return 'please enter your first name on the ticket';
-                                      }
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: CustomFormField(
-                                    controller: lastNameController,
-                                    hint: 'Last name on the ticket',
-                                    icon: Icon(Icons.airplane_ticket_rounded),
-                                    validator: (text) {
-                                      if (text == null || text.trim().isEmpty) {
-                                        return 'please enter your last name on the ticket';
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Center(
-                            child: Text(
-                              'Categories do not like to carry',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                          ),
-                          Center(
-                            child: MultiSelectDropDown(
-                              showClearIcon: true,
-                              controller: _controller,
-                              onOptionSelected: (items) {
-                                itemsNotAllowed = items
-                                    .map((item) =>
-                                        ItemsNotAllowedDto(name: item.label))
-                                    .toList();
 
-                                for (var element in itemsNotAllowed) {
-                                  print(element.name);
-                                }
-                              },
-                              options: const <ValueItem>[
-                                ValueItem(label: 'Mobiles & Tablets'),
-                                ValueItem(label: 'Laptops'),
-                                ValueItem(label: 'Cosmetics'),
-                                ValueItem(label: 'Clothing'),
-                                ValueItem(label: 'Shoes & Bags'),
-                                ValueItem(label: 'Watches & Sunglasses'),
-                                ValueItem(label: 'Supplements'),
-                                ValueItem(label: 'Food & Beverages'),
-                                ValueItem(label: 'Books'),
-                              ],
-                              selectionType: SelectionType.multi,
-                              chipConfig:
-                                  const ChipConfig(wrapType: WrapType.scroll),
-                              dropdownHeight: 500,
-                              optionTextStyle: const TextStyle(
-                                  fontSize: 13, fontWeight: FontWeight.w500),
-                              selectedOptionIcon:
-                                  const Icon(Icons.check_circle),
+                            ///DropdownDialog Heading style [OPTIONAL PARAMETER]
+                            dropdownHeadingStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold),
+
+                            ///DropdownDialog Item style [OPTIONAL PARAMETER]
+                            dropdownItemStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
                             ),
+
+                            ///Dialog box radius [OPTIONAL PARAMETER]
+                            dropdownDialogRadius: 10.0,
+
+                            ///Search bar radius [OPTIONAL PARAMETER]
+                            searchBarRadius: 10.0,
+
+                            ///triggers once country selected in dropdown
+                            onCountryChanged: (value) {
+                              setState(() {
+                                ///store value in country variable
+                                fromCountry = value;
+                              });
+                            },
+
+                            ///triggers once state selected in dropdown
+                            onStateChanged: (value) {
+                              setState(() {
+                                ///store value in state variable
+                                fromStateValue = value ?? "";
+                              });
+                            },
+
+                            ///triggers once city selected in dropdown
+
+                            onCityChanged: (value) {
+                              setState(() {
+                                fromCityValue = value ?? "";
+                              });
+                            },
+                          ),
+                          Text(
+                            'To',
+                            style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          CSCPicker(
+                            ///Enable disable state dropdown [OPTIONAL PARAMETER]
+                            showStates: true,
+
+                            /// Enable disable city drop down [OPTIONAL PARAMETER]
+                            showCities: false,
+
+                            ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
+                            flagState: CountryFlag.DISABLE,
+
+                            ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
+                            dropdownDecoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                color: Colors.white,
+                                border: Border.all(
+                                    color: Colors.grey.shade300, width: 1)),
+
+                            ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
+                            disabledDropdownDecoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                color: Colors.grey.shade300,
+                                border: Border.all(
+                                    color: Colors.grey.shade300, width: 1)),
+
+                            ///placeholders for dropdown search field
+                            countrySearchPlaceholder: "Country",
+                            stateSearchPlaceholder: "State",
+                            citySearchPlaceholder: "City",
+
+                            ///labels for dropdown
+                            countryDropdownLabel: "*Country",
+                            stateDropdownLabel: "*State",
+                            cityDropdownLabel: "*City",
+
+                            ///Default Country
+                            //defaultCountry: CscCountry.India,
+
+                            ///Disable country dropdown (Note: use it with default country)
+                            //disableCountry: true,
+
+                            ///selected item style [OPTIONAL PARAMETER]
+                            selectedItemStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                            ),
+
+                            ///DropdownDialog Heading style [OPTIONAL PARAMETER]
+                            dropdownHeadingStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold),
+
+                            ///DropdownDialog Item style [OPTIONAL PARAMETER]
+                            dropdownItemStyle: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                            ),
+
+                            ///Dialog box radius [OPTIONAL PARAMETER]
+                            dropdownDialogRadius: 10.0,
+
+                            ///Search bar radius [OPTIONAL PARAMETER]
+                            searchBarRadius: 10.0,
+
+                            ///triggers once country selected in dropdown
+                            onCountryChanged: (value) {
+                              setState(() {
+                                ///store value in country variable
+                                toCountry = value;
+                              });
+                            },
+
+                            ///triggers once state selected in dropdown
+                            onStateChanged: (value) {
+                              setState(() {
+                                ///store value in state variable
+                                toStateValue = value ?? "";
+                              });
+                            },
+
+                            onCityChanged: (value) {
+                              setState(() {
+                                toCityValue = value ?? "";
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Divider(
+                      height: 2,
+                      thickness: 3,
+                      color: Colors.grey[500],
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Center(
+                      child: Text(
+                        'Trip details',
+                        style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.only(top: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        children: [
+                          CustomFormField(
+                            controller: departDateController,
+                            // label: '',
+                            hint: 'Depart date and time',
+                            readOnly: true,
+                            icon: Icon(Icons.date_range_rounded),
+                            validator: (date) {
+                              if (date == null || date.trim().isEmpty) {
+                                return 'please choose date';
+                              }
+                            },
+                            onTap: () {
+                              DateTime selectedDate = DateTime.now();
+                              _selectDate(context);
+                            },
                           ),
                           Container(
                             margin: EdgeInsets.only(top: 10),
                             child: CustomFormField(
-                              controller: noteController,
-                              hint: 'Note',
-                              lines: 5,
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(top: 10),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(double.infinity, 60),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15)),
-                                  side:
-                                      BorderSide(color: Colors.white, width: 2),
-                                  backgroundColor:
-                                      Theme.of(context).primaryColor,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12)),
-                              onPressed: () {
-                                print('note ${noteController.text}');
-                                create(
-                                    origin: fromCountry,
-                                    destination: toCountry,
-                                    dateTime: date,
-                                    available: int.tryParse(
-                                        availableWeightController.text),
-                                    airline: airlineController.text,
-                                    bookReference:
-                                        bookingReferenceController.text,
-                                    firstName: firstNameController.text,
-                                    note: noteController.text.isEmpty
-                                        ? null
-                                        : noteController.text,
-                                    lastName: lastNameController.text,
-                                    itemsNotAllowed: itemsNotAllowed);
+                              controller: availableWeightController,
+                              keyboardType: TextInputType.number,
+                              hint: 'Available weight in KG',
+                              icon: Icon(Icons.monitor_weight_rounded),
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter the available weight';
+                                }
                               },
-                              child: const Text(
-                                'Create',
-                                style: TextStyle(
-                                    fontSize: 24, color: Colors.white),
-                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Center(
+                      child: Text(
+                        'Ticket info',
+                        style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.only(top: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        children: [
+                          CustomFormField(
+                            controller: airlineController,
+                            // label: '',
+                            hint: 'Airline',
+                            icon: Icon(Icons.flight),
+                            validator: (date) {
+                              if (date == null || date.trim().isEmpty) {
+                                return 'please enter the airline name';
+                              }
+                            },
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: CustomFormField(
+                              controller: bookingReferenceController,
+                              keyboardType: TextInputType.number,
+                              hint: 'Booking reference',
+                              icon: Icon(Icons.airplane_ticket_rounded),
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter your booking reference';
+                                }
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: CustomFormField(
+                              controller: firstNameController,
+                              hint: 'First name on the ticket',
+                              icon: Icon(Icons.airplane_ticket_rounded),
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter your first name on the ticket';
+                                }
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: CustomFormField(
+                              controller: lastNameController,
+                              hint: 'Last name on the ticket',
+                              icon: Icon(Icons.airplane_ticket_rounded),
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter your last name on the ticket';
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Center(
+                      child: Text(
+                        'Categories do not like to carry',
+                        style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                    Center(
+                      child: MultiSelectDropDown(
+                        showClearIcon: true,
+                        controller: _controller,
+                        onOptionSelected: (items) {
+                          itemsNotAllowed = items
+                              .map((item) =>
+                                  ItemsNotAllowedDto(name: item.label))
+                              .toList();
+
+                          for (var element in itemsNotAllowed) {
+                            print(element.name);
+                          }
+                        },
+                        options: const <ValueItem>[
+                          ValueItem(label: 'Mobiles & Tablets'),
+                          ValueItem(label: 'Laptops'),
+                          ValueItem(label: 'Cosmetics'),
+                          ValueItem(label: 'Clothing'),
+                          ValueItem(label: 'Shoes & Bags'),
+                          ValueItem(label: 'Watches & Sunglasses'),
+                          ValueItem(label: 'Supplements'),
+                          ValueItem(label: 'Food & Beverages'),
+                          ValueItem(label: 'Books'),
+                        ],
+                        selectionType: SelectionType.multi,
+                        chipConfig: const ChipConfig(wrapType: WrapType.scroll),
+                        dropdownHeight: 500,
+                        optionTextStyle: const TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500),
+                        selectedOptionIcon: const Icon(Icons.check_circle),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      child: CustomFormField(
+                        controller: noteController,
+                        hint: 'Note',
+                        lines: 5,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 10),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: Size(double.infinity, 60),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                            side: BorderSide(color: Colors.white, width: 2),
+                            backgroundColor: Theme.of(context).primaryColor,
+                            padding: const EdgeInsets.symmetric(vertical: 12)),
+                        onPressed: () {
+                          print('note ${noteController.text}');
+                          create(
+                              origin: fromCountry,
+                              destination: toCountry,
+                              dateTime: date,
+                              available:
+                                  int.tryParse(availableWeightController.text),
+                              airline: airlineController.text,
+                              bookReference: bookingReferenceController.text,
+                              firstName: firstNameController.text,
+                              note: noteController.text.isEmpty
+                                  ? null
+                                  : noteController.text,
+                              lastName: lastNameController.text,
+                              itemsNotAllowed: itemsNotAllowed);
+                        },
+                        child: const Text(
+                          'Create',
+                          style: TextStyle(fontSize: 24, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              );
+              ),
+            ),
+          ),
+        );
       },
     );
   }

@@ -11,7 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/ui/components/my_trip_card.dart';
-import 'package:hatly/ui/components/shipment_card%20copy.dart';
+import 'package:hatly/ui/components/my_shipment_card.dart';
 import 'package:hatly/ui/components/trip_card.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipments_bottom_sheet.dart';
@@ -175,7 +175,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
                     IconButton(
                       onPressed: () {
                         // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateTripScreen()));
-                        Navigator.pushReplacementNamed(
+                        Navigator.pushNamed(
                             context, CreateTripScreen.routeName);
                       },
                       icon: const Icon(

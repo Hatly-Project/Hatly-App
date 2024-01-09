@@ -141,6 +141,9 @@ class ShipmentCard extends StatelessWidget {
                                         color: Colors.grey[300],
                                       )),
                           ),
+                          const SizedBox(
+                            width: 10,
+                          ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -154,7 +157,7 @@ class ShipmentCard extends StatelessWidget {
                               ),
                               SizedBox(
                                 height:
-                                    MediaQuery.of(context).size.height * .02,
+                                    MediaQuery.of(context).size.height * .01,
                               ),
                               Text('4.3 Reviews')
                             ],

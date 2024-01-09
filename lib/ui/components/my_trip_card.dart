@@ -33,7 +33,6 @@ class MyTripCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-
         elevation: 0,
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -163,14 +162,6 @@ class MyTripCard extends StatelessWidget {
                     ],
                   )
                 ],
-              ),
-              Divider(
-                height: 2,
-                thickness: 2,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(
-                height: 10,
               ),
             ],
           ),

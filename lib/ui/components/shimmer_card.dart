@@ -56,32 +56,31 @@ class ShimmerCard extends StatelessWidget {
                         SizedBox(
                           height: 10,
                         ),
-                        Row(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(left: 10),
-                              child: Shimmer.fromColors(
-                                baseColor: Colors.grey.shade300,
-                                highlightColor: Colors.grey.shade400,
-                                child: Container(
-                                  width: 150,
-                                  height: 10,
-                                  color: Colors.white,
-                                ),
-                              ),
+                        Container(
+                          margin: EdgeInsets.only(left: 10),
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey.shade300,
+                            highlightColor: Colors.grey.shade400,
+                            child: Container(
+                              width: 150,
+                              height: 10,
+                              color: Colors.white,
                             ),
-                          ],
+                          ),
                         ),
                         SizedBox(
                           height: 15,
                         ),
-                        Shimmer.fromColors(
-                          baseColor: Colors.grey.shade300,
-                          highlightColor: Colors.grey.shade400,
-                          child: Container(
-                            width: 90,
-                            height: 10,
-                            color: Colors.white,
+                        Container(
+                          margin: EdgeInsets.only(left: 10),
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey.shade300,
+                            highlightColor: Colors.grey.shade400,
+                            child: Container(
+                              width: 90,
+                              height: 10,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ],

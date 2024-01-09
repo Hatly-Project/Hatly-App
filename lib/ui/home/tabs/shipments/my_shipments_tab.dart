@@ -9,7 +9,8 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
-import 'package:hatly/ui/components/shipment_card%20copy.dart';
+import 'package:hatly/ui/components/my_shipment_card.dart';
+import 'package:hatly/ui/components/my_shipments_shimmer_card.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipments_bottom_sheet.dart';
 import 'package:hive/hive.dart';
@@ -34,7 +35,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
   late String token;
   ScrollController scrollController = ScrollController();
   Image? shipImage;
-  bool isMyshipmentEmpty = false;
+  bool isMyshipmentEmpty = false, shimmerIsLoading = false;
   late LoggedInState loggedInState;
 
   @override
@@ -57,18 +58,16 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
     }
 
     // Check for cached shipments when initializing
-    Future.delayed(Duration(milliseconds: 300), () {
-      getCachedMyShipments().then((cachedShipments) {
-        if (cachedShipments.isNotEmpty) {
-          print('exist');
-          setState(() {
-            myShipments = cachedShipments;
-          });
-        } else {
-          viewModel.getMyShipments(token: token);
-          print('no Exist'); // Fetch from API if cache is empty
-        }
-      });
+    getCachedMyShipments().then((cachedShipments) async {
+      if (cachedShipments.isNotEmpty) {
+        print('exist');
+        setState(() {
+          myShipments = cachedShipments;
+        });
+      } else {
+        await viewModel.getMyShipments(token: token);
+        print('no Exist'); // Fetch from API if cache is empty
+      }
     });
   }
 
@@ -131,17 +130,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
           }
         }
         if (state is GetMyShipmentsLoadingState) {
-          if (Platform.isIOS) {
-            DialogUtils.showDialogIos(
-                alertMsg: 'Loading',
-                alertContent: state.loadingMessage,
-                context: context);
-          } else {
-            DialogUtils.showDialogAndroid(
-                alertMsg: 'Loading',
-                alertContent: state.loadingMessage,
-                context: context);
-          }
+          shimmerIsLoading = true;
         } else if (state is GetMyShipmentsFailState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
@@ -161,7 +150,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
           DialogUtils.hideDialog(context);
         }
         if (previous is GetMyShipmentsLoadingState) {
-          DialogUtils.hideDialog(context);
+          shimmerIsLoading = false;
         }
         if (current is CreateShipLoadingState ||
             current is CreateShipFailState ||
@@ -183,6 +172,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
             isMyshipmentEmpty = false;
             cacheMyShipments(myShipments);
           }
+          shimmerIsLoading = false;
         }
         if (state is CreateShipSuccessState) {
           print('done create ${state.responseDto.shipment?.title}');
@@ -225,42 +215,49 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                         setState(() {});
                       },
                     ),
-                    isMyshipmentEmpty
-                        ? SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Image.asset('images/no_shipments.png'),
-                                  Text(
-                                    "You don't have any shipments, press the add button to add a shipment",
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        : SliverList(
+                    shimmerIsLoading
+                        ? SliverList(
                             delegate: SliverChildBuilderDelegate(
-                                (context, index) => MyShipmentCard(
-                                      title: myShipments[index].title!,
-                                      from: myShipments[index].from!,
-                                      to: myShipments[index].to!,
-                                      date: DateFormat('dd MMMM yyyy').format(
-                                          myShipments[index].expectedDate!),
-                                      shipImage: base64ToImage(
-                                          myShipments[index]
-                                                  .items
-                                                  ?.first
-                                                  .photo ??
-                                              ''), //
-                                    ),
-                                childCount: myShipments.length),
-                          ),
+                                (context, index) => MyShipmentShimmerCard(),
+                                childCount: 5),
+                          )
+                        : isMyshipmentEmpty
+                            ? SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Image.asset('images/no_shipments.png'),
+                                      Text(
+                                        "You don't have any shipments, press the add button to add a shipment",
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                    (context, index) => MyShipmentCard(
+                                          title: myShipments[index].title!,
+                                          from: myShipments[index].from!,
+                                          to: myShipments[index].to!,
+                                          date: DateFormat('dd MMMM yyyy')
+                                              .format(myShipments[index]
+                                                  .expectedDate!),
+                                          shipImage: base64ToImage(
+                                              myShipments[index]
+                                                      .items
+                                                      ?.first
+                                                      .photo ??
+                                                  ''), //
+                                        ),
+                                    childCount: myShipments.length),
+                              ),
                   ],
                 ),
               )

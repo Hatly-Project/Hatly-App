@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -288,7 +289,9 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
       print('Base64 encoded image: $base64Image');
       setState(() {});
     } else {
-      onError(context);
+      if (kDebugMode) {
+        print('no');
+      }
     }
   }
 }
