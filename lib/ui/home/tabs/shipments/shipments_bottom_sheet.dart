@@ -28,6 +28,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   String countryValue = "";
   String stateValue = "";
   String cityValue = "";
+  int itemID = 0;
 
   String itemItile = '';
   String itemPrice = '';
@@ -509,7 +510,6 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
 
   void addItem(String title, String price, String link, String baseImage,
       String weight, bool update, int? id) {
-    int itemID = 0;
     itemItile = title;
     itemPrice = price;
     totalWeight = 0;
@@ -534,9 +534,6 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
     totalItems = items.length.toString();
     bonus = '200';
     fees = '90';
-    image = baseImage;
-    Image imageWidget = base64ToImage(baseImage);
-    shipmentImage = imageWidget;
     for (var item in items) {
       print(item.name);
       totalWeight += item.weight!;

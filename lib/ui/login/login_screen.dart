@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -21,6 +22,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  var connectivityResult;
+
   var formKey = GlobalKey<FormState>();
 
   var emailController = TextEditingController(text: '');
@@ -225,9 +228,21 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Future<bool> checkInternetConnection() async {
+    connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      return false;
+    } else if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      return true;
+    }
+    return true;
+  }
+
   void login() async {
     // async - await
-    if (formKey.currentState?.validate() == false) {
+    if (formKey.currentState?.validate() == false &&
+        await checkInternetConnection()) {
       return;
     }
     viewModel.login(emailController.text, passwordController.text);
