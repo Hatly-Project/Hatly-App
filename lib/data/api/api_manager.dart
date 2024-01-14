@@ -25,7 +25,7 @@ import 'package:http/http.dart';
 import 'interceptor/LoggingInterceptor.dart';
 
 class ApiManager {
-  static const String baseUrl = 'hatlyapi.onrender.com';
+  static const String baseUrl = 'hatly-api.vercel.app';
   static const String countriesBaseUrl = 'countriesnow.space';
   Client client = InterceptedClient.build(
     interceptors: [
