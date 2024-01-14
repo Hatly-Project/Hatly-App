@@ -7,6 +7,7 @@ import 'package:hatly/ui/home/home_screen.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipment_details.dart';
 import 'package:hatly/ui/home/tabs/trips/create_trip_screen.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips.dart';
+import 'package:hatly/ui/home/tabs/trips/trip_details.dart';
 import 'package:hatly/ui/login/login_screen.dart';
 import 'package:hatly/ui/register/register_screen.dart';
 import 'package:hatly/ui/splash/splash_screen.dart';
@@ -54,7 +55,8 @@ class MyApp extends StatelessWidget {
         MyTripsTab.routeName: (context) => MyTripsTab(),
         HomeScreen.routeName: (context) => HomeScreen(),
         CreateTripScreen.routeName: (context) => CreateTripScreen(),
-        ShipmentDetails.routeName: (context) => ShipmentDetails()
+        ShipmentDetails.routeName: (context) => ShipmentDetails(),
+        TripDetails.routeName: (context) => TripDetails()
       },
     );
   }

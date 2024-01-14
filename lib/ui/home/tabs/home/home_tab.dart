@@ -514,26 +514,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                       delegate: SliverChildBuilderDelegate(
                                         (context, index) => selectedTab == 1
                                             ? TripCard(
-                                                origin: trips[index].origin,
-                                                destination:
-                                                    trips[index].destination,
-                                                username:
-                                                    trips[index].user?.name,
-                                                availableWeight:
-                                                    trips[index].available,
-                                                consumedWeight:
-                                                    trips[index].consumed ?? 0,
-                                                date: DateFormat('dd MMMM yyyy')
-                                                    .format(trips[index]
-                                                        .departDate!),
-                                                userImage: trips[index]
-                                                            .user
-                                                            ?.profilePhoto ==
-                                                        null
-                                                    ? null
-                                                    : base64ToImage(trips[index]
-                                                        .user!
-                                                        .profilePhoto!))
+                                                tripsDto: trips[index],
+                                              )
                                             : Container(),
                                         childCount: trips.length,
                                       ),
@@ -788,28 +770,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         delegate: SliverChildBuilderDelegate(
                                           (context, index) => selectedTab == 1
                                               ? TripCard(
-                                                  origin: trips[index].origin,
-                                                  destination:
-                                                      trips[index].destination,
-                                                  username:
-                                                      trips[index].user?.name,
-                                                  availableWeight:
-                                                      trips[index].available,
-                                                  consumedWeight:
-                                                      trips[index].consumed,
-                                                  date:
-                                                      DateFormat('dd MMMM yyyy')
-                                                          .format(trips[index]
-                                                              .departDate!),
-                                                  userImage: trips[index]
-                                                              .user
-                                                              ?.profilePhoto ==
-                                                          null
-                                                      ? null
-                                                      : base64ToImage(
-                                                          trips[index]
-                                                              .user!
-                                                              .profilePhoto!))
+                                                  tripsDto: trips[index],
+                                                )
                                               : Container(),
                                           childCount: trips.length,
                                         ),

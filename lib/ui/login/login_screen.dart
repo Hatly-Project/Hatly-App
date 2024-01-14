@@ -11,6 +11,7 @@ import 'package:hatly/ui/home/home_screen.dart';
 import 'package:hatly/ui/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/ui/login/login_screen_arguments.dart';
 import 'package:hatly/ui/login/login_viewmodel.dart';
+import 'package:hatly/ui/register/register_screen_arguments.dart';
 import '../../utils/dialog_utils.dart';
 import '../../utils/validation_utils.dart';
 import '../components/custom_text_field.dart';
@@ -217,7 +218,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             onPressed: () {
                               Navigator.pushReplacementNamed(
-                                  context, RegisterScreen.routeName);
+                                  context, RegisterScreen.routeName,
+                                  arguments: RegisterScreenArguments(
+                                      args.countriesFlagsDto));
                             },
                           ),
                         ),
