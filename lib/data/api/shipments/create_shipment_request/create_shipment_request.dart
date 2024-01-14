@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'item.dart';
+import 'package:hatly/data/api/item.dart';
 
 class CreateShipmentRequest {
   String? title;

@@ -3,27 +3,27 @@ import 'dart:convert';
 class UserDto {
   String? name;
   String? email;
-  dynamic phone;
+  String? phone;
   String? profilePhoto;
   int? id;
-  List<dynamic>? review;
+  double? averageRating;
 
-  UserDto(
-      {required this.name,
-      required this.phone,
-      required this.email,
-      required this.profilePhoto,
-      this.id,
-      this.review});
+  UserDto({
+    required this.name,
+    required this.phone,
+    required this.email,
+    required this.profilePhoto,
+    this.id,
+    this.averageRating,
+  });
 
   factory UserDto.fromMap(Map<String, dynamic> data) => UserDto(
-        name: data['name'] as String?,
-        email: data['email'] as String?,
-        phone: data['phone'] as dynamic,
-        profilePhoto: data['ProfilePhoto'] as String?,
-        id: data['id'] as int?,
-        review: data['review'] as List<dynamic>?,
-      );
+      name: data['name'] as String?,
+      email: data['email'] as String?,
+      phone: data['phone'] as String?,
+      profilePhoto: data['ProfilePhoto'] as String?,
+      id: data['id'] as int?,
+      averageRating: (data['averageRating'] as num?)?.toDouble());
 
   Map<String, dynamic> toMap() => {
         'name': name,
@@ -31,7 +31,7 @@ class UserDto {
         'phone': phone,
         'ProfilePhoto': profilePhoto,
         'id': id,
-        'review': review,
+        'averageRating': averageRating,
       };
 
   /// `dart:convert`

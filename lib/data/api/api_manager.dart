@@ -1,12 +1,13 @@
 import 'dart:ffi';
 import 'package:hatly/data/api/book_info.dart';
+import 'package:hatly/data/api/countries_flags/countries_flags.dart';
+import 'package:hatly/data/api/item.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
 import 'package:hatly/data/api/login/login_request.dart';
 import 'package:hatly/data/api/login/login_response/login_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
 import 'package:hatly/data/api/register/register_request.dart';
 import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment_request.dart';
-import 'package:hatly/data/api/shipments/create_shipment_request/item.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
@@ -24,7 +25,8 @@ import 'package:http/http.dart';
 import 'interceptor/LoggingInterceptor.dart';
 
 class ApiManager {
-  static const String baseUrl = 'hatly-api.vercel.app';
+  static const String baseUrl = 'hatlyapi.onrender.com';
+  static const String countriesBaseUrl = 'countriesnow.space';
   Client client = InterceptedClient.build(
     interceptors: [
       LoggingInterceptor(),
@@ -55,8 +57,27 @@ class ApiManager {
         throw ServerErrorException(registerResponse.message!);
       }
       return registerResponse;
-    } on FormatException catch (e) {
-      throw ServerErrorException(e.message);
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<CountriesFlags> getCountriesFlags() async {
+    try {
+      var url = Uri.https(countriesBaseUrl, 'api/v0.1/countries/flag/images');
+      var response = await client.get(url);
+      var countriesResponse = CountriesFlags.fromJson(response.body);
+
+      if (countriesResponse.error == true) {
+        throw ServerErrorException(countriesResponse.msg!);
+      }
+      return countriesResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
     }
   }
 
@@ -77,8 +98,10 @@ class ApiManager {
         throw ServerErrorException(loginResponse.message!);
       }
       return loginResponse;
-    } on FormatException catch (e) {
-      throw ServerErrorException(e.message);
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
     }
   }
 
@@ -97,6 +120,8 @@ class ApiManager {
       return getResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
     }
   }
 
@@ -114,6 +139,8 @@ class ApiManager {
       return getResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
     }
   }
 
@@ -138,6 +165,8 @@ class ApiManager {
       return getResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
     }
   }
 
@@ -161,6 +190,8 @@ class ApiManager {
       return getResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
     }
   }
 
@@ -200,6 +231,8 @@ class ApiManager {
       return tripResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
     }
   }
 

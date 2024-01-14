@@ -6,6 +6,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/domain/models/user_model.dart';
+import 'package:hatly/ui/login/login_screen_arguments.dart';
+import 'package:hatly/ui/register/register_screen_arguments.dart';
 import 'package:hatly/ui/register/register_viewmodel.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 
@@ -36,6 +38,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   RegisterViewModel viewModel = RegisterViewModel();
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as RegisterScreenArguments;
+    var countriesList = args.countriesFlagsDto.countries;
     return BlocConsumer(
       bloc: viewModel,
       buildWhen: (previous, current) {
@@ -195,7 +200,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             onPressed: () {
                               Navigator.pushReplacementNamed(
-                                  context, LoginScreen.routeName);
+                                  context, LoginScreen.routeName,
+                                  arguments: LoginScreenArguments(
+                                      args.countriesFlagsDto));
                             },
                           ),
                         ),
@@ -242,7 +249,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           //     passwordController.text,
           //     passwordConfirmationController.text);
           print('success');
-          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName,
+              arguments: LoginScreenArguments(args.countriesFlagsDto));
         }
       },
     );

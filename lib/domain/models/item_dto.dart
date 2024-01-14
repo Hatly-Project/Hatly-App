@@ -1,44 +1,56 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/shipments/create_shipment_request/item.dart';
+import 'package:hatly/data/api/item.dart';
+import 'package:hatly/data/api/photo.dart';
+import 'package:hatly/domain/models/photo_dto.dart';
 
 class ItemDto {
   double? price;
   double? weight;
-
-  String? photo;
+  int? quantity;
+  List<PhotoDto>? photos;
   String? link;
   String? name;
   int? id;
   int? shipmentId;
   ItemDto(
       {this.price,
-      this.photo,
+      this.photos,
       this.link,
       this.id,
+      this.quantity = 1,
       this.shipmentId,
       this.name,
       this.weight});
 
   Item toItem() {
     return Item(
-        photo: photo, price: price, link: link, name: name, weight: weight);
+        photos: photos?.map((photo) => photo.toPhoto()).toList(),
+        price: price,
+        link: link,
+        name: name,
+        weight: weight,
+        quantity: quantity);
   }
 
   factory ItemDto.fromMap(Map<String, dynamic> data) => ItemDto(
         id: data['id'] as int?,
+        quantity: data['quantity'] as int?,
         name: data['name'] as String?,
         price: (data['price'] as num?)?.toDouble(),
-        photo: data['photo'] as String?,
+        photos: (data['photos'] as List<dynamic>?)
+            ?.map((e) => PhotoDto.fromMap(e as Map<String, dynamic>))
+            .toList(),
         link: data['link'] as String?,
         shipmentId: data['shipmentId'] as int?,
       );
 
   Map<String, dynamic> toMap() => {
         'id': id,
+        'quantity': quantity,
         'name': name,
         'price': price,
-        'photo': photo,
+        'photos': photos?.map((e) => e.toMap()).toList(),
         'link': link,
         'shipmentId': shipmentId,
       };

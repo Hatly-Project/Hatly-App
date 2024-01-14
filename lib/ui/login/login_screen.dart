@@ -8,6 +8,8 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/ui/home/home_screen.dart';
+import 'package:hatly/ui/home/tabs/home/home_screen_arguments.dart';
+import 'package:hatly/ui/login/login_screen_arguments.dart';
 import 'package:hatly/ui/login/login_viewmodel.dart';
 import '../../utils/dialog_utils.dart';
 import '../../utils/validation_utils.dart';
@@ -33,6 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
   LoginViewModel viewModel = LoginViewModel();
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as LoginScreenArguments;
     return BlocConsumer(
       bloc: viewModel,
       buildWhen: (previous, current) {
@@ -80,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
           print('load');
         } else if (state is LoginSuccessState) {
           print('success');
-          Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+          Navigator.pushReplacementNamed(context, HomeScreen.routeName,
+              arguments: HomeScreenArguments(args.countriesFlagsDto));
           UserProvider userProvider =
               BlocProvider.of<UserProvider>(context, listen: false);
           userProvider.login(LoggedInState(

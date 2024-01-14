@@ -162,7 +162,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
       },
       builder: (context, state) {
         if (state is GetMyShipmentsSuccessState) {
-          print('getSuccess');
+          print('getMySuccess');
           myShipments = state.responseDto.shipments ?? [];
           if (myShipments.isEmpty) {
             isMyshipmentEmpty = true;
@@ -170,6 +170,8 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
             print('empty');
           } else {
             isMyshipmentEmpty = false;
+            print(
+                'photoooo ${myShipments.first.items!.first.photos!.first.photo!}');
             cacheMyShipments(myShipments);
           }
           shimmerIsLoading = false;
@@ -249,12 +251,17 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                                           date: DateFormat('dd MMMM yyyy')
                                               .format(myShipments[index]
                                                   .expectedDate!),
-                                          shipImage: base64ToImage(
-                                              myShipments[index]
-                                                      .items
-                                                      ?.first
-                                                      .photo ??
-                                                  ''), //
+                                          shipImage: Image.network(
+                                            myShipments[index]
+                                                .items!
+                                                .first
+                                                .photos!
+                                                .first
+                                                .photo!,
+                                            fit: BoxFit.fitHeight,
+                                            width: 100,
+                                            height: 100,
+                                          ), //
                                         ),
                                     childCount: myShipments.length),
                               ),
@@ -318,8 +325,17 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                             to: myShipments[index].to!,
                             date: DateFormat('dd MMMM yyyy')
                                 .format(myShipments[index].expectedDate!),
-                            shipImage: base64ToImage(
-                                myShipments[index].items?.first.photo ?? ''), //
+                            shipImage: Image.network(
+                              myShipments[index]
+                                  .items!
+                                  .first
+                                  .photos!
+                                  .first
+                                  .photo!,
+                              fit: BoxFit.fitHeight,
+                              width: 100,
+                              height: 100,
+                            ), //
                           ),
                         ),
                 ),
@@ -415,6 +431,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
   void showShipmentBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
       builder: (context) => AddShipmentBottomSheet(
         onError: onError,
         done: done,

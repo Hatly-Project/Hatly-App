@@ -8,9 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/book_info_dto.dart';
+import 'package:hatly/domain/models/country_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/ui/components/custom_text_field.dart';
+import 'package:hatly/ui/home/tabs/trips/countries_list_bottom_sheet.dart';
+import 'package:hatly/ui/home/tabs/trips/create_trip_arguments.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips_viewmodel.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -128,6 +131,10 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as CreatetripScreenArguments;
+    var countries = args.countriesFlagsDto.countries;
+
     return BlocConsumer(
       bloc: viewModel,
       listener: (context, state) {
@@ -212,206 +219,23 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                       height: 10,
                     ),
                     Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'From',
-                            style: GoogleFonts.poppins(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          CSCPicker(
-                            ///Enable disable state dropdown [OPTIONAL PARAMETER]
-                            showStates: true,
-
-                            /// Enable disable city drop down [OPTIONAL PARAMETER]
-                            showCities: false,
-
-                            ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
-                            flagState: CountryFlag.DISABLE,
-
-                            ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-                            dropdownDecoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1)),
-
-                            ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-                            disabledDropdownDecoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                color: Colors.grey.shade300,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1)),
-
-                            ///placeholders for dropdown search field
-                            countrySearchPlaceholder: "Country",
-                            stateSearchPlaceholder: "State",
-                            citySearchPlaceholder: "City",
-
-                            ///labels for dropdown
-                            countryDropdownLabel: "*Country",
-                            stateDropdownLabel: "*State",
-                            cityDropdownLabel: "*City",
-
-                            ///Default Country
-                            //defaultCountry: CscCountry.India,
-
-                            ///Disable country dropdown (Note: use it with default country)
-                            //disableCountry: true,
-
-                            ///selected item style [OPTIONAL PARAMETER]
-                            selectedItemStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-
-                            ///DropdownDialog Heading style [OPTIONAL PARAMETER]
-                            dropdownHeadingStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold),
-
-                            ///DropdownDialog Item style [OPTIONAL PARAMETER]
-                            dropdownItemStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-
-                            ///Dialog box radius [OPTIONAL PARAMETER]
-                            dropdownDialogRadius: 10.0,
-
-                            ///Search bar radius [OPTIONAL PARAMETER]
-                            searchBarRadius: 10.0,
-
-                            ///triggers once country selected in dropdown
-                            onCountryChanged: (value) {
-                              setState(() {
-                                ///store value in country variable
-                                fromCountry = value;
-                              });
-                            },
-
-                            ///triggers once state selected in dropdown
-                            onStateChanged: (value) {
-                              setState(() {
-                                ///store value in state variable
-                                fromStateValue = value ?? "";
-                              });
-                            },
-
-                            ///triggers once city selected in dropdown
-
-                            onCityChanged: (value) {
-                              setState(() {
-                                fromCityValue = value ?? "";
-                              });
-                            },
-                          ),
-                          Text(
-                            'To',
-                            style: GoogleFonts.poppins(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          CSCPicker(
-                            ///Enable disable state dropdown [OPTIONAL PARAMETER]
-                            showStates: true,
-
-                            /// Enable disable city drop down [OPTIONAL PARAMETER]
-                            showCities: false,
-
-                            ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
-                            flagState: CountryFlag.DISABLE,
-
-                            ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-                            dropdownDecoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1)),
-
-                            ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-                            disabledDropdownDecoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                color: Colors.grey.shade300,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1)),
-
-                            ///placeholders for dropdown search field
-                            countrySearchPlaceholder: "Country",
-                            stateSearchPlaceholder: "State",
-                            citySearchPlaceholder: "City",
-
-                            ///labels for dropdown
-                            countryDropdownLabel: "*Country",
-                            stateDropdownLabel: "*State",
-                            cityDropdownLabel: "*City",
-
-                            ///Default Country
-                            //defaultCountry: CscCountry.India,
-
-                            ///Disable country dropdown (Note: use it with default country)
-                            //disableCountry: true,
-
-                            ///selected item style [OPTIONAL PARAMETER]
-                            selectedItemStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-
-                            ///DropdownDialog Heading style [OPTIONAL PARAMETER]
-                            dropdownHeadingStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold),
-
-                            ///DropdownDialog Item style [OPTIONAL PARAMETER]
-                            dropdownItemStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-
-                            ///Dialog box radius [OPTIONAL PARAMETER]
-                            dropdownDialogRadius: 10.0,
-
-                            ///Search bar radius [OPTIONAL PARAMETER]
-                            searchBarRadius: 10.0,
-
-                            ///triggers once country selected in dropdown
-                            onCountryChanged: (value) {
-                              setState(() {
-                                ///store value in country variable
-                                toCountry = value;
-                              });
-                            },
-
-                            ///triggers once state selected in dropdown
-                            onStateChanged: (value) {
-                              setState(() {
-                                ///store value in state variable
-                                toStateValue = value ?? "";
-                              });
-                            },
-
-                            onCityChanged: (value) {
-                              setState(() {
-                                toCityValue = value ?? "";
-                              });
-                            },
-                          ),
-                        ],
+                      margin: const EdgeInsets.only(top: 10),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: Size(double.infinity, 60),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                            side: BorderSide(color: Colors.white, width: 2),
+                            backgroundColor: Theme.of(context).primaryColor,
+                            padding: const EdgeInsets.symmetric(vertical: 12)),
+                        onPressed: () {
+                          showCountriesListBottomSheet(context, countries!);
+                        },
+                        child: const Text(
+                          'open',
+                          style: TextStyle(fontSize: 24, color: Colors.white),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -642,6 +466,23 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
           ),
         );
       },
+    );
+  }
+
+  void showCountriesListBottomSheet(
+      BuildContext context, List<CountryDto> countries) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => CountriesListBottomSheet(
+        countries: countries,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
     );
   }
 

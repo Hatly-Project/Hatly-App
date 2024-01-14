@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/photo_dto.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -37,6 +38,8 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
   String? fromStateValue;
   String? base64Image;
   var toCountryValue = '';
+  List<PhotoDto> itemPhotos = [];
+
   String? toStateValue;
   double _bottomSheetPadding = 20.0;
   var nameController = TextEditingController(text: '');
@@ -45,7 +48,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
   var linkController = TextEditingController(text: '');
 
   var priceController = TextEditingController(text: '');
-  XFile? image;
+  List<XFile>? image;
   var formKey = GlobalKey<FormState>();
 
   @override
@@ -266,7 +269,7 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
     }
     print(update);
     addItem(nameController.text, priceController.text, linkController.text,
-        base64Image, weightController.text, update, widget.itemId);
+        itemPhotos, weightController.text, update, widget.itemId);
     Navigator.of(context).pop();
     // viewModel.login(emailController.text, passwordController.text);
   }
@@ -275,18 +278,26 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
     final ImagePicker picker = ImagePicker();
 
     // Pick an image.
-    image = await picker.pickImage(
-        source: ImageSource.gallery, maxWidth: 100, maxHeight: 100);
+    image = await picker.pickMultiImage(maxWidth: 100, maxHeight: 100);
 
     if (image != null) {
       // Read the image file as bytes.
-      List<int> imageBytes = await image!.readAsBytes();
+      for (var element in image!) {
+        List<int> im = await element.readAsBytes();
+        base64Image = base64Encode(im);
+        itemPhotos.add(PhotoDto(photo: base64Image));
+      }
+      // List<int> imageBytes = await image!.readAsBytes();
 
-      // Convert the image bytes to a Base64 encoded string.
-      base64Image = base64Encode(imageBytes);
+      // // Convert the image bytes to a Base64 encoded string.
+      // base64Image = base64Encode(imageBytes);
 
-      // Now you have the image as a Base64 string.
-      print('Base64 encoded image: $base64Image');
+      // itemPhotos.add(PhotoDto(photo: base64Image));
+      // // Now you have the image as a Base64 string.
+      // print('Base64 encoded image: $base64Image');
+      for (var element in itemPhotos) {
+        print('base ${element.photo}');
+      }
       setState(() {});
     } else {
       if (kDebugMode) {

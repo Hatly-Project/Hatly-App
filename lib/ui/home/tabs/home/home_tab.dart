@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/ui/components/shimmer_card.dart';
 import 'package:hatly/ui/components/trip_card.dart';
+import 'package:hatly/ui/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/ui/home/tabs/home/home_tab_viewmodel.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -136,6 +137,12 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
+
+    for (var element in args.countriesFlagsDto.countries!) {
+      print(element.name);
+    }
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {
@@ -220,7 +227,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             } else {
               shipmentsIsEmpty = false;
               // cacheShipments(shipments);
-              print('success ${shipments[0].items![0].photo}');
+              print('success ${shipments[0].items![0].photos!.first}');
             }
             shimmerIsLoading = false;
           }
@@ -430,36 +437,39 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                       delegate: SliverChildBuilderDelegate(
                                         (context, index) => selectedTab == 0
                                             ? ShipmentCard(
-                                                title: shipments[index].title!,
-                                                from: shipments[index].from!,
-                                                to: shipments[index].to!,
-                                                date: shipments[index]
-                                                    .expectedDate!,
-                                                userName: shipments[index]
-                                                    .user!
-                                                    .name!,
-                                                shipImage: shipments[index]
-                                                            .items![0]
-                                                            .photo ==
-                                                        null
-                                                    ? null
-                                                    : base64ToImage(
-                                                        shipments[index]
-                                                            .items![0]
-                                                            .photo!),
-                                                userImage: shipments[index]
-                                                            .user!
-                                                            .profilePhoto ==
-                                                        null
-                                                    ? null
-                                                    : base64ToUserImage(
-                                                        shipments[index]
-                                                            .user!
-                                                            .profilePhoto!),
-                                                bonus: shipments[index]
-                                                    .reward
-                                                    .toString(),
+                                                shipmentDto: shipments[index],
                                               )
+                                            // ShipmentCard(
+                                            //     title: shipments[index].title!,
+                                            //     from: shipments[index].from!,
+                                            //     to: shipments[index].to!,
+                                            //     date: shipments[index]
+                                            //         .expectedDate!,
+                                            //     userName: shipments[index]
+                                            //         .user!
+                                            //         .name!,
+                                            //     shipImage: shipments[index]
+                                            //                 .items![0]
+                                            //                 .photo ==
+                                            //             null
+                                            //         ? null
+                                            //         : base64ToImage(
+                                            //             shipments[index]
+                                            //                 .items![0]
+                                            //                 .photo!),
+                                            //     userImage: shipments[index]
+                                            //                 .user!
+                                            //                 .profilePhoto ==
+                                            //             null
+                                            //         ? null
+                                            //         : base64ToUserImage(
+                                            //             shipments[index]
+                                            //                 .user!
+                                            //                 .profilePhoto!),
+                                            //     bonus: shipments[index]
+                                            //         .reward
+                                            //         .toString(),
+                                            //   )
                                             : Container(),
                                         childCount: shipments.length,
                                       ),
@@ -732,36 +742,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         delegate: SliverChildBuilderDelegate(
                                           (context, index) => selectedTab == 0
                                               ? ShipmentCard(
-                                                  title:
-                                                      shipments[index].title!,
-                                                  from: shipments[index].from!,
-                                                  to: shipments[index].to!,
-                                                  date: shipments[index]
-                                                      .expectedDate!,
-                                                  userName: shipments[index]
-                                                      .user!
-                                                      .name!,
-                                                  shipImage: shipments[index]
-                                                              .items![0]
-                                                              .photo ==
-                                                          null
-                                                      ? null
-                                                      : base64ToImage(
-                                                          shipments[index]
-                                                              .items![0]
-                                                              .photo!),
-                                                  userImage: shipments[index]
-                                                              .user!
-                                                              .profilePhoto ==
-                                                          null
-                                                      ? null
-                                                      : base64ToUserImage(
-                                                          shipments[index]
-                                                              .user!
-                                                              .profilePhoto!),
-                                                  bonus: shipments[index]
-                                                      .reward
-                                                      .toString(),
+                                                  shipmentDto: shipments[index],
                                                 )
                                               : Container(),
                                           childCount: shipments.length,

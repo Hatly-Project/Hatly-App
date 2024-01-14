@@ -5,7 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/ui/home/tabs/home/home_tab.dart';
 import 'package:hatly/ui/login/login_screen.dart';
+import 'package:hatly/ui/login/login_screen_arguments.dart';
 import 'package:hatly/ui/register/register_screen.dart';
+import 'package:hatly/ui/register/register_screen_arguments.dart';
+import 'package:hatly/ui/welcome/welcome_screen_arguments.dart';
 
 import '../../providers/auth_provider.dart';
 
@@ -39,6 +42,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as WelcomeScreenArguments;
+    var countriesList = args.countriesFlagsDto.countries;
+    print(countriesList!.first.name);
+
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -79,7 +87,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushReplacementNamed(
-                          context, LoginScreen.routeName);
+                          context, LoginScreen.routeName,
+                          arguments:
+                              LoginScreenArguments(args.countriesFlagsDto));
                     },
                     style: ElevatedButton.styleFrom(
                         // minimumSize: Size(double.infinity, 10),
@@ -102,7 +112,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushReplacementNamed(
-                          context, RegisterScreen.routeName);
+                          context, RegisterScreen.routeName,
+                          arguments:
+                              RegisterScreenArguments(args.countriesFlagsDto));
                     },
                     style: ElevatedButton.styleFrom(
                         // minimumSize: Size(double.infinity, 10),

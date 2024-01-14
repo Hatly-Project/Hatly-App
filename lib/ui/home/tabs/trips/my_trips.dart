@@ -13,8 +13,11 @@ import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/ui/components/my_trip_card.dart';
 import 'package:hatly/ui/components/my_shipment_card.dart';
 import 'package:hatly/ui/components/trip_card.dart';
+import 'package:hatly/ui/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipments_bottom_sheet.dart';
+import 'package:hatly/ui/home/tabs/trips/countries_list_bottom_sheet.dart';
+import 'package:hatly/ui/home/tabs/trips/create_trip_arguments.dart';
 import 'package:hatly/ui/home/tabs/trips/create_trip_screen.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips_viewmodel.dart';
 import 'package:hatly/ui/login/login_screen.dart';
@@ -105,6 +108,8 @@ class _MyTripsTabState extends State<MyTripsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
     return BlocConsumer(
       bloc: viewModel,
       listener: (context, state) {
@@ -175,8 +180,9 @@ class _MyTripsTabState extends State<MyTripsTab> {
                     IconButton(
                       onPressed: () {
                         // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateTripScreen()));
-                        Navigator.pushNamed(
-                            context, CreateTripScreen.routeName);
+                        Navigator.pushNamed(context, CreateTripScreen.routeName,
+                            arguments: CreatetripScreenArguments(
+                                args.countriesFlagsDto));
                       },
                       icon: const Icon(
                         Icons.add,

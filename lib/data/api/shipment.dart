@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:hatly/data/api/count.dart';
 import 'package:hatly/data/api/item.dart';
 import 'package:hatly/data/api/user.dart';
 
@@ -10,6 +11,7 @@ class Shipment {
   User? user;
   String? title;
   dynamic trip;
+  String? notes;
   double? wight;
   String? from;
   String? to;
@@ -17,20 +19,22 @@ class Shipment {
   double? reward;
   DateTime? expectedDate;
   List<Item>? items;
+  Count? count;
 
-  Shipment({
-    this.id,
-    this.user,
-    this.title,
-    this.trip,
-    this.wight,
-    this.from,
-    this.to,
-    this.totalPrice,
-    this.reward,
-    this.expectedDate,
-    this.items,
-  });
+  Shipment(
+      {this.id,
+      this.user,
+      this.title,
+      this.trip,
+      this.notes,
+      this.wight,
+      this.from,
+      this.to,
+      this.totalPrice,
+      this.reward,
+      this.expectedDate,
+      this.items,
+      this.count});
 
   factory Shipment.fromMap(Map<String, dynamic> data) => Shipment(
         id: data['id'] as int?,
@@ -41,6 +45,7 @@ class Shipment {
         trip: data['trip'] as dynamic,
         wight: (data['wight'] as num?)?.toDouble(),
         from: data['from'] as String?,
+        notes: data['note'] as String?,
         to: data['to'] as String?,
         totalPrice: (data['total_price'] as num?)?.toDouble(),
         reward: (data['reward'] as num?)?.toDouble(),
@@ -50,6 +55,9 @@ class Shipment {
         items: (data['items'] as List<dynamic>?)
             ?.map((e) => Item.fromMap(e as Map<String, dynamic>))
             .toList(),
+        count: data['_count'] == null
+            ? null
+            : Count.fromMap(data['_count'] as Map<String, dynamic>),
       );
 
   Map<String, dynamic> toMap() => {
@@ -58,12 +66,14 @@ class Shipment {
         'title': title,
         'trip': trip,
         'wight': wight,
+        'note': notes,
         'from': from,
         'to': to,
         'total_price': totalPrice,
         'reward': reward,
         'expectedDate': expectedDate?.toIso8601String(),
         'items': items?.map((e) => e.toMap()).toList(),
+        '_count': count?.toMap(),
       };
 
   /// `dart:convert`
@@ -79,16 +89,19 @@ class Shipment {
   String toJson() => json.encode(toMap());
   ShipmentDto toShipmentDto() {
     return ShipmentDto(
-        id: id,
-        user: user?.toUserDto(),
-        title: title,
-        trip: trip,
-        wight: wight,
-        from: from,
-        to: to,
-        totalPrice: totalPrice,
-        reward: reward,
-        expectedDate: expectedDate,
-        items: items?.map((item) => item.toItemDto()).toList());
+      id: id,
+      user: user?.toUserDto(),
+      title: title,
+      trip: trip,
+      wight: wight,
+      from: from,
+      to: to,
+      notes: notes,
+      totalPrice: totalPrice,
+      reward: reward,
+      expectedDate: expectedDate,
+      items: items?.map((item) => item.toItemDto()).toList(),
+      count: count,
+    );
   }
 }

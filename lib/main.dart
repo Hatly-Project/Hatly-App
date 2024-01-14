@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/firebase_options.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/ui/home/home_screen.dart';
+import 'package:hatly/ui/home/tabs/shipments/shipment_details.dart';
 import 'package:hatly/ui/home/tabs/trips/create_trip_screen.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips.dart';
 import 'package:hatly/ui/login/login_screen.dart';
@@ -52,7 +53,8 @@ class MyApp extends StatelessWidget {
         WelcomeScreen.routeName: (context) => WelcomeScreen(),
         MyTripsTab.routeName: (context) => MyTripsTab(),
         HomeScreen.routeName: (context) => HomeScreen(),
-        CreateTripScreen.routeName: (context) => CreateTripScreen()
+        CreateTripScreen.routeName: (context) => CreateTripScreen(),
+        ShipmentDetails.routeName: (context) => ShipmentDetails()
       },
     );
   }

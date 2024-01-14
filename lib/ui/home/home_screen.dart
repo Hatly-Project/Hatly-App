@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/ui/components/shipment_card.dart';
+import 'package:hatly/ui/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/ui/home/tabs/home/home_tab.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_tab.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips.dart';

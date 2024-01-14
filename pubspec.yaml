@@ -45,10 +45,15 @@ dependencies:
   intl: ^0.18.1
   connectivity: ^3.0.3
   html: ^0.15.0
+  url_launcher: ^6.0.9
   hive: ^2.2.3
+  flutter_svg: ^2.0.9
+  flutter_image_slideshow: ^0.1.6
+  carousel_slider: ^4.0.0
   shimmer: ^3.0.0
   multi_dropdown: ^2.0.0
   firebase_core: ^2.24.2
+  shared_preferences: ^2.2.2
 
 
 dev_dependencies:

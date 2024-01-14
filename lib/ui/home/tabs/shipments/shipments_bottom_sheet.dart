@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/item_dto.dart';
+import 'package:hatly/domain/models/photo_dto.dart';
 import 'package:hatly/ui/components/shipment_item.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipment_fees_bottom.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipment_item_bottom.dart';
@@ -350,7 +351,8 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                       itemPrice: items[index].price.toString(),
                       itemLink: items[index].link!,
                       weight: items[index].weight.toString(),
-                      shipImage: base64ToImage(items[index].photo!),
+                      shipImage:
+                          base64ToImage(items[index].photos!.first.photo!),
                       id: items[index].id,
                       update: update,
                     );
@@ -508,7 +510,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
     done(widget.done, bonus);
   }
 
-  void addItem(String title, String price, String link, String baseImage,
+  void addItem(String title, String price, String link, List<PhotoDto> images,
       String weight, bool update, int? id) {
     itemItile = title;
     itemPrice = price;
@@ -521,14 +523,14 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
             price: double.tryParse(itemPrice),
             link: link,
             weight: double.tryParse(weight),
-            photo: baseImage,
+            photos: images,
             id: id)
         : items.add(ItemDto(
             name: itemItile,
             price: double.tryParse(itemPrice),
             link: link,
             weight: double.tryParse(weight),
-            photo: baseImage,
+            photos: images,
             id: itemID++));
     print('shipment weight $weight');
     totalItems = items.length.toString();
