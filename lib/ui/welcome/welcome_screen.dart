@@ -44,8 +44,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as WelcomeScreenArguments;
-    var countriesList = args.countriesFlagsDto.countries;
-    print(countriesList!.first.name);
+    var countriesList = args.countriesFlagsDto;
 
     return Container(
       decoration: const BoxDecoration(

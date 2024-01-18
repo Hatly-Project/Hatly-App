@@ -40,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as RegisterScreenArguments;
-    var countriesList = args.countriesFlagsDto.countries;
+    var countriesList = args.countriesFlagsDto;
     return BlocConsumer(
       bloc: viewModel,
       buildWhen: (previous, current) {

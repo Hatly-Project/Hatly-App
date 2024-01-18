@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:hatly/data/api/count.dart';
+import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/user_model.dart';
 
@@ -81,5 +82,21 @@ class ShipmentDto {
   /// Parses the string and returns the resulting Json object as [Shipment].
   factory ShipmentDto.fromJson(String data) {
     return ShipmentDto.fromMap(json.decode(data) as Map<String, dynamic>);
+  }
+
+  Shipment toShipment() {
+    return Shipment(
+        id: id,
+        title: title,
+        notes: notes,
+        wight: wight,
+        from: from,
+        to: to,
+        totalPrice: totalPrice,
+        reward: reward,
+        expectedDate: expectedDate,
+        items: items?.map((item) => item.toItem()).toList(),
+        count: count,
+        user: user?.toUser());
   }
 }

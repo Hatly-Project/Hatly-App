@@ -3,6 +3,8 @@ import 'package:hatly/domain/models/create_trip_response_dto.dart';
 import 'package:hatly/domain/models/get_all_trips_response_dto.dart';
 import 'package:hatly/domain/models/get_user_trip_response_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
+import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/domain/models/trip_deal_response.dart';
 
 abstract class TripsDatasource {
   Future<GetAllTripsResponseDto> getAllTrips(String token);
@@ -18,4 +20,10 @@ abstract class TripsDatasource {
       required String token});
 
   Future<GetUserTripResponseDto> getUserTrip({required String token});
+
+  Future<TripDealResponseDto> sendDeal(
+      {List<ShipmentDto>? shipments,
+      double? reward,
+      required String token,
+      required int tripId});
 }

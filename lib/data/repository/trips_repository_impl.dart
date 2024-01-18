@@ -4,6 +4,8 @@ import 'package:hatly/domain/models/create_trip_response_dto.dart';
 import 'package:hatly/domain/models/get_all_trips_response_dto.dart';
 import 'package:hatly/domain/models/get_user_trip_response_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
+import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/domain/models/trip_deal_response.dart';
 import 'package:hatly/domain/repository/trips_repository.dart';
 
 class TripsRepositoryImpl implements TripsRepository {
@@ -42,5 +44,15 @@ class TripsRepositoryImpl implements TripsRepository {
   @override
   Future<GetUserTripResponseDto> getUserTrip({required String token}) {
     return tripsDatasource.getUserTrip(token: token);
+  }
+
+  @override
+  Future<TripDealResponseDto> sendDeal(
+      {List<ShipmentDto>? shipments,
+      double? reward,
+      required String token,
+      required int tripId}) {
+    return tripsDatasource.sendDeal(
+        token: token, tripId: tripId, shipments: shipments, reward: reward);
   }
 }

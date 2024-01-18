@@ -140,9 +140,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     final args =
         ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
 
-    for (var element in args.countriesFlagsDto.countries!) {
-      print(element.name);
-    }
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {

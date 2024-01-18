@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/ui/home/tabs/trips/trip_details.dart';
+import 'package:hatly/ui/home/tabs/trips/trip_details_arguments.dart';
 import 'package:intl/intl.dart';
 
 class TripCard extends StatelessWidget {
@@ -18,7 +19,8 @@ class TripCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(10),
       child: InkWell(
-        onTap: () => Navigator.pushNamed(context, TripDetails.routeName),
+        onTap: () => Navigator.pushNamed(context, TripDetails.routeName,
+            arguments: TripDetailsArguments(tripsDto: tripsDto)),
         child: Card(
           color: Colors.white,
           shape: RoundedRectangleBorder(

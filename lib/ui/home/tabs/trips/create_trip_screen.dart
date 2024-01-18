@@ -8,13 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/book_info_dto.dart';
+import 'package:hatly/domain/models/countries_dto.dart';
 import 'package:hatly/domain/models/country_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
+import 'package:hatly/domain/models/state_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/ui/components/custom_text_field.dart';
 import 'package:hatly/ui/home/tabs/trips/countries_list_bottom_sheet.dart';
 import 'package:hatly/ui/home/tabs/trips/create_trip_arguments.dart';
 import 'package:hatly/ui/home/tabs/trips/my_trips_viewmodel.dart';
+import 'package:hatly/ui/home/tabs/trips/states_list_bottom_sheet.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
@@ -66,7 +69,12 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   TextEditingController state = TextEditingController();
   TextEditingController city = TextEditingController();
   bool isMyTripsEmpty = true;
+  int selectedCountryIndex = 0;
+  late CountriesDto countries;
   Image? shipImage;
+  List<StateDto> fromStatesList = [];
+  List<StateDto> toStatesList = [];
+
   late LoggedInState loggedInState;
 
   @override
@@ -133,7 +141,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as CreatetripScreenArguments;
-    var countries = args.countriesFlagsDto.countries;
+    countries = args.countriesFlagsDto;
 
     return BlocConsumer(
       bloc: viewModel,
@@ -219,32 +227,285 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                       height: 10,
                     ),
                     Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            minimumSize: Size(double.infinity, 60),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            side: BorderSide(color: Colors.white, width: 2),
-                            backgroundColor: Theme.of(context).primaryColor,
-                            padding: const EdgeInsets.symmetric(vertical: 12)),
-                        onPressed: () {
-                          showCountriesListBottomSheet(context, countries!);
-                        },
-                        child: const Text(
-                          'open',
-                          style: TextStyle(fontSize: 24, color: Colors.white),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          minimumSize: Size(160, 45),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              width: 1),
+                                          backgroundColor: Colors.transparent,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12)),
+                                      onPressed: () {
+                                        showFromCountriesListBottomSheet(
+                                            context, countries);
+                                      },
+                                      child: Container(
+                                        width: 150,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: const Icon(
+                                                Icons.location_on_rounded,
+                                                color: Colors.amber,
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: Text(
+                                                'From',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context)
+                                                        .primaryColor),
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              width: 65,
+                                              child: Text(
+                                                fromCountry.isEmpty
+                                                    ? 'Country'
+                                                    : fromCountry,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          minimumSize: Size(160, 45),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              width: 1),
+                                          backgroundColor: Colors.transparent,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12)),
+                                      onPressed: () {
+                                        showToCountriesListBottomSheet(
+                                            context, countries);
+                                      },
+                                      child: Container(
+                                        width: 150,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: const Icon(
+                                                Icons.location_on_rounded,
+                                                color: Colors.amber,
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: Text(
+                                                'To',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context)
+                                                        .primaryColor),
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: Text(
+                                                toCountry.isEmpty
+                                                    ? 'Country'
+                                                    : toCountry,
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          minimumSize: Size(160, 45),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              width: 1),
+                                          backgroundColor: Colors.transparent,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12)),
+                                      onPressed: fromCountry.isNotEmpty
+                                          ? () {
+                                              showFromStatesListBottomSheet(
+                                                  context, fromStatesList);
+                                            }
+                                          : null,
+                                      child: Container(
+                                        width: 150,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: const Icon(
+                                                Icons.location_on_rounded,
+                                                color: Colors.amber,
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: Text(
+                                                'From',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context)
+                                                        .primaryColor),
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              width: 60,
+                                              child: Text(
+                                                fromCityValue.isEmpty
+                                                    ? 'City'
+                                                    : fromCityValue,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          minimumSize: Size(160, 45),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              width: 1),
+                                          backgroundColor: Colors.transparent,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12)),
+                                      onPressed: toCountry.isNotEmpty
+                                          ? () {
+                                              showToStatesListBottomSheet(
+                                                  context, toStatesList);
+                                            }
+                                          : null,
+                                      child: Container(
+                                        width: 150,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: const Icon(
+                                                Icons.location_on_rounded,
+                                                color: Colors.amber,
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: Text(
+                                                'To',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context)
+                                                        .primaryColor),
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              width: 60,
+                                              child: Text(
+                                                toCityValue.isEmpty
+                                                    ? 'City'
+                                                    : toCityValue,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Divider(
-                      height: 2,
-                      thickness: 3,
-                      color: Colors.grey[500],
                     ),
                     SizedBox(
                       height: 15,
@@ -375,46 +636,53 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                         ],
                       ),
                     ),
-                    Center(
-                      child: Text(
-                        'Categories do not like to carry',
-                        style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      child: Center(
+                        child: Text(
+                          'Categories do not like to carry',
+                          style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
                       ),
                     ),
-                    Center(
-                      child: MultiSelectDropDown(
-                        showClearIcon: true,
-                        controller: _controller,
-                        onOptionSelected: (items) {
-                          itemsNotAllowed = items
-                              .map((item) =>
-                                  ItemsNotAllowedDto(name: item.label))
-                              .toList();
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      child: Center(
+                        child: MultiSelectDropDown(
+                          showClearIcon: true,
+                          controller: _controller,
+                          onOptionSelected: (items) {
+                            itemsNotAllowed = items
+                                .map((item) =>
+                                    ItemsNotAllowedDto(name: item.label))
+                                .toList();
 
-                          for (var element in itemsNotAllowed) {
-                            print(element.name);
-                          }
-                        },
-                        options: const <ValueItem>[
-                          ValueItem(label: 'Mobiles & Tablets'),
-                          ValueItem(label: 'Laptops'),
-                          ValueItem(label: 'Cosmetics'),
-                          ValueItem(label: 'Clothing'),
-                          ValueItem(label: 'Shoes & Bags'),
-                          ValueItem(label: 'Watches & Sunglasses'),
-                          ValueItem(label: 'Supplements'),
-                          ValueItem(label: 'Food & Beverages'),
-                          ValueItem(label: 'Books'),
-                        ],
-                        selectionType: SelectionType.multi,
-                        chipConfig: const ChipConfig(wrapType: WrapType.scroll),
-                        dropdownHeight: 500,
-                        optionTextStyle: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w500),
-                        selectedOptionIcon: const Icon(Icons.check_circle),
+                            for (var element in itemsNotAllowed) {
+                              print(element.name);
+                            }
+                          },
+                          options: const <ValueItem>[
+                            ValueItem(label: 'Mobiles & Tablets'),
+                            ValueItem(label: 'Laptops'),
+                            ValueItem(label: 'Cosmetics'),
+                            ValueItem(label: 'Clothing'),
+                            ValueItem(label: 'Shoes & Bags'),
+                            ValueItem(label: 'Watches & Sunglasses'),
+                            ValueItem(label: 'Supplements'),
+                            ValueItem(label: 'Food & Beverages'),
+                            ValueItem(label: 'Books'),
+                          ],
+                          selectionType: SelectionType.multi,
+                          chipConfig:
+                              const ChipConfig(wrapType: WrapType.scroll),
+                          dropdownHeight: 500,
+                          optionTextStyle: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w500),
+                          selectedOptionIcon: const Icon(Icons.check_circle),
+                        ),
                       ),
                     ),
                     Container(
@@ -422,7 +690,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                       child: CustomFormField(
                         controller: noteController,
                         hint: 'Note',
-                        lines: 5,
+                        lines: 3,
                       ),
                     ),
                     Container(
@@ -469,13 +737,14 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
     );
   }
 
-  void showCountriesListBottomSheet(
-      BuildContext context, List<CountryDto> countries) {
+  void showFromCountriesListBottomSheet(
+      BuildContext context, CountriesDto countries) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
       builder: (context) => CountriesListBottomSheet(
         countries: countries,
+        selectFromCountry: selectFromCountry,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -484,6 +753,102 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
         ),
       ),
     );
+  }
+
+  void showToCountriesListBottomSheet(
+      BuildContext context, CountriesDto countries) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => CountriesListBottomSheet(
+        countries: countries,
+        selectToCountry: selectToCountry,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void showFromStatesListBottomSheet(
+      BuildContext context, List<StateDto> states) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => StatesListBottomSheet(
+        states: states,
+        selectFromCity: selectFromCity,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void showToStatesListBottomSheet(
+      BuildContext context, List<StateDto> states) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => StatesListBottomSheet(
+        states: states,
+        selectToCity: selectToCity,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void selectFromCountry(String selectedCountry) {
+    Navigator.pop(context);
+    var index = countries.countries
+        ?.indexWhere((country) => country.name == selectedCountry);
+    var countryStates = countries.countries![index!].states;
+
+    setState(() {
+      fromCountry = selectedCountry;
+      fromCityValue = '';
+      fromStatesList = countryStates!;
+    });
+  }
+
+  void selectToCountry(String selectedCountry) {
+    Navigator.pop(context);
+    var index = countries.countries
+        ?.indexWhere((country) => country.name == selectedCountry);
+    var countryStates = countries.countries![index!].states;
+
+    setState(() {
+      toCountry = selectedCountry;
+      toCityValue = '';
+      toStatesList = countryStates!;
+    });
+  }
+
+  void selectFromCity(String selectedCity) {
+    Navigator.pop(context);
+
+    setState(() {
+      fromCityValue = selectedCity;
+    });
+  }
+
+  void selectToCity(String selectedCity) {
+    Navigator.pop(context);
+
+    setState(() {
+      toCityValue = selectedCity;
+    });
   }
 
   Image base64ToImage(String base64String) {

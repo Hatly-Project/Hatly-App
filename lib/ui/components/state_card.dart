@@ -3,15 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CountryFlagCard extends StatelessWidget {
-  String imageUrl = '';
-  String countryName = '';
-  Function? selectFromCountry, selectToCountry;
-  CountryFlagCard(
-      {required this.countryName,
-      required this.imageUrl,
-      this.selectFromCountry,
-      this.selectToCountry});
+class StateCard extends StatelessWidget {
+  String stateName = '';
+  Function? selectFromCity, selectToCity;
+  StateCard({required this.stateName, this.selectFromCity, this.selectToCity});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +14,10 @@ class CountryFlagCard extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
-          if (selectFromCountry == null) {
-            selectedToCountry(selectToCountry!);
+          if (selectFromCity == null) {
+            selectedToCity(selectToCity!);
           } else {
-            selectedFromCountry(selectFromCountry!);
+            selectedFromCity(selectFromCity!);
           }
         },
         child: Card(
@@ -30,22 +25,13 @@ class CountryFlagCard extends StatelessWidget {
           elevation: 0,
           child: Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  width: 50,
-                  height: 50,
-                ),
-              ),
               SizedBox(
                 width: MediaQuery.sizeOf(context).width * .1,
               ),
               Container(
                 width: MediaQuery.sizeOf(context).width * .50,
                 child: Text(
-                  countryName,
+                  stateName,
                   overflow: TextOverflow.visible,
                   style: GoogleFonts.poppins(
                       fontSize: 15,
@@ -60,11 +46,11 @@ class CountryFlagCard extends StatelessWidget {
     );
   }
 
-  void selectedFromCountry(Function select) {
-    select(countryName);
+  void selectedFromCity(Function select) {
+    select(stateName);
   }
 
-  void selectedToCountry(Function select) {
-    select(countryName);
+  void selectedToCity(Function select) {
+    select(stateName);
   }
 }
