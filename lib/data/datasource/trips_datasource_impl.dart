@@ -5,6 +5,8 @@ import 'package:hatly/domain/models/create_trip_response_dto.dart';
 import 'package:hatly/domain/models/get_all_trips_response_dto.dart';
 import 'package:hatly/domain/models/get_user_trip_response_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
+import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/domain/models/trip_deal_response.dart';
 
 class TripsDatasourceImpl implements TripsDatasource {
   ApiManager apiManager;
@@ -48,5 +50,20 @@ class TripsDatasourceImpl implements TripsDatasource {
     var response = await apiManager.getUserTrips(token: token);
 
     return response.toUserTripResponseDto();
+  }
+
+  @override
+  Future<TripDealResponseDto> sendDeal(
+      {List<ShipmentDto>? shipments,
+      double? reward,
+      required String token,
+      required int tripId}) async {
+    var response = await apiManager.sendTripDeal(
+        token: token,
+        tripId: tripId,
+        shipments: shipments?.map((shipment) => shipment.toShipment()).toList(),
+        reward: reward);
+
+    return response.toTripDealResponseDto();
   }
 }

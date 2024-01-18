@@ -1,16 +1,21 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'package:hatly/data/api/book_info.dart';
-import 'package:hatly/data/api/countries_flags/countries_flags.dart';
+import 'package:hatly/data/api/countries_states/countries.dart';
+import 'package:hatly/data/api/countries_states/countries_states.dart';
 import 'package:hatly/data/api/item.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
 import 'package:hatly/data/api/login/login_request.dart';
 import 'package:hatly/data/api/login/login_response/login_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
 import 'package:hatly/data/api/register/register_request.dart';
+import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment_request.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
+import 'package:hatly/data/api/trip_deal/trip_deal_request.dart';
+import 'package:hatly/data/api/trip_deal/trip_deal_response.dart';
 import 'package:hatly/data/api/trips/create_trip_request/create_trip_request.dart';
 import 'package:hatly/data/api/trips/create_trip_response/create_trip_response.dart';
 import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_response/get_all_trips_response.dart';
@@ -18,6 +23,7 @@ import 'package:hatly/data/api/trips/get_user_trip_response/get_user_trip_respon
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/models/book_info_dto.dart';
 import 'package:hatly/domain/models/item_dto.dart';
+import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -26,7 +32,6 @@ import 'interceptor/LoggingInterceptor.dart';
 
 class ApiManager {
   static const String baseUrl = 'hatly-api.vercel.app';
-  static const String countriesBaseUrl = 'countriesnow.space';
   Client client = InterceptedClient.build(
     interceptors: [
       LoggingInterceptor(),
@@ -64,15 +69,12 @@ class ApiManager {
     }
   }
 
-  Future<CountriesFlags> getCountriesFlags() async {
+  Future<Countries> getCountriesFlags() async {
     try {
-      var url = Uri.https(countriesBaseUrl, 'api/v0.1/countries/flag/images');
+      var url = Uri.https(baseUrl, 'assets');
       var response = await client.get(url);
-      var countriesResponse = CountriesFlags.fromJson(response.body);
 
-      if (countriesResponse.error == true) {
-        throw ServerErrorException(countriesResponse.msg!);
-      }
+      var countriesResponse = Countries.fromJson(response.body);
       return countriesResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
@@ -188,6 +190,40 @@ class ApiManager {
       }
 
       return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<TripDealResponse> sendTripDeal(
+      {List<Shipment>? shipments,
+      double? reward,
+      required String token,
+      required int tripId}) async {
+    try {
+      print('tripId ${shipments!.first.id}');
+      var url = Uri.https(baseUrl, 'deal/trip', {
+        'tripId': tripId.toString(),
+      });
+      var requestBody = TripDealRequest(
+        shipments: shipments,
+        reward: reward,
+      );
+      print(url.toString());
+      var response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {
+            'content-type': 'application/json',
+            'authorization': 'Bearer $token'
+          });
+
+      var tripDealResponse = TripDealResponse.fromJson(response.body);
+      if (tripDealResponse.status == false) {
+        throw ServerErrorException(tripDealResponse.message!);
+      }
+      return tripDealResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
     } on Exception catch (e) {

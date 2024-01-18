@@ -1,7 +1,8 @@
-import 'package:hatly/domain/models/countries_flags_dto.dart';
+import 'package:hatly/domain/models/countries_dto.dart';
+import 'package:hatly/domain/models/country_dto.dart';
 
 class WelcomeScreenArguments {
-  CountriesFlagsDto countriesFlagsDto;
+  CountriesDto countriesFlagsDto;
 
   WelcomeScreenArguments(this.countriesFlagsDto);
 }

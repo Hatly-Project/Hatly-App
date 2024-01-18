@@ -6,12 +6,18 @@ class DialogUtils {
       {String? alertMsg, String? alertContent, required BuildContext context}) {
     showDialog(
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: true,
         builder: (context) {
           return AlertDialog(
             title: Text(alertMsg!),
             content: Text(alertContent!),
-            actions: [TextButton(onPressed: () {}, child: Text('Ok'))],
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    hideDialog(context);
+                  },
+                  child: Text('Ok'))
+            ],
           );
         });
   }

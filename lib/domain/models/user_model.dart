@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:hatly/data/api/user.dart';
+
 class UserDto {
   String? name;
   String? email;
@@ -45,4 +47,14 @@ class UserDto {
   ///
   /// Converts [User] to a JSON string.
   String toJson() => json.encode(toMap());
+
+  User toUser() {
+    return User(
+        name: name,
+        email: email,
+        phone: phone,
+        profilePhoto: profilePhoto,
+        id: id,
+        averageRating: averageRating);
+  }
 }
