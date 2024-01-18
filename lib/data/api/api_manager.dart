@@ -14,6 +14,7 @@ import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
+import 'package:hatly/data/api/trip_deal/deals.dart';
 import 'package:hatly/data/api/trip_deal/trip_deal_request.dart';
 import 'package:hatly/data/api/trip_deal/trip_deal_response.dart';
 import 'package:hatly/data/api/trips/create_trip_request/create_trip_request.dart';
@@ -198,19 +199,15 @@ class ApiManager {
   }
 
   Future<TripDealResponse> sendTripDeal(
-      {List<Shipment>? shipments,
+      {int? shipmentId,
       double? reward,
       required String token,
       required int tripId}) async {
     try {
-      print('tripId ${shipments!.first.id}');
       var url = Uri.https(baseUrl, 'deal/trip', {
         'tripId': tripId.toString(),
       });
-      var requestBody = TripDealRequest(
-        shipments: shipments,
-        reward: reward,
-      );
+      var requestBody = Deals(shipmentId: shipmentId, reward: reward);
       print(url.toString());
       var response = await client.post(url,
           body: requestBody.toJson(),

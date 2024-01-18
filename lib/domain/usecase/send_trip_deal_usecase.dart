@@ -8,11 +8,11 @@ class SendTripDealUsecase {
   SendTripDealUsecase({required this.repository});
 
   Future<TripDealResponseDto> sendDeal(
-      {List<ShipmentDto>? shipments,
+      {int? shipmentId,
       double? reward,
       required String token,
       required int tripId}) {
     return repository.sendDeal(
-        token: token, shipments: shipments, reward: reward, tripId: tripId);
+        token: token, shipmentId: shipmentId, reward: reward, tripId: tripId);
   }
 }

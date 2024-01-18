@@ -32,14 +32,14 @@ class TripDealViewModel extends Cubit<TripDealViewState> {
   }
 
   void sendDeal(
-      {List<ShipmentDto>? shipments,
+      {int? shipmentId,
       double? reward,
       required String token,
       required int tripId}) async {
     try {
       emit(CreateTripDealLoadingState('Loading...'));
       var response = await sendTripDealUsecase.sendDeal(
-          token: token, tripId: tripId, shipments: shipments, reward: reward);
+          token: token, tripId: tripId, shipmentId: shipmentId, reward: reward);
       emit(CreateTripDealSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(CreateTripDealFailState(e.errorMessage));

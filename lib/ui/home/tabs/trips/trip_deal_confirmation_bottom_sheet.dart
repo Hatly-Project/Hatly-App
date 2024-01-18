@@ -546,7 +546,7 @@ class _TripDealConfirmationBottomSheetState
                                     token: token,
                                     tripId: deal.tripsDto.id!,
                                     reward: deal.shipmentDto.reward,
-                                    shipments: shipments);
+                                    shipmentId: deal.shipmentDto.id);
                               },
                               child: Text(
                                 'Confirm Offer',

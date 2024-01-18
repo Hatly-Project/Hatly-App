@@ -876,8 +876,8 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
     if (formKey.currentState?.validate() == false) {
       return;
     } else if (formKey.currentState?.validate() == true &&
-            (fromCountry.isEmpty || fromStateValue.isEmpty) ||
-        (toCountry.isEmpty || toStateValue.isEmpty)) {
+            (fromCountry.isEmpty || fromCityValue.isEmpty) ||
+        (toCountry.isEmpty || toCityValue.isEmpty)) {
       onError(context, 'Please choose a country');
       return;
     }
