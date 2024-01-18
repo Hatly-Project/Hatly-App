@@ -22,7 +22,7 @@ abstract class TripsDatasource {
   Future<GetUserTripResponseDto> getUserTrip({required String token});
 
   Future<TripDealResponseDto> sendDeal(
-      {List<ShipmentDto>? shipments,
+      {int? shipmentId,
       double? reward,
       required String token,
       required int tripId});

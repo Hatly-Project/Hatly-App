@@ -48,11 +48,11 @@ class TripsRepositoryImpl implements TripsRepository {
 
   @override
   Future<TripDealResponseDto> sendDeal(
-      {List<ShipmentDto>? shipments,
+      {int? shipmentId,
       double? reward,
       required String token,
       required int tripId}) {
     return tripsDatasource.sendDeal(
-        token: token, tripId: tripId, shipments: shipments, reward: reward);
+        token: token, tripId: tripId, shipmentId: shipmentId, reward: reward);
   }
 }

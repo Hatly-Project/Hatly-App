@@ -54,15 +54,12 @@ class TripsDatasourceImpl implements TripsDatasource {
 
   @override
   Future<TripDealResponseDto> sendDeal(
-      {List<ShipmentDto>? shipments,
+      {int? shipmentId,
       double? reward,
       required String token,
       required int tripId}) async {
     var response = await apiManager.sendTripDeal(
-        token: token,
-        tripId: tripId,
-        shipments: shipments?.map((shipment) => shipment.toShipment()).toList(),
-        reward: reward);
+        token: token, tripId: tripId, shipmentId: shipmentId, reward: reward);
 
     return response.toTripDealResponseDto();
   }

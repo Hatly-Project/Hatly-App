@@ -145,7 +145,7 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                                           "You don't have any shipments, please add a shipment to send your offer",
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.poppins(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.bold),
                                         )
                                       ],
