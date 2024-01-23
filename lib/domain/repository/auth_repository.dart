@@ -8,6 +8,7 @@ abstract class AuthRepository {
       String? email,
       String? phone,
       String? image,
-      String? password});
+      String? password,
+      String? fcmToken});
   Future<LoginResponseDto> login(String email, String password);
 }

@@ -8,9 +8,11 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/countries_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/ui/components/my_shipment_card.dart';
 import 'package:hatly/ui/components/my_shipments_shimmer_card.dart';
+import 'package:hatly/ui/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/ui/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipments_bottom_sheet.dart';
 import 'package:hive/hive.dart';
@@ -35,6 +37,8 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
   late String token;
   ScrollController scrollController = ScrollController();
   Image? shipImage;
+  late CountriesDto countries;
+
   bool isMyshipmentEmpty = false, shimmerIsLoading = false;
   late LoggedInState loggedInState;
 
@@ -101,6 +105,9 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
+    countries = args.countriesFlagsDto;
     return BlocConsumer(
       bloc: viewModel,
       listener: (context, state) {
@@ -198,7 +205,8 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                   ),
                   actions: [
                     IconButton(
-                      onPressed: () => showShipmentBottomSheet(context),
+                      onPressed: () =>
+                          showShipmentBottomSheet(context, countries),
                       icon: const Icon(
                         Icons.add,
                         color: Colors.white,
@@ -289,7 +297,8 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                     ),
                     actions: [
                       IconButton(
-                        onPressed: () => showShipmentBottomSheet(context),
+                        onPressed: () =>
+                            showShipmentBottomSheet(context, countries),
                         icon: const Icon(
                           Icons.add,
                           color: Colors.white,
@@ -428,13 +437,15 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
     Navigator.of(context).pop();
   }
 
-  void showShipmentBottomSheet(BuildContext context) {
+  void showShipmentBottomSheet(
+      BuildContext context, CountriesDto countriesDto) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
       builder: (context) => AddShipmentBottomSheet(
         onError: onError,
         done: done,
+        countriesDto: countriesDto,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(

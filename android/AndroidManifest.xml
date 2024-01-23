@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.hatly">
+    package="com.hatly.hatly_user">
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
     <!-- Provide required visibility configuration for API level 30 and above -->
 <queries>

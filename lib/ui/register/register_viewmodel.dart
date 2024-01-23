@@ -26,16 +26,19 @@ class RegisterViewModel extends Cubit<RegisterViewState> {
       String? email,
       String? phone,
       String? image,
-      String? password}) async {
+      String? password,
+      required String? fcmToken}) async {
     emit(RegisterLoadingState('Loading...'));
 
     try {
       await registerUseCase.invoke(
-          name: name,
-          email: email,
-          phone: phone,
-          image: image,
-          password: password);
+        name: name,
+        email: email,
+        phone: phone,
+        image: image,
+        password: password,
+        fcmToken: fcmToken,
+      );
       // createUserInDb(user);
       emit(RegisterSuccessState());
     } on ServerErrorException catch (e) {

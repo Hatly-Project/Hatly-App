@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCKpHM2623YqkMwvbGMViNtuSEhqxfw7jU',
-    appId: '1:901080662696:android:4d483706cc858ea680789d',
-    messagingSenderId: '901080662696',
-    projectId: 'hatly-170e1',
-    storageBucket: 'hatly-170e1.appspot.com',
+    apiKey: 'AIzaSyD1WHkeQYacFCyJjBaz_-HFqZROrqCekj0',
+    appId: '1:445303705925:android:8191de8fafa01ecf04ee2c',
+    messagingSenderId: '445303705925',
+    projectId: 'hatly-100dc',
+    storageBucket: 'hatly-100dc.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBrQifk4i-M7AkpqxZbcaegHb57DvUDoCQ',
-    appId: '1:901080662696:ios:6fcb1a35f12c1cf180789d',
-    messagingSenderId: '901080662696',
-    projectId: 'hatly-170e1',
-    storageBucket: 'hatly-170e1.appspot.com',
-    iosBundleId: 'com.example.hatly',
+    apiKey: 'AIzaSyCexxbjciqkvH0c9ae8-QzzIvhaBhwPdFk',
+    appId: '1:445303705925:ios:0d3653b4d1918bf504ee2c',
+    messagingSenderId: '445303705925',
+    projectId: 'hatly-100dc',
+    storageBucket: 'hatly-100dc.appspot.com',
+    iosBundleId: 'com.hatly.hatly-user',
   );
 }

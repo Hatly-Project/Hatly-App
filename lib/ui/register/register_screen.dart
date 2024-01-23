@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -23,6 +24,20 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  String? fcmToken = '';
+  @override
+  void initState() {
+    super.initState();
+    getFcmToken().then((value) {
+      fcmToken = value;
+    });
+    print('fcm token $fcmToken');
+  }
+
+  Future<String?> getFcmToken() async {
+    return await FirebaseMessaging.instance.getToken();
+  }
+
   var formKey = GlobalKey<FormState>();
 
   var nameController = TextEditingController(text: '');
@@ -277,7 +292,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         name: nameController.text,
         email: emailController.text,
         phone: mobileController.text,
-        password: passwordController.text);
+        password: passwordController.text,
+        fcmToken: fcmToken);
     // loginViewModel.register(emailController.text, passwordController.text);
   }
 }
