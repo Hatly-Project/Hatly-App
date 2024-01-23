@@ -15,13 +15,16 @@ class AuthRepositoryImpl implements AuthRepository {
       String? email,
       String? phone,
       String? image,
-      String? password}) async {
+      String? password,
+      String? fcmToken}) async {
     return authDataSource.register(
-        name: name,
-        email: email,
-        phone: phone,
-        image: image,
-        password: password);
+      name: name,
+      email: email,
+      phone: phone,
+      image: image,
+      password: password,
+      fcmToken: fcmToken,
+    );
   }
 
   @override

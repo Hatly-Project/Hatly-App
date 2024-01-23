@@ -11,12 +11,14 @@ class RegisterUseCase {
       String? email,
       String? phone,
       String? image,
-      String? password}) async {
+      String? password,
+      required String? fcmToken}) async {
     return authRepository.register(
         name: name,
         email: email,
         phone: phone,
         image: image,
-        password: password);
+        password: password,
+        fcmToken: fcmToken);
   }
 }

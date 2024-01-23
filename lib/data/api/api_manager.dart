@@ -32,7 +32,7 @@ import 'package:http/http.dart';
 import 'interceptor/LoggingInterceptor.dart';
 
 class ApiManager {
-  static const String baseUrl = 'hatly-api.vercel.app';
+  static const String baseUrl = 'hatlyapi.onrender.com';
   Client client = InterceptedClient.build(
     interceptors: [
       LoggingInterceptor(),
@@ -44,7 +44,8 @@ class ApiManager {
       String? email,
       String? phone,
       String? image,
-      String? password}) async {
+      String? password,
+      String? fcmToken}) async {
     try {
       var url = Uri.https(baseUrl, 'user/register');
       var requestBody = RegisterRequest(
@@ -53,6 +54,7 @@ class ApiManager {
         phone: phone,
         image: image,
         password: password,
+        fcmToken: fcmToken,
       );
       var response = await client.post(url,
           body: requestBody.toJson(),

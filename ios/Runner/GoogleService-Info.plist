@@ -3,23 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>901080662696-1aqdtsham25g36gih3dt0onn61ubu4ig.apps.googleusercontent.com</string>
+	<string>445303705925-6sh98frk7v49858seg60bn7u9t25srbl.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.901080662696-1aqdtsham25g36gih3dt0onn61ubu4ig</string>
+	<string>com.googleusercontent.apps.445303705925-6sh98frk7v49858seg60bn7u9t25srbl</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>901080662696-7qgqbee2mnis1r3vklf5qqi3abf59cs3.apps.googleusercontent.com</string>
+	<string>445303705925-mlnjpvric7d0bia56e5i92biiaghnotu.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBrQifk4i-M7AkpqxZbcaegHb57DvUDoCQ</string>
+	<string>AIzaSyCexxbjciqkvH0c9ae8-QzzIvhaBhwPdFk</string>
 	<key>GCM_SENDER_ID</key>
-	<string>901080662696</string>
+	<string>445303705925</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.hatly</string>
+	<string>com.hatly.hatly-user</string>
 	<key>PROJECT_ID</key>
-	<string>hatly-170e1</string>
+	<string>hatly-100dc</string>
 	<key>STORAGE_BUCKET</key>
-	<string>hatly-170e1.appspot.com</string>
+	<string>hatly-100dc.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:901080662696:ios:6fcb1a35f12c1cf180789d</string>
+	<string>1:445303705925:ios:0d3653b4d1918bf504ee2c</string>
 </dict>
 </plist>

@@ -15,13 +15,16 @@ class AuthDataSourceImpl implements AuthDataSource {
       String? email,
       String? phone,
       String? image,
-      String? password}) async {
+      String? password,
+      String? fcmToken}) async {
     var response = await apiManager.registerUser(
-        name: name,
-        email: email,
-        phone: phone,
-        image: image,
-        password: password);
+      name: name,
+      email: email,
+      phone: phone,
+      image: image,
+      password: password,
+      fcmToken: fcmToken,
+    );
 
     return response.toRegisterDto();
   }

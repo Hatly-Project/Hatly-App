@@ -1,48 +1,48 @@
 {
   "project_info": {
-    "project_number": "901080662696",
-    "project_id": "hatly-170e1",
-    "storage_bucket": "hatly-170e1.appspot.com"
+    "project_number": "445303705925",
+    "project_id": "hatly-100dc",
+    "storage_bucket": "hatly-100dc.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:901080662696:android:4d483706cc858ea680789d",
+        "mobilesdk_app_id": "1:445303705925:android:8191de8fafa01ecf04ee2c",
         "android_client_info": {
-          "package_name": "com.example.hatly_app"
+          "package_name": "com.hatly.hatly_user"
         }
       },
       "oauth_client": [
         {
-          "client_id": "901080662696-7qgqbee2mnis1r3vklf5qqi3abf59cs3.apps.googleusercontent.com",
+          "client_id": "445303705925-mlnjpvric7d0bia56e5i92biiaghnotu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.hatly_app",
+            "package_name": "com.hatly.hatly_user",
             "certificate_hash": "a9ad8c509edf58b3141aa2c20bf1078eba107592"
           }
         },
         {
-          "client_id": "901080662696-f2okd4v2jcbjvdm9s0oa6mq8ruo197cc.apps.googleusercontent.com",
+          "client_id": "445303705925-fn5q5j7sl607rgl7t33rkehhii3mguu1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCKpHM2623YqkMwvbGMViNtuSEhqxfw7jU"
+          "current_key": "AIzaSyD1WHkeQYacFCyJjBaz_-HFqZROrqCekj0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "901080662696-f2okd4v2jcbjvdm9s0oa6mq8ruo197cc.apps.googleusercontent.com",
+              "client_id": "445303705925-fn5q5j7sl607rgl7t33rkehhii3mguu1.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "901080662696-1aqdtsham25g36gih3dt0onn61ubu4ig.apps.googleusercontent.com",
+              "client_id": "445303705925-6sh98frk7v49858seg60bn7u9t25srbl.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.hatly"
+                "bundle_id": "com.hatly.hatly-user"
               }
             }
           ]

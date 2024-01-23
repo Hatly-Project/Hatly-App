@@ -7,19 +7,26 @@ import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/countries_dto.dart';
 import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/photo_dto.dart';
+import 'package:hatly/domain/models/state_dto.dart';
 import 'package:hatly/ui/components/shipment_item.dart';
+import 'package:hatly/ui/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipment_fees_bottom.dart';
 import 'package:hatly/ui/home/tabs/shipments/shipment_item_bottom.dart';
+import 'package:hatly/ui/home/tabs/trips/countries_list_bottom_sheet.dart';
+import 'package:hatly/ui/home/tabs/trips/states_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 import '../../../components/custom_text_field.dart';
 
 class AddShipmentBottomSheet extends StatefulWidget {
   Function onError;
   Function done;
+  CountriesDto countriesDto;
 
-  AddShipmentBottomSheet({required this.onError, required this.done});
+  AddShipmentBottomSheet(
+      {required this.onError, required this.done, required this.countriesDto});
 
   @override
   State<AddShipmentBottomSheet> createState() => _AddShipmentBottomSheetState();
@@ -42,12 +49,17 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   Image? shipmentImage;
 
   int index = 0;
+  String fromStateValue = "", date = '';
+  String fromCityValue = "",
+      toCityValue = "",
+      toStateValue = "",
+      fromCountry = "",
+      toCountry = "";
+  List<StateDto> fromStatesList = [];
+  List<StateDto> toStatesList = [];
 
-  String toCountryValue = '';
-  String toStateValue = '';
   double _bottomSheetPadding = 20.0;
   List<ItemDto> items = [];
-  String date = '';
   TextEditingController country = TextEditingController();
   TextEditingController state = TextEditingController();
   TextEditingController city = TextEditingController();
@@ -57,13 +69,13 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   var noteController = TextEditingController(text: '');
   var weightController = TextEditingController(text: '');
   var bonusController = TextEditingController(text: '');
-
+  late CountriesDto countries;
   var formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey();
-
+    countries = widget.countriesDto;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
@@ -89,198 +101,266 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                   style: GoogleFonts.poppins(
                       fontSize: 17, fontWeight: FontWeight.w600),
                 ),
-                CSCPicker(
-                  ///Enable disable state dropdown [OPTIONAL PARAMETER]
-                  showStates: true,
 
-                  /// Enable disable city drop down [OPTIONAL PARAMETER]
-                  showCities: false,
-
-                  ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
-                  flagState: CountryFlag.DISABLE,
-
-                  ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-                  dropdownDecoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      color: Colors.white,
-                      border:
-                          Border.all(color: Colors.grey.shade300, width: 1)),
-
-                  ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-                  disabledDropdownDecoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      color: Colors.grey.shade300,
-                      border:
-                          Border.all(color: Colors.grey.shade300, width: 1)),
-
-                  ///placeholders for dropdown search field
-                  countrySearchPlaceholder: "Country",
-                  stateSearchPlaceholder: "State",
-                  citySearchPlaceholder: "City",
-
-                  ///labels for dropdown
-                  countryDropdownLabel: "*Country",
-                  stateDropdownLabel: "*State",
-                  cityDropdownLabel: "*City",
-
-                  ///Default Country
-                  //defaultCountry: CscCountry.India,
-
-                  ///Disable country dropdown (Note: use it with default country)
-                  //disableCountry: true,
-
-                  ///selected item style [OPTIONAL PARAMETER]
-                  selectedItemStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-
-                  ///DropdownDialog Heading style [OPTIONAL PARAMETER]
-                  dropdownHeadingStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold),
-
-                  ///DropdownDialog Item style [OPTIONAL PARAMETER]
-                  dropdownItemStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-
-                  ///Dialog box radius [OPTIONAL PARAMETER]
-                  dropdownDialogRadius: 10.0,
-
-                  ///Search bar radius [OPTIONAL PARAMETER]
-                  searchBarRadius: 10.0,
-
-                  ///triggers once country selected in dropdown
-                  onCountryChanged: (value) {
-                    setState(() {
-                      ///store value in country variable
-                      countryValue = value;
-                    });
-                  },
-
-                  ///triggers once state selected in dropdown
-                  onStateChanged: (value) {
-                    setState(() {
-                      ///store value in state variable
-                      stateValue = value ?? "";
-                    });
-                  },
-
-                  ///triggers once city selected in dropdown
-                  onCityChanged: (value) {
-                    setState(() {
-                      ///store value in city variable
-                      cityValue = value ?? "";
-                    });
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 5),
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              minimumSize: Size(160, 45),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              side: BorderSide(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 1),
+                              backgroundColor: Colors.transparent,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 12)),
+                          onPressed: () {
+                            showFromCountriesListBottomSheet(
+                                context, countries);
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * .42,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  child: const Icon(
+                                    Icons.location_on_rounded,
+                                    color: Colors.amber,
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  child: Text(
+                                    'From',
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).primaryColor),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  width: MediaQuery.sizeOf(context).width * .2,
+                                  child: Text(
+                                    fromCountry.isEmpty
+                                        ? 'Country'
+                                        : fromCountry,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 10),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: Size(160, 45),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            side: BorderSide(
+                                color: Theme.of(context).primaryColor,
+                                width: 1),
+                            backgroundColor: Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 12)),
+                        onPressed: fromCountry.isNotEmpty
+                            ? () {
+                                showFromStatesListBottomSheet(
+                                    context, fromStatesList);
+                              }
+                            : null,
+                        child: Container(
+                          width: MediaQuery.sizeOf(context).width * .4,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(left: 5),
+                                child: const Icon(
+                                  Icons.location_on_rounded,
+                                  color: Colors.amber,
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 5),
+                                child: Text(
+                                  'From',
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).primaryColor),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 5),
+                                width: MediaQuery.sizeOf(context).width * .17,
+                                child: Text(
+                                  fromCityValue.isEmpty
+                                      ? 'City'
+                                      : fromCityValue,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                // CountryStateCityPicker(
-                //     country: country,
-                //     state: state,
-                //     city: city,
-                //     dialogColor: Colors.grey.shade200,
-                //     textFieldDecoration: InputDecoration(
-                //         fillColor: Colors.blueGrey.shade100,
-                //         filled: true,
-                //         suffixIcon: const Icon(Icons.arrow_downward_rounded),
-                //         border: const OutlineInputBorder(
-                //             borderSide: BorderSide.none))),
+                SizedBox(
+                  height: 5,
+                ),
                 Text(
                   'To',
                   style: GoogleFonts.poppins(
                       fontSize: 17, fontWeight: FontWeight.w600),
                 ),
-                CSCPicker(
-                  ///Enable disable state dropdown [OPTIONAL PARAMETER]
-                  showStates: true,
 
-                  /// Enable disable city drop down [OPTIONAL PARAMETER]
-                  showCities: false,
-
-                  ///Enable (get flag with country name) / Disable (Disable flag) / ShowInDropdownOnly (display flag in dropdown only) [OPTIONAL PARAMETER]
-                  flagState: CountryFlag.DISABLE,
-
-                  ///Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER] (USE with disabledDropdownDecoration)
-                  dropdownDecoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      color: Colors.white,
-                      border:
-                          Border.all(color: Colors.grey.shade300, width: 1)),
-
-                  ///Disabled Dropdown box decoration to style your dropdown selector [OPTIONAL PARAMETER]  (USE with disabled dropdownDecoration)
-                  disabledDropdownDecoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      color: Colors.grey.shade300,
-                      border:
-                          Border.all(color: Colors.grey.shade300, width: 1)),
-
-                  ///placeholders for dropdown search field
-                  countrySearchPlaceholder: "Country",
-                  stateSearchPlaceholder: "State",
-                  citySearchPlaceholder: "City",
-
-                  ///labels for dropdown
-                  countryDropdownLabel: "*Country",
-                  stateDropdownLabel: "*State",
-                  cityDropdownLabel: "*City",
-
-                  ///Default Country
-                  //defaultCountry: CscCountry.India,
-
-                  ///Disable country dropdown (Note: use it with default country)
-                  //disableCountry: true,
-
-                  ///selected item style [OPTIONAL PARAMETER]
-                  selectedItemStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-
-                  ///DropdownDialog Heading style [OPTIONAL PARAMETER]
-                  dropdownHeadingStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold),
-
-                  ///DropdownDialog Item style [OPTIONAL PARAMETER]
-                  dropdownItemStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-
-                  ///Dialog box radius [OPTIONAL PARAMETER]
-                  dropdownDialogRadius: 10.0,
-
-                  ///Search bar radius [OPTIONAL PARAMETER]
-                  searchBarRadius: 10.0,
-
-                  ///triggers once country selected in dropdown
-                  onCountryChanged: (value) {
-                    setState(() {
-                      ///store value in country variable
-                      toCountryValue = value;
-                    });
-                  },
-
-                  ///triggers once state selected in dropdown
-                  onStateChanged: (value) {
-                    setState(() {
-                      ///store value in state variable
-                      toStateValue = value ?? "";
-                    });
-                  },
-
-                  ///triggers once city selected in dropdown
-                  onCityChanged: (value) {
-                    setState(() {
-                      ///store value in city variable
-                      cityValue = value ?? "";
-                    });
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 5),
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              minimumSize: Size(160, 45),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              side: BorderSide(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 1),
+                              backgroundColor: Colors.transparent,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 12)),
+                          onPressed: () {
+                            showToCountriesListBottomSheet(context, countries);
+                          },
+                          child: Container(
+                            width: MediaQuery.sizeOf(context).width * .42,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  child: const Icon(
+                                    Icons.location_on_rounded,
+                                    color: Colors.amber,
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  child: Text(
+                                    'To',
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).primaryColor),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  width: MediaQuery.sizeOf(context).width * .2,
+                                  child: Text(
+                                    toCountry.isEmpty ? 'Country' : toCountry,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 10),
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              minimumSize: Size(160, 45),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              side: BorderSide(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 1),
+                              backgroundColor: Colors.transparent,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 12)),
+                          onPressed: toCountry.isNotEmpty
+                              ? () {
+                                  showToStatesListBottomSheet(
+                                      context, toStatesList);
+                                }
+                              : null,
+                          child: Container(
+                            width: 150,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  child: const Icon(
+                                    Icons.location_on_rounded,
+                                    color: Colors.amber,
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  child: Text(
+                                    'To',
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).primaryColor),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  width: MediaQuery.sizeOf(context).width * .2,
+                                  child: Text(
+                                    toCityValue.isEmpty ? 'City' : toCityValue,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    ),
+                  ],
                 ),
+
                 CustomFormField(
                   controller: dateController,
                   label: '',
@@ -498,7 +578,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
   }
 
   void done(Function done, String bonus) {
-    done(countryValue, stateValue, toStateValue, toCountryValue, date,
+    done(countryValue, stateValue, toStateValue, toCountry, date,
         nameController.text, noteController.text, bonus, items);
   }
 
@@ -543,6 +623,120 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
     }
     setState(() {
       showDoneBtn();
+    });
+  }
+
+  void showFromCountriesListBottomSheet(
+      BuildContext context, CountriesDto countries) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => CountriesListBottomSheet(
+        countries: countries,
+        selectFromCountry: selectFromCountry,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void showToCountriesListBottomSheet(
+      BuildContext context, CountriesDto countries) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => CountriesListBottomSheet(
+        countries: countries,
+        selectToCountry: selectToCountry,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void showFromStatesListBottomSheet(
+      BuildContext context, List<StateDto> states) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => StatesListBottomSheet(
+        states: states,
+        selectFromCity: selectFromCity,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void showToStatesListBottomSheet(
+      BuildContext context, List<StateDto> states) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => StatesListBottomSheet(
+        states: states,
+        selectToCity: selectToCity,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void selectFromCountry(String selectedCountry) {
+    Navigator.pop(context);
+    var index = countries.countries
+        ?.indexWhere((country) => country.name == selectedCountry);
+    var countryStates = countries.countries![index!].states;
+
+    setState(() {
+      fromCountry = selectedCountry;
+      fromCityValue = '';
+      fromStatesList = countryStates!;
+    });
+  }
+
+  void selectToCountry(String selectedCountry) {
+    Navigator.pop(context);
+    var index = countries.countries
+        ?.indexWhere((country) => country.name == selectedCountry);
+    var countryStates = countries.countries![index!].states;
+
+    setState(() {
+      toCountry = selectedCountry;
+      toCityValue = '';
+      toStatesList = countryStates!;
+    });
+  }
+
+  void selectFromCity(String selectedCity) {
+    Navigator.pop(context);
+
+    setState(() {
+      fromCityValue = selectedCity;
+    });
+  }
+
+  void selectToCity(String selectedCity) {
+    Navigator.pop(context);
+
+    setState(() {
+      toCityValue = selectedCity;
     });
   }
 
@@ -645,8 +839,8 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
     if (formKey.currentState?.validate() == false) {
       return;
     } else if (formKey.currentState?.validate() == true &&
-            (countryValue.isEmpty || stateValue.isEmpty) ||
-        (toCountryValue.isEmpty || toStateValue.isEmpty)) {
+            (fromCountry.isEmpty || fromCityValue.isEmpty) ||
+        (toCountry.isEmpty || toCityValue.isEmpty)) {
       onError(context, 'Please choose a country');
       return;
     }

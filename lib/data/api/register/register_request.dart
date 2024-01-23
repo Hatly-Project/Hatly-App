@@ -6,15 +6,22 @@ class RegisterRequest {
   String? name;
   String? phone;
   String? image;
+  String? fcmToken;
 
   RegisterRequest(
-      {this.email, this.password, this.name, this.image, this.phone});
+      {this.email,
+      this.password,
+      this.name,
+      this.image,
+      this.phone,
+      this.fcmToken});
 
   factory RegisterRequest.fromMap(Map<String, dynamic> data) {
     return RegisterRequest(
       email: data['email'] as String?,
       password: data['password'] as String?,
       name: data['name'] as String?,
+      fcmToken: data['fcmToken'] as String?,
       phone: data['phone'] as String?,
       image: data['image'] as String?,
     );
@@ -23,6 +30,7 @@ class RegisterRequest {
   Map<String, dynamic> toMap() => {
         'email': email,
         'password': password,
+        'fcmToken': fcmToken,
         'name': name,
         'phone': phone,
         'image': image,
