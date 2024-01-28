@@ -9,6 +9,8 @@ abstract class ShipmentDataSource {
       {String? title,
       String? note,
       String? from,
+      String? fromCity,
+      String? toCity,
       String? to,
       String? date,
       double? reward,
