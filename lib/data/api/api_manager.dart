@@ -32,7 +32,7 @@ import 'package:http/http.dart';
 import 'interceptor/LoggingInterceptor.dart';
 
 class ApiManager {
-  static const String baseUrl = 'hatlyapi.onrender.com';
+  static const String baseUrl = 'hatly-api.vercel.app';
   Client client = InterceptedClient.build(
     interceptors: [
       LoggingInterceptor(),
@@ -275,6 +275,8 @@ class ApiManager {
       {String? title,
       String? note,
       String? from,
+      String? fromCity,
+      String? toCity,
       String? to,
       String? date,
       double? reward,
@@ -286,6 +288,8 @@ class ApiManager {
       var requestBody = CreateShipmentRequest(
           title: title,
           from: from,
+          fromCity: fromCity,
+          toCity: toCity,
           to: to,
           note: note,
           expectedDate: date,
@@ -308,6 +312,8 @@ class ApiManager {
       throw ServerErrorException(e.errorMessage);
     } on FormatException catch (e) {
       throw ServerErrorException(e.message);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
     }
   }
 }

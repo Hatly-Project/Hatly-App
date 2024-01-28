@@ -11,6 +11,8 @@ class CreateShipmentUsecase {
   Future<CreateShipmentsResponseDto> invoke(
       {String? title,
       String? from,
+      String? fromCity,
+      String? toCity,
       String? to,
       String? note,
       String? date,
@@ -22,6 +24,8 @@ class CreateShipmentUsecase {
         title: title,
         from: from,
         to: to,
+        fromCity: fromCity,
+        toCity: toCity,
         note: note,
         date: date,
         reward: reward,

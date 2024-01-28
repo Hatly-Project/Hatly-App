@@ -12,7 +12,7 @@ class ShipmentDto {
   dynamic trip;
   String? notes;
   double? wight;
-  String? from;
+  String? from, fromCity, toCity;
   String? to;
   double? totalPrice;
   double? reward;
@@ -27,6 +27,8 @@ class ShipmentDto {
       this.trip,
       this.wight,
       this.from,
+      this.fromCity,
+      this.toCity,
       this.to,
       this.totalPrice,
       this.reward,
@@ -44,6 +46,8 @@ class ShipmentDto {
         trip: data['trip'] as dynamic,
         wight: (data['wight'] as num?)?.toDouble(),
         from: data['from'] as String?,
+        fromCity: data['fromCity'] as String?,
+        toCity: data['toCity'] as String?,
         notes: data['note'] as String?,
         to: data['to'] as String?,
         totalPrice: (data['total_price'] as num?)?.toDouble(),
@@ -68,6 +72,8 @@ class ShipmentDto {
         'note': notes,
         'from': from,
         'to': to,
+        'fromCity': fromCity,
+        'toCity': toCity,
         'total_price': totalPrice,
         'reward': reward,
         'expectedDate': expectedDate?.toIso8601String(),
@@ -92,6 +98,8 @@ class ShipmentDto {
         wight: wight,
         from: from,
         to: to,
+        fromCity: fromCity,
+        toCity: toCity,
         totalPrice: totalPrice,
         reward: reward,
         expectedDate: expectedDate,

@@ -5,6 +5,8 @@ import 'package:hatly/data/api/item.dart';
 class CreateShipmentRequest {
   String? title;
   String? from;
+  String? fromCity;
+  String? toCity;
   String? to;
   String? note;
   String? expectedDate;
@@ -14,6 +16,8 @@ class CreateShipmentRequest {
   CreateShipmentRequest({
     this.title,
     this.from,
+    this.fromCity,
+    this.toCity,
     this.to,
     this.expectedDate,
     this.reward,
@@ -25,6 +29,8 @@ class CreateShipmentRequest {
     return CreateShipmentRequest(
       title: data['title'] as String?,
       from: data['from'] as String?,
+      fromCity: data['fromCity'] as String?,
+      toCity: data['toCity'] as String?,
       note: data['note'] as String?,
       to: data['to'] as String?,
       expectedDate: data['expectedDate'] as String?,
@@ -38,6 +44,8 @@ class CreateShipmentRequest {
   Map<String, dynamic> toMap() => {
         'title': title,
         'from': from,
+        'fromCity': fromCity,
+        'toCity': toCity,
         'to': to,
         'note': note,
         'expectedDate': expectedDate,
