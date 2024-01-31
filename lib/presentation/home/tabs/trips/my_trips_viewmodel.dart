@@ -34,6 +34,8 @@ class MyTripsViewmodel extends Cubit<MyTripsViewState> {
   void createTrip(
       {String? origin,
       String? destination,
+      String? originCity,
+      String? destinationCity,
       int? available,
       String? note,
       String? addressMeeting,
@@ -47,6 +49,8 @@ class MyTripsViewmodel extends Cubit<MyTripsViewState> {
         token: token,
         origin: origin,
         destination: destination,
+        originCity: originCity,
+        destinationCity: destinationCity,
         available: available,
         bookInfoDto: bookInfoDto,
         itemsNotAllowed: itemsNotAllowed,

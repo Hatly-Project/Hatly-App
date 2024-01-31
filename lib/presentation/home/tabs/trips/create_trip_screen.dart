@@ -886,6 +886,8 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
       token: token,
       origin: origin,
       destination: destination,
+      originCity: fromCityValue,
+      destinationCity: toCityValue,
       departDate: dateTime,
       available: available,
       note: note,

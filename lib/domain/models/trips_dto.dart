@@ -8,8 +8,8 @@ import 'package:hatly/domain/models/user_model.dart';
 
 class TripsDto {
   int? id;
-  String? origin;
-  String? destination;
+  String? origin, originCity;
+  String? destination, destinationCity;
   int? available;
   int? consumed;
   String? note;
@@ -25,6 +25,8 @@ class TripsDto {
     this.id,
     this.origin,
     this.destination,
+    this.originCity,
+    this.destinationCity,
     this.available,
     this.consumed,
     this.note,
@@ -41,6 +43,8 @@ class TripsDto {
         id: data['id'] as int?,
         origin: data['origin'] as String?,
         destination: data['destination'] as String?,
+        originCity: data['originCity'] as String?,
+        destinationCity: data['destinationCity'] as String?,
         available: data['available'] as int?,
         consumed: data['consumed'] as int?,
         note: data['note'] as String?,
@@ -69,6 +73,8 @@ class TripsDto {
         'id': id,
         'origin': origin,
         'destination': destination,
+        'originCity': originCity,
+        'destinationCity': destinationCity,
         'available': available,
         'consumed': consumed,
         'note': note,

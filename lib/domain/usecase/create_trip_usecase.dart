@@ -11,6 +11,8 @@ class CreateTripUsecase {
   Future<CreateTripResponseDto> invoke(
       {String? origin,
       String? destination,
+      String? originCity,
+      String? destinationCity,
       int? available,
       String? note,
       String? addressMeeting,
@@ -22,6 +24,8 @@ class CreateTripUsecase {
         token: token,
         origin: origin,
         destination: destination,
+        originCity: originCity,
+        destinationCity: destinationCity,
         available: available,
         bookInfoDto: bookInfoDto,
         itemsNotAllowed: itemsNotAllowed,
