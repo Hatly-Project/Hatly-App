@@ -66,18 +66,16 @@ class _MyTripsTabState extends State<MyTripsTab> {
     }
 
     //Check for cached shipments when initializing
-    Future.delayed(Duration(milliseconds: 300), () {
-      getCachedMyTrips().then((cachedTrips) {
-        if (cachedTrips.isNotEmpty) {
-          print('exist');
-          setState(() {
-            myTrips = cachedTrips;
-          });
-        } else {
-          viewModel.getMyTrip(token: token);
-          print('no Exist'); // Fetch from API if cache is empty
-        }
-      });
+    getCachedMyTrips().then((cachedTrips) {
+      if (cachedTrips.isNotEmpty) {
+        print('exist');
+        setState(() {
+          myTrips = cachedTrips;
+        });
+      } else {
+        viewModel.getMyTrip(token: token);
+        print('no Exist'); // Fetch from API if cache is empty
+      }
     });
   }
 

@@ -12,6 +12,8 @@ abstract class TripsRepository {
   Future<CreateTripResponseDto> createTrip(
       {String? origin,
       String? destination,
+      String? originCity,
+      String? destinationCity,
       int? available,
       String? note,
       String? addressMeeting,

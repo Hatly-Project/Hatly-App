@@ -32,7 +32,7 @@ import 'package:http/http.dart';
 import 'interceptor/LoggingInterceptor.dart';
 
 class ApiManager {
-  static const String baseUrl = 'hatly-api.vercel.app';
+  static const String baseUrl = 'hatlyapi.onrender.com';
   Client client = InterceptedClient.build(
     interceptors: [
       LoggingInterceptor(),
@@ -209,7 +209,8 @@ class ApiManager {
       var url = Uri.https(baseUrl, 'deal/trip', {
         'tripId': tripId.toString(),
       });
-      var requestBody = Deals(shipmentId: shipmentId, reward: reward);
+      var requestBody =
+          TripDealRequest(deals: Deals(shipmentId: shipmentId, reward: reward));
       print(url.toString());
       var response = await client.post(url,
           body: requestBody.toJson(),
@@ -233,6 +234,8 @@ class ApiManager {
   Future<CreateTripResponse> createTrip(
       {String? origin,
       String? destination,
+      String? originCity,
+      String? destinationCity,
       int? available,
       String? note,
       String? addressMeeting,
@@ -246,6 +249,8 @@ class ApiManager {
       var requestBody = CreateTripRequest(
           origin: origin,
           destination: destination,
+          originCity: originCity,
+          destinationCity: destinationCity,
           available: available,
           bookInfo: bookInfo,
           itemsNotAllowed: itemsNotAllowed,

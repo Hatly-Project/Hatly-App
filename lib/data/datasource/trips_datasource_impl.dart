@@ -24,6 +24,8 @@ class TripsDatasourceImpl implements TripsDatasource {
   Future<CreateTripResponseDto> createTrip(
       {String? origin,
       String? destination,
+      String? originCity,
+      String? destinationCity,
       int? available,
       String? note,
       String? addressMeeting,
@@ -34,6 +36,8 @@ class TripsDatasourceImpl implements TripsDatasource {
     var response = await apiManager.createTrip(
         token: token,
         origin: origin,
+        originCity: originCity,
+        destinationCity: destinationCity,
         departDate: departDate,
         destination: destination,
         available: available,

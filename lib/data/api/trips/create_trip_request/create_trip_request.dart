@@ -4,8 +4,8 @@ import 'package:hatly/data/api/book_info.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
 
 class CreateTripRequest {
-  String? origin;
-  String? destination;
+  String? origin, originCity;
+  String? destination, destinationCity;
   int? available;
   String? note;
   String? addressMeeting;
@@ -18,6 +18,8 @@ class CreateTripRequest {
     this.destination,
     this.available,
     this.note,
+    this.originCity,
+    this.destinationCity,
     this.addressMeeting,
     this.departData,
     this.bookInfo,
@@ -28,6 +30,8 @@ class CreateTripRequest {
     return CreateTripRequest(
       origin: data['origin'] as String?,
       destination: data['destination'] as String?,
+      originCity: data['originCity'] as String?,
+      destinationCity: data['destinationCity'] as String?,
       available: data['available'] as int?,
       note: data['note'] as String?,
       addressMeeting: data['addressMeeting'] as String?,
@@ -44,6 +48,8 @@ class CreateTripRequest {
   Map<String, dynamic> toMap() => {
         'origin': origin,
         'destination': destination,
+        'originCity': originCity,
+        'destinationCity': destinationCity,
         'available': available,
         'note': note,
         'addressMeeting': addressMeeting,

@@ -8,8 +8,8 @@ import 'package:hatly/domain/models/trips_dto.dart';
 
 class Trip {
   int? id;
-  String? origin;
-  String? destination;
+  String? origin, originCity;
+  String? destination, destinationCity;
   int? available;
   int? consumed;
   String? note;
@@ -26,6 +26,8 @@ class Trip {
     this.origin,
     this.destination,
     this.available,
+    this.originCity,
+    this.destinationCity,
     this.consumed,
     this.note,
     this.addressMeeting,
@@ -41,6 +43,8 @@ class Trip {
         id: data['id'] as int?,
         origin: data['origin'] as String?,
         destination: data['destination'] as String?,
+        originCity: data['originCity'] as String?,
+        destinationCity: data['destinationCity'] as String?,
         available: data['available'] as int?,
         consumed: data['consumed'] as int?,
         user: data['user'] == null
@@ -69,6 +73,8 @@ class Trip {
         'id': id,
         'origin': origin,
         'destination': destination,
+        'originCity': originCity,
+        'destinationCity': destinationCity,
         'available': available,
         'note': note,
         'user': user,
@@ -97,6 +103,8 @@ class Trip {
         id: id,
         origin: origin,
         destination: destination,
+        originCity: originCity,
+        destinationCity: destinationCity,
         available: available,
         consumed: consumed,
         note: note,

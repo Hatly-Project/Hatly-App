@@ -13,6 +13,8 @@ abstract class TripsDatasource {
       String? destination,
       int? available,
       String? note,
+      String? originCity,
+      String? destinationCity,
       String? addressMeeting,
       String? departDate,
       BookInfoDto? bookInfoDto,
