@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,8 +15,10 @@ import 'package:hatly/domain/models/items_not_allowed_dto.dart';
 import 'package:hatly/domain/models/state_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/components/custom_text_field.dart';
+import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/trips/countries_list_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/create_trip_arguments.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trips.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips_viewmodel.dart';
 import 'package:hatly/presentation/home/tabs/trips/states_list_bottom_sheet.dart';
 import 'package:hive/hive.dart';
@@ -42,6 +45,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   List<ItemsNotAllowedDto> itemsNotAllowed = [];
   String countryValue = "";
   String? selecteditem = '';
+  bool isLoading = false;
   String fromStateValue = "", date = '';
   String fromCityValue = "",
       toCityValue = "",
@@ -147,17 +151,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
       bloc: viewModel,
       listener: (context, state) {
         if (state is CreateTripLoadingState) {
-          if (Platform.isIOS) {
-            DialogUtils.showDialogIos(
-                alertMsg: 'Loading',
-                alertContent: state.loadingMessage,
-                context: context);
-          } else {
-            DialogUtils.showDialogAndroid(
-                alertMsg: 'Loading',
-                alertContent: state.loadingMessage,
-                context: context);
-          }
+          isLoading = true;
         } else if (state is CreateTripFailState) {
           if (Platform.isIOS) {
             DialogUtils.showDialogIos(
@@ -174,7 +168,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
       },
       listenWhen: (previous, current) {
         if (previous is CreateTripLoadingState) {
-          DialogUtils.hideDialog(context);
+          isLoading = false;
         }
         if (current is CreateTripLoadingState ||
             current is CreateTripFailState) {
@@ -188,550 +182,612 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
           TripsDto? trip = state.responseDto.trip;
           myTrips.add(trip!);
           isMyTripsEmpty = false;
+          isLoading = false;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pop(context);
+          });
           // cacheMytrips(myTrips);
           // cacheMyShipments(myTrips);
         }
-        return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            iconTheme: IconThemeData(color: Colors.white),
-            centerTitle: true,
-            title: Text(
-              'Create Trip',
-              style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-          ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Text(
-                        'Trip route',
-                        style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              appBar: AppBar(
+                backgroundColor: Theme.of(context).primaryColor,
+                iconTheme: IconThemeData(color: Colors.white),
+                centerTitle: true,
+                title: Text(
+                  'Create Trip',
+                  style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ),
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'Trip route',
+                            style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.only(top: 10),
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          minimumSize: Size(160, 45),
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .primaryColor,
-                                              width: 1),
-                                          backgroundColor: Colors.transparent,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12)),
-                                      onPressed: () {
-                                        showFromCountriesListBottomSheet(
-                                            context, countries);
-                                      },
-                                      child: Container(
-                                        width: 150,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: const Icon(
-                                                Icons.location_on_rounded,
-                                                color: Colors.amber,
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 10),
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              minimumSize: Size(160, 45),
+                                              elevation: 0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                               ),
+                                              side: BorderSide(
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  width: 1),
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12)),
+                                          onPressed: () {
+                                            showFromCountriesListBottomSheet(
+                                                context, countries);
+                                          },
+                                          child: Container(
+                                            width: 150,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: const Icon(
+                                                    Icons.location_on_rounded,
+                                                    color: Colors.amber,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Text(
+                                                    'From',
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Theme.of(context)
+                                                            .primaryColor),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  width: 65,
+                                                  child: Text(
+                                                    fromCountry.isEmpty
+                                                        ? 'Country'
+                                                        : fromCountry,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: Text(
-                                                'From',
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Theme.of(context)
-                                                        .primaryColor),
+                                          )),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 10),
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              minimumSize: Size(160, 45),
+                                              elevation: 0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                               ),
+                                              side: BorderSide(
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  width: 1),
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12)),
+                                          onPressed: () {
+                                            showToCountriesListBottomSheet(
+                                                context, countries);
+                                          },
+                                          child: Container(
+                                            width: 150,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: const Icon(
+                                                    Icons.location_on_rounded,
+                                                    color: Colors.amber,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Text(
+                                                    'To',
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Theme.of(context)
+                                                            .primaryColor),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Text(
+                                                    toCountry.isEmpty
+                                                        ? 'Country'
+                                                        : toCountry,
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              width: 65,
-                                              child: Text(
-                                                fromCountry.isEmpty
-                                                    ? 'Country'
-                                                    : fromCountry,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.grey),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )),
+                                          )),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 10),
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          minimumSize: Size(160, 45),
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .primaryColor,
-                                              width: 1),
-                                          backgroundColor: Colors.transparent,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12)),
-                                      onPressed: () {
-                                        showToCountriesListBottomSheet(
-                                            context, countries);
-                                      },
-                                      child: Container(
-                                        width: 150,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: const Icon(
-                                                Icons.location_on_rounded,
-                                                color: Colors.amber,
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 10),
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              minimumSize: Size(160, 45),
+                                              elevation: 0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                               ),
+                                              side: BorderSide(
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  width: 1),
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12)),
+                                          onPressed: fromCountry.isNotEmpty
+                                              ? () {
+                                                  showFromStatesListBottomSheet(
+                                                      context, fromStatesList);
+                                                }
+                                              : null,
+                                          child: Container(
+                                            width: 150,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: const Icon(
+                                                    Icons.location_on_rounded,
+                                                    color: Colors.amber,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Text(
+                                                    'From',
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Theme.of(context)
+                                                            .primaryColor),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  width: 60,
+                                                  child: Text(
+                                                    fromCityValue.isEmpty
+                                                        ? 'City'
+                                                        : fromCityValue,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: Text(
-                                                'To',
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Theme.of(context)
-                                                        .primaryColor),
+                                          )),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 10),
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              minimumSize: Size(160, 45),
+                                              elevation: 0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                               ),
+                                              side: BorderSide(
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  width: 1),
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12)),
+                                          onPressed: toCountry.isNotEmpty
+                                              ? () {
+                                                  showToStatesListBottomSheet(
+                                                      context, toStatesList);
+                                                }
+                                              : null,
+                                          child: Container(
+                                            width: 150,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: const Icon(
+                                                    Icons.location_on_rounded,
+                                                    color: Colors.amber,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  child: Text(
+                                                    'To',
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Theme.of(context)
+                                                            .primaryColor),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(left: 5),
+                                                  width: 60,
+                                                  child: Text(
+                                                    toCityValue.isEmpty
+                                                        ? 'City'
+                                                        : toCityValue,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: GoogleFonts.poppins(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: Text(
-                                                toCountry.isEmpty
-                                                    ? 'Country'
-                                                    : toCountry,
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.grey),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )),
+                                          )),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(top: 10),
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          minimumSize: Size(160, 45),
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .primaryColor,
-                                              width: 1),
-                                          backgroundColor: Colors.transparent,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12)),
-                                      onPressed: fromCountry.isNotEmpty
-                                          ? () {
-                                              showFromStatesListBottomSheet(
-                                                  context, fromStatesList);
-                                            }
-                                          : null,
-                                      child: Container(
-                                        width: 150,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: const Icon(
-                                                Icons.location_on_rounded,
-                                                color: Colors.amber,
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: Text(
-                                                'From',
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Theme.of(context)
-                                                        .primaryColor),
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              width: 60,
-                                              child: Text(
-                                                fromCityValue.isEmpty
-                                                    ? 'City'
-                                                    : fromCityValue,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.grey),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 10),
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          minimumSize: Size(160, 45),
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .primaryColor,
-                                              width: 1),
-                                          backgroundColor: Colors.transparent,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12)),
-                                      onPressed: toCountry.isNotEmpty
-                                          ? () {
-                                              showToStatesListBottomSheet(
-                                                  context, toStatesList);
-                                            }
-                                          : null,
-                                      child: Container(
-                                        width: 150,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: const Icon(
-                                                Icons.location_on_rounded,
-                                                color: Colors.amber,
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              child: Text(
-                                                'To',
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Theme.of(context)
-                                                        .primaryColor),
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 5),
-                                              width: 60,
-                                              child: Text(
-                                                toCityValue.isEmpty
-                                                    ? 'City'
-                                                    : toCityValue,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.grey),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )),
-                                ),
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Center(
-                      child: Text(
-                        'Trip details',
-                        style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          CustomFormField(
-                            controller: departDateController,
-                            // label: '',
-                            hint: 'Depart date and time',
-                            readOnly: true,
-                            icon: Icon(Icons.date_range_rounded),
-                            validator: (date) {
-                              if (date == null || date.trim().isEmpty) {
-                                return 'please choose date';
-                              }
-                            },
-                            onTap: () {
-                              DateTime selectedDate = DateTime.now();
-                              _selectDate(context);
-                            },
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            child: CustomFormField(
-                              controller: availableWeightController,
-                              keyboardType: TextInputType.number,
-                              hint: 'Available weight in KG',
-                              icon: Icon(Icons.monitor_weight_rounded),
-                              validator: (text) {
-                                if (text == null || text.trim().isEmpty) {
-                                  return 'please enter the available weight';
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Center(
-                      child: Text(
-                        'Ticket info',
-                        style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        children: [
-                          CustomFormField(
-                            controller: airlineController,
-                            // label: '',
-                            hint: 'Airline',
-                            icon: Icon(Icons.flight),
-                            validator: (date) {
-                              if (date == null || date.trim().isEmpty) {
-                                return 'please enter the airline name';
-                              }
-                            },
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            child: CustomFormField(
-                              controller: bookingReferenceController,
-                              keyboardType: TextInputType.number,
-                              hint: 'Booking reference',
-                              icon: Icon(Icons.airplane_ticket_rounded),
-                              validator: (text) {
-                                if (text == null || text.trim().isEmpty) {
-                                  return 'please enter your booking reference';
-                                }
-                              },
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            child: CustomFormField(
-                              controller: firstNameController,
-                              hint: 'First name on the ticket',
-                              icon: Icon(Icons.airplane_ticket_rounded),
-                              validator: (text) {
-                                if (text == null || text.trim().isEmpty) {
-                                  return 'please enter your first name on the ticket';
-                                }
-                              },
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            child: CustomFormField(
-                              controller: lastNameController,
-                              hint: 'Last name on the ticket',
-                              icon: Icon(Icons.airplane_ticket_rounded),
-                              validator: (text) {
-                                if (text == null || text.trim().isEmpty) {
-                                  return 'please enter your last name on the ticket';
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      child: Center(
-                        child: Text(
-                          'Categories do not like to carry',
-                          style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
+                        SizedBox(
+                          height: 15,
                         ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      child: Center(
-                        child: MultiSelectDropDown(
-                          showClearIcon: true,
-                          controller: _controller,
-                          onOptionSelected: (items) {
-                            itemsNotAllowed = items
-                                .map((item) =>
-                                    ItemsNotAllowedDto(name: item.label))
-                                .toList();
+                        Center(
+                          child: Text(
+                            'Trip details',
+                            style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Column(
+                            children: [
+                              CustomFormField(
+                                controller: departDateController,
+                                // label: '',
+                                hint: 'Depart date and time',
+                                readOnly: true,
+                                icon: Icon(Icons.date_range_rounded),
+                                validator: (date) {
+                                  if (date == null || date.trim().isEmpty) {
+                                    return 'please choose date';
+                                  }
+                                },
+                                onTap: () {
+                                  DateTime selectedDate = DateTime.now();
+                                  _selectDate(context);
+                                },
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: CustomFormField(
+                                  controller: availableWeightController,
+                                  keyboardType: TextInputType.number,
+                                  hint: 'Available weight in KG',
+                                  icon: Icon(Icons.monitor_weight_rounded),
+                                  validator: (text) {
+                                    if (text == null || text.trim().isEmpty) {
+                                      return 'please enter the available weight';
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Center(
+                          child: Text(
+                            'Ticket info',
+                            style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Column(
+                            children: [
+                              CustomFormField(
+                                controller: airlineController,
+                                // label: '',
+                                hint: 'Airline',
+                                icon: Icon(Icons.flight),
+                                validator: (date) {
+                                  if (date == null || date.trim().isEmpty) {
+                                    return 'please enter the airline name';
+                                  }
+                                },
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: CustomFormField(
+                                  controller: bookingReferenceController,
+                                  keyboardType: TextInputType.number,
+                                  hint: 'Booking reference',
+                                  icon: Icon(Icons.airplane_ticket_rounded),
+                                  validator: (text) {
+                                    if (text == null || text.trim().isEmpty) {
+                                      return 'please enter your booking reference';
+                                    }
+                                  },
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: CustomFormField(
+                                  controller: firstNameController,
+                                  hint: 'First name on the ticket',
+                                  icon: Icon(Icons.airplane_ticket_rounded),
+                                  validator: (text) {
+                                    if (text == null || text.trim().isEmpty) {
+                                      return 'please enter your first name on the ticket';
+                                    }
+                                  },
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: CustomFormField(
+                                  controller: lastNameController,
+                                  hint: 'Last name on the ticket',
+                                  icon: Icon(Icons.airplane_ticket_rounded),
+                                  validator: (text) {
+                                    if (text == null || text.trim().isEmpty) {
+                                      return 'please enter your last name on the ticket';
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Center(
+                            child: Text(
+                              'Categories do not like to carry',
+                              style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Center(
+                            child: MultiSelectDropDown(
+                              showClearIcon: true,
+                              controller: _controller,
+                              onOptionSelected: (items) {
+                                itemsNotAllowed = items
+                                    .map((item) =>
+                                        ItemsNotAllowedDto(name: item.label))
+                                    .toList();
 
-                            for (var element in itemsNotAllowed) {
-                              print(element.name);
-                            }
-                          },
-                          options: const <ValueItem>[
-                            ValueItem(label: 'Mobiles & Tablets'),
-                            ValueItem(label: 'Laptops'),
-                            ValueItem(label: 'Cosmetics'),
-                            ValueItem(label: 'Clothing'),
-                            ValueItem(label: 'Shoes & Bags'),
-                            ValueItem(label: 'Watches & Sunglasses'),
-                            ValueItem(label: 'Supplements'),
-                            ValueItem(label: 'Food & Beverages'),
-                            ValueItem(label: 'Books'),
-                          ],
-                          selectionType: SelectionType.multi,
-                          chipConfig:
-                              const ChipConfig(wrapType: WrapType.scroll),
-                          dropdownHeight: 500,
-                          optionTextStyle: const TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.w500),
-                          selectedOptionIcon: const Icon(Icons.check_circle),
+                                for (var element in itemsNotAllowed) {
+                                  print(element.name);
+                                }
+                              },
+                              options: const <ValueItem>[
+                                ValueItem(label: 'Mobiles & Tablets'),
+                                ValueItem(label: 'Laptops'),
+                                ValueItem(label: 'Cosmetics'),
+                                ValueItem(label: 'Clothing'),
+                                ValueItem(label: 'Shoes & Bags'),
+                                ValueItem(label: 'Watches & Sunglasses'),
+                                ValueItem(label: 'Supplements'),
+                                ValueItem(label: 'Food & Beverages'),
+                                ValueItem(label: 'Books'),
+                              ],
+                              selectionType: SelectionType.multi,
+                              chipConfig:
+                                  const ChipConfig(wrapType: WrapType.scroll),
+                              dropdownHeight: 500,
+                              optionTextStyle: const TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.w500),
+                              selectedOptionIcon:
+                                  const Icon(Icons.check_circle),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      child: CustomFormField(
-                        controller: noteController,
-                        hint: 'Note',
-                        lines: 3,
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            minimumSize: Size(double.infinity, 60),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            side: BorderSide(color: Colors.white, width: 2),
-                            backgroundColor: Theme.of(context).primaryColor,
-                            padding: const EdgeInsets.symmetric(vertical: 12)),
-                        onPressed: () {
-                          print('note ${noteController.text}');
-                          create(
-                              origin: fromCountry,
-                              destination: toCountry,
-                              dateTime: date,
-                              available:
-                                  int.tryParse(availableWeightController.text),
-                              airline: airlineController.text,
-                              bookReference: bookingReferenceController.text,
-                              firstName: firstNameController.text,
-                              note: noteController.text.isEmpty
-                                  ? null
-                                  : noteController.text,
-                              lastName: lastNameController.text,
-                              itemsNotAllowed: itemsNotAllowed);
-                        },
-                        child: const Text(
-                          'Create',
-                          style: TextStyle(fontSize: 24, color: Colors.white),
+                        Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: CustomFormField(
+                            controller: noteController,
+                            hint: 'Note',
+                            lines: 3,
+                          ),
                         ),
-                      ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 10),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, 60),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)),
+                                side: BorderSide(color: Colors.white, width: 2),
+                                backgroundColor: Theme.of(context).primaryColor,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12)),
+                            onPressed: () {
+                              print('note ${noteController.text}');
+                              create(
+                                  origin: fromCountry,
+                                  destination: toCountry,
+                                  dateTime: date,
+                                  available: int.tryParse(
+                                      availableWeightController.text),
+                                  airline: airlineController.text,
+                                  bookReference:
+                                      bookingReferenceController.text,
+                                  firstName: firstNameController.text,
+                                  note: noteController.text.isEmpty
+                                      ? null
+                                      : noteController.text,
+                                  lastName: lastNameController.text,
+                                  itemsNotAllowed: itemsNotAllowed);
+                            },
+                            child: const Text(
+                              'Create',
+                              style:
+                                  TextStyle(fontSize: 24, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+            if (isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                    child: Platform.isIOS
+                        ? const CupertinoActivityIndicator(
+                            radius: 25,
+                            color: Colors.white,
+                          )
+                        : const CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                  ),
+                ),
+              ),
+          ],
         );
       },
     );
