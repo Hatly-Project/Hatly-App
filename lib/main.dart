@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/firebase_options.dart';
+import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/home/home_screen.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
@@ -57,7 +58,8 @@ class MyApp extends StatelessWidget {
         HomeScreen.routeName: (context) => HomeScreen(),
         CreateTripScreen.routeName: (context) => CreateTripScreen(),
         ShipmentDetails.routeName: (context) => ShipmentDetails(),
-        TripDetails.routeName: (context) => TripDetails()
+        TripDetails.routeName: (context) => TripDetails(),
+        MyShipmentDetails.routeName: (context) => MyShipmentDetails()
       },
     );
   }
