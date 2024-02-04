@@ -3,7 +3,9 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal.dart';
+import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
+import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_arguments.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_deal_confirmation_bottom_sheet.dart';
 
 class MyShipmentCard extends StatelessWidget {
@@ -14,10 +16,12 @@ class MyShipmentCard extends StatelessWidget {
   Image? shipImage;
   bool isDealTap;
   Deal? deal;
+  ShipmentDto? shipmentDto;
 
   MyShipmentCard(
       {required this.title,
       required this.from,
+      this.shipmentDto,
       required this.to,
       required this.date,
       this.deal,
@@ -34,7 +38,9 @@ class MyShipmentCard extends StatelessWidget {
           if (isDealTap) {
             _showTripDealConfirmationBottomSheet(context, deal!);
           } else {
-            Navigator.pushNamed(context, MyShipmentDetails.routeName);
+            Navigator.pushNamed(context, MyShipmentDetails.routeName,
+                arguments:
+                    MyShipmentDetailsArguments(shipmentDto: shipmentDto!));
           }
         },
         child: Card(

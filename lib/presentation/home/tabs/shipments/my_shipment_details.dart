@@ -1,7 +1,16 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hatly/presentation/components/deals_widget.dart';
+import 'package:hatly/domain/models/deal_dto.dart';
+import 'package:hatly/presentation/components/my_shipment_deals.dart';
+import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_arguments.dart';
+import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_screen-viewmodel.dart';
+import 'package:hatly/providers/auth_provider.dart';
+import 'package:hatly/utils/dialog_utils.dart';
 
 class MyShipmentDetails extends StatefulWidget {
   static const routeName = 'MyShipmentDetails';
@@ -12,6 +21,49 @@ class MyShipmentDetails extends StatefulWidget {
 }
 
 class _MyShipmentDetailsState extends State<MyShipmentDetails> {
+  late LoggedInState loggedInState;
+  MyShipmentDetailsScreenViewModel viewModel =
+      MyShipmentDetailsScreenViewModel();
+
+  List<DealDto>? deals;
+  bool isMyshipmentDealsEmpty = false;
+  late String token;
+  bool isLoading = true;
+  @override
+  void initState() {
+    super.initState();
+
+    UserProvider userProvider =
+        BlocProvider.of<UserProvider>(context, listen: false);
+
+// Check if the current state is LoggedInState and then access the token
+    if (userProvider.state is LoggedInState) {
+      loggedInState = userProvider.state as LoggedInState;
+      token = loggedInState.token;
+      // Now you can use the 'token' variable as needed in your code.
+      print('User token: $token');
+      print('user email ${loggedInState.user.email}');
+    } else {
+      print(
+          'User is not logged in.'); // Handle the scenario where the user is not logged in.
+    }
+
+    // getMyshipmentDeals(token: token, shipmentId: shipmentId)
+
+    // Check for cached shipments when initializing
+    // getCachedMyShipments().then((cachedShipments) async {
+    //   if (cachedShipments.isNotEmpty) {
+    //     print('exist');
+    //     setState(() {
+    //       myShipments = cachedShipments;
+    //     });
+    //   } else {
+    //     await viewModel.getMyShipments(token: token);
+    //     print('no Exist'); // Fetch from API if cache is empty
+    //   }
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -21,7 +73,7 @@ class _MyShipmentDetailsState extends State<MyShipmentDetails> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).primaryColor,
           centerTitle: true,
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: const IconThemeData(color: Colors.white),
           title: Text(
             'Alaa',
             style: GoogleFonts.poppins(

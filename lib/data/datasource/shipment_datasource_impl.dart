@@ -4,6 +4,7 @@ import 'package:hatly/domain/models/create_shipment_response_dto.dart';
 import 'package:hatly/domain/models/get_all_shipments_dto.dart';
 import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
 import 'package:hatly/domain/models/item_dto.dart';
+import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
 
 class ShipmentDataSourceImpl implements ShipmentDataSource {
   ApiManager apiManager;
@@ -50,5 +51,14 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
     print('datasource');
 
     return response.toUserShipmentDto();
+  }
+
+  @override
+  Future<MyShipmentDealsResponseDto> getMyShipmentDeals(
+      {required String token, required int shipmentId}) async {
+    var response = await apiManager.getMyShipmentDeals(
+        token: token, shipmentId: shipmentId);
+
+    return response.toMyShipmentDealsResponseDto();
   }
 }

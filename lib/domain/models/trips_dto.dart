@@ -98,4 +98,25 @@ class TripsDto {
   ///
   /// Converts [Trip] to a JSON string.
   String toJson() => json.encode(toMap());
+
+  Trip toTrip() {
+    return Trip(
+      id: id,
+      origin: origin,
+      destination: destination,
+      available: available,
+      originCity: originCity,
+      destinationCity: destinationCity,
+      consumed: consumed,
+      note: note,
+      addressMeeting: addressMeeting,
+      departDate: departDate,
+      createdAt: createdAt,
+      user: user?.toUser(),
+      bookInfo: bookInfo?.toBookInfo(),
+      itemsNotAllowed:
+          itemsNotAllowed?.map((item) => item.toItemsNotAllowed()).toList(),
+      shipments: shipmentDto?.map((shipment) => shipment.toShipment()).toList(),
+    );
+  }
 }
