@@ -13,6 +13,7 @@ import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment_request.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
+import 'package:hatly/data/api/shipments/my_shipment_deals_response/my_shipment_deals_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
 import 'package:hatly/data/api/trip_deal/deals.dart';
 import 'package:hatly/data/api/trip_deal/trip_deal_request.dart';
@@ -119,6 +120,28 @@ class ApiManager {
       });
 
       var getResponse = GetShipmentsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(getResponse.message!);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<MyShipmentDealsResponse> getMyShipmentDeals(
+      {required String token, required int shipmentId}) async {
+    try {
+      var url = Uri.https(
+          baseUrl, 'shipment/deals', {'shipmentId': shipmentId.toString()});
+      var response = await client.get(url, headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $token'
+      });
+
+      var getResponse = MyShipmentDealsResponse.fromJson(response.body);
       if (getResponse.status == false) {
         throw ServerErrorException(getResponse.message!);
       }

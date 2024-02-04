@@ -259,6 +259,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                                           date: DateFormat('dd MMMM yyyy')
                                               .format(myShipments[index]
                                                   .expectedDate!),
+                                          shipmentDto: myShipments[index],
                                           shipImage: Image.network(
                                             myShipments[index]
                                                 .items!

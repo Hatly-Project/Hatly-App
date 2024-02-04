@@ -3,19 +3,22 @@ import 'dart:convert';
 import 'package:hatly/domain/models/book_info_dto.dart';
 
 class BookInfo {
+  int? id;
+
   String? airline;
   String? bookingReference;
   String? firstName;
   String? lastName;
 
-  BookInfo({
-    this.airline,
-    this.bookingReference,
-    this.firstName,
-    this.lastName,
-  });
+  BookInfo(
+      {this.airline,
+      this.bookingReference,
+      this.firstName,
+      this.lastName,
+      this.id});
 
   factory BookInfo.fromMap(Map<String, dynamic> data) => BookInfo(
+        id: data['id'] as int?,
         airline: data['airline'] as String?,
         bookingReference: data['bookingReference'] as String?,
         firstName: data['firstName'] as String?,
@@ -23,6 +26,7 @@ class BookInfo {
       );
 
   Map<String, dynamic> toMap() => {
+        'id': id,
         'airline': airline,
         'bookingReference': bookingReference,
         'firstName': firstName,
@@ -43,9 +47,11 @@ class BookInfo {
 
   BookInfoDto toBookInfoDto() {
     return BookInfoDto(
-        firstName: firstName,
-        lastName: lastName,
-        bookingReference: bookingReference,
-        airline: airline);
+      firstName: firstName,
+      lastName: lastName,
+      bookingReference: bookingReference,
+      airline: airline,
+      id: id,
+    );
   }
 }

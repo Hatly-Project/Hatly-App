@@ -144,6 +144,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         bloc: viewModel,
         listener: (context, state) {
           if (state is GetAllShipsLoadingState) {
+            print(state);
             shimmerIsLoading = true;
             // if (Platform.isIOS) {
             //   DialogUtils.showDialogIos(
