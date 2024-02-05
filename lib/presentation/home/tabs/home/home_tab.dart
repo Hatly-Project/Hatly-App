@@ -6,14 +6,18 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/components/shimmer_card.dart';
 import 'package:hatly/presentation/components/trip_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab_viewmodel.dart';
+import 'package:hatly/providers/firebase_messaging_provider.dart';
+import 'package:hatly/services/local_notifications_service.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../domain/models/shipment_dto.dart';
 import '../../../../providers/auth_provider.dart';
@@ -41,6 +45,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
 
@@ -137,9 +142,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
-
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {

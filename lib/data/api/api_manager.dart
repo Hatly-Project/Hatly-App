@@ -279,7 +279,7 @@ class ApiManager {
           itemsNotAllowed: itemsNotAllowed,
           note: note,
           addressMeeting: addressMeeting,
-          departData: departDate);
+          departDate: departDate);
       var response = await client.post(url,
           body: requestBody.toJson(),
           headers: {

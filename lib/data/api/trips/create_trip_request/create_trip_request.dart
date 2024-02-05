@@ -9,7 +9,7 @@ class CreateTripRequest {
   int? available;
   String? note;
   String? addressMeeting;
-  String? departData;
+  String? departDate;
   BookInfo? bookInfo;
   List<ItemsNotAllowed>? itemsNotAllowed;
 
@@ -21,7 +21,7 @@ class CreateTripRequest {
     this.originCity,
     this.destinationCity,
     this.addressMeeting,
-    this.departData,
+    this.departDate,
     this.bookInfo,
     this.itemsNotAllowed,
   });
@@ -35,7 +35,7 @@ class CreateTripRequest {
       available: data['available'] as int?,
       note: data['note'] as String?,
       addressMeeting: data['addressMeeting'] as String?,
-      departData: data['departData'] as String?,
+      departDate: data['departDate'] as String?,
       bookInfo: data['bookInfo'] == null
           ? null
           : BookInfo.fromMap(data['bookInfo'] as Map<String, dynamic>),
@@ -53,7 +53,7 @@ class CreateTripRequest {
         'available': available,
         'note': note,
         'addressMeeting': addressMeeting,
-        'departData': departData,
+        'departDate': departDate,
         'bookInfo': bookInfo?.toMap(),
         'itemsNotAllowed': itemsNotAllowed?.map((e) => e.toMap()).toList(),
       };

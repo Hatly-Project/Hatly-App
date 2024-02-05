@@ -562,7 +562,12 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
           selectedDate = picked;
           final formattedDate = DateFormat('dd MMMM yyyy')
               .format(selectedDate); // Format the date
-          dateController.text = selectedDate.toIso8601String();
+          final time = TimeOfDay.fromDateTime(selectedDate);
+          // Format the date
+          var formattedTime = time.format(context);
+          dateController.text = '${formattedDate + ' ' + formattedTime}';
+
+          date = selectedDate.toIso8601String();
         });
       }
     }

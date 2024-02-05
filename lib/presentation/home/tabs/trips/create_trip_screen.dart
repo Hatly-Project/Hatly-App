@@ -1005,7 +1005,13 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
           selectedDate = picked;
           final formattedDate = DateFormat('dd MMMM yyyy')
               .format(selectedDate); // Format the date
-          departDateController.text = selectedDate.toIso8601String();
+          final time = TimeOfDay.fromDateTime(selectedDate);
+          // Format the date
+          var formattedTime = time.format(context);
+          departDateController.text =
+              '${formattedDate + ' at ' + formattedTime}';
+
+          date = selectedDate.toIso8601String();
         });
       }
     }
