@@ -333,6 +333,8 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                             title: myShipments[index].title!,
                             from: myShipments[index].from!,
                             to: myShipments[index].to!,
+                            shipmentDto: myShipments[index],
+
                             date: DateFormat('dd MMMM yyyy')
                                 .format(myShipments[index].expectedDate!),
                             shipImage: Image.network(

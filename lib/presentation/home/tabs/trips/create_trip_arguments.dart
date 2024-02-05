@@ -4,5 +4,5 @@ import 'package:hatly/domain/models/country_dto.dart';
 class CreatetripScreenArguments {
   CountriesDto countriesFlagsDto;
 
-  CreatetripScreenArguments(this.countriesFlagsDto);
+  CreatetripScreenArguments({required this.countriesFlagsDto});
 }

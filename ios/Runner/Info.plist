@@ -43,6 +43,11 @@
 	<string>Please pick the item photo</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -62,26 +67,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Please pick the item photo</string>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>CLIENT_ID</key>
-	<string>445303705925-6sh98frk7v49858seg60bn7u9t25srbl.apps.googleusercontent.com</string>
-	<key>CFBundleURLTypes</key>
-<array>
-	<dict>
-		<key>CFBundleTypeRole</key>
-		<string>Editor</string>
-		<key>CFBundleURLSchemes</key>
-		<array>
-			<!-- TODO Replace this value: -->
-			<!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
-			<string>com.googleusercontent.apps.445303705925-6sh98frk7v49858seg60bn7u9t25srbl</string>
-		</array>
-	</dict>
-</array>
 </dict>
 </plist>

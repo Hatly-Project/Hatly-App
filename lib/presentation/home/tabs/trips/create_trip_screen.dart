@@ -144,7 +144,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   @override
   Widget build(BuildContext context) {
     final args =
-        ModalRoute.of(context)!.settings.arguments as CreatetripScreenArguments;
+        ModalRoute.of(context)?.settings.arguments as CreatetripScreenArguments;
     countries = args.countriesFlagsDto;
 
     return BlocConsumer(

@@ -8,6 +8,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/countries_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/components/my_trip_card.dart';
@@ -41,6 +42,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
   MyTripsViewmodel viewModel = MyTripsViewmodel();
   List<TripsDto> myTrips = [];
   late String token;
+  late CountriesDto countriesDto;
   ScrollController scrollController = ScrollController();
   bool isMyTripsEmpty = false;
   Image? shipImage;
@@ -108,6 +110,8 @@ class _MyTripsTabState extends State<MyTripsTab> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
+    print(args.countriesFlagsDto);
+    countriesDto = args.countriesFlagsDto;
     return BlocConsumer(
       bloc: viewModel,
       listener: (context, state) {
@@ -180,7 +184,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
                         // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateTripScreen()));
                         Navigator.pushNamed(context, CreateTripScreen.routeName,
                             arguments: CreatetripScreenArguments(
-                                args.countriesFlagsDto));
+                                countriesFlagsDto: countriesDto));
                       },
                       icon: const Icon(
                         Icons.add,
@@ -263,7 +267,9 @@ class _MyTripsTabState extends State<MyTripsTab> {
                       IconButton(
                         onPressed: () {
                           Navigator.pushNamed(
-                              context, CreateTripScreen.routeName);
+                              context, CreateTripScreen.routeName,
+                              arguments: CreatetripScreenArguments(
+                                  countriesFlagsDto: countriesDto));
                         },
                         icon: const Icon(
                           Icons.add,

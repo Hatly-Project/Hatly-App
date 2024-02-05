@@ -162,6 +162,7 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                                                 .format(myShipments[index]
                                                     .expectedDate!),
                                             isDealTap: true,
+                                            shipmentDto: myShipments[index],
                                             deal: Deal(
                                                 shipmentDto: myShipments[index],
                                                 tripsDto: widget.tripsDto),
@@ -235,6 +236,7 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                                   title: myShipments[index].title!,
                                   from: myShipments[index].from!,
                                   to: myShipments[index].to!,
+                                  shipmentDto: myShipments[index],
                                   date: DateFormat('dd MMMM yyyy')
                                       .format(myShipments[index].expectedDate!),
                                   isDealTap: true,

@@ -16,12 +16,12 @@ class MyShipmentCard extends StatelessWidget {
   Image? shipImage;
   bool isDealTap;
   Deal? deal;
-  ShipmentDto? shipmentDto;
+  ShipmentDto shipmentDto;
 
   MyShipmentCard(
       {required this.title,
       required this.from,
-      this.shipmentDto,
+      required this.shipmentDto,
       required this.to,
       required this.date,
       this.deal,
@@ -40,7 +40,7 @@ class MyShipmentCard extends StatelessWidget {
           } else {
             Navigator.pushNamed(context, MyShipmentDetails.routeName,
                 arguments:
-                    MyShipmentDetailsArguments(shipmentDto: shipmentDto!));
+                    MyShipmentDetailsArguments(shipmentDto: shipmentDto));
           }
         },
         child: Card(
