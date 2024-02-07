@@ -6,12 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/home/home_screen.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/presentation/login/login_viewmodel.dart';
 import 'package:hatly/presentation/register/register_screen_arguments.dart';
+import 'package:hatly/providers/firebase_messaging_provider.dart';
+import 'package:provider/provider.dart';
 import '../../utils/dialog_utils.dart';
 import '../../utils/validation_utils.dart';
 import '../components/custom_text_field.dart';
@@ -36,6 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
   LoginViewModel viewModel = LoginViewModel();
   @override
   Widget build(BuildContext context) {
+    FCMProvider fcmProvider = Provider.of<FCMProvider>(context);
+
     final args =
         ModalRoute.of(context)!.settings.arguments as LoginScreenArguments;
     return BlocConsumer(
@@ -84,14 +89,21 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           print('load');
         } else if (state is LoginSuccessState) {
-          print('success');
-          Navigator.pushReplacementNamed(context, HomeScreen.routeName,
-              arguments: HomeScreenArguments(args.countriesFlagsDto));
           UserProvider userProvider =
               BlocProvider.of<UserProvider>(context, listen: false);
           userProvider.login(LoggedInState(
               user: state.loginResponseDto.user!,
               token: state.loginResponseDto.token!));
+
+          fcmProvider.loginAndRefresh();
+          // if (fcmProvider.fcmToken != null) {
+          //   ApiManager().refreshFCMToken(
+          //       token: state.loginResponseDto.token!,
+          //       fcmToken: fcmProvider.fcmToken!);
+          // }
+          print('success');
+          Navigator.pushReplacementNamed(context, HomeScreen.routeName,
+              arguments: HomeScreenArguments(args.countriesFlagsDto));
           // Navigator.pushNamed(context, LoginScreen.routeName);
         }
       },

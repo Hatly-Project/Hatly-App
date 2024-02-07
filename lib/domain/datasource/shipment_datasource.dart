@@ -2,6 +2,7 @@ import 'package:hatly/domain/models/create_shipment_response_dto.dart';
 import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
 import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
+import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 
 import '../models/get_all_shipments_dto.dart';
 
@@ -24,4 +25,10 @@ abstract class ShipmentDataSource {
 
   Future<MyShipmentDealsResponseDto> getMyShipmentDeals(
       {required String token, required int shipmentId});
+
+  Future<ShipmentDealResponseDto> sendDeal(
+      {required String token,
+      required int? shipmentId,
+      required double? reward,
+      required int tripId});
 }

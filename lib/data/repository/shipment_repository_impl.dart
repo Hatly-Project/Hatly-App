@@ -4,6 +4,7 @@ import 'package:hatly/domain/models/get_all_shipments_dto.dart';
 import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
 import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
+import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 
 class ShipmentRepositoryImpl implements ShipmentRepository {
@@ -51,5 +52,15 @@ class ShipmentRepositoryImpl implements ShipmentRepository {
       {required String token, required int shipmentId}) {
     return shipmentDataSource.getMyShipmentDeals(
         token: token, shipmentId: shipmentId);
+  }
+
+  @override
+  Future<ShipmentDealResponseDto> sendDeal(
+      {required String token,
+      required int? shipmentId,
+      required double? reward,
+      required int tripId}) {
+    return shipmentDataSource.sendDeal(
+        token: token, shipmentId: shipmentId, reward: reward, tripId: tripId);
   }
 }
