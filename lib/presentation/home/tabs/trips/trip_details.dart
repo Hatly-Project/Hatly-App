@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,6 +7,7 @@ import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/home/bottom_nav_icon.dart';
 import 'package:hatly/presentation/home/tabs/trips/shipment_list_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_details_arguments.dart';
+import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
 
 class TripDetails extends StatefulWidget {
@@ -468,7 +471,8 @@ class _TripDetailsState extends State<TripDetails> {
                           backgroundColor: Colors.amber,
                           padding: const EdgeInsets.symmetric(vertical: 12)),
                       onPressed: () {
-                        _showShipmentsListBottomSheet(context, trip);
+                        _showShipmentsListBottomSheet(
+                            context, trip, showSuccessDialog);
                       },
                       child: Text(
                         'Send Offer',
@@ -488,13 +492,17 @@ class _TripDetailsState extends State<TripDetails> {
     );
   }
 
-  void _showShipmentsListBottomSheet(BuildContext contex, TripsDto trip) {
+  void _showShipmentsListBottomSheet(
+      BuildContext contex, TripsDto trip, Function showSuccessDialog) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[100],
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => ShipmentsListBottomSheet(tripsDto: trip),
+      builder: (context) => ShipmentsListBottomSheet(
+        tripsDto: trip,
+        showSuccessDialog: showSuccessDialog,
+      ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
@@ -502,6 +510,16 @@ class _TripDetailsState extends State<TripDetails> {
         ),
       ),
     );
+  }
+
+  void showSuccessDialog(String successMsg) {
+    if (Platform.isIOS) {
+      DialogUtils.showDialogIos(
+          alertMsg: 'Success', alertContent: successMsg, context: context);
+    } else {
+      DialogUtils.showDialogAndroid(
+          alertMsg: 'Success', alertContent: successMsg, context: context);
+    }
   }
 
   String substractDates(DateTime dateTime) {

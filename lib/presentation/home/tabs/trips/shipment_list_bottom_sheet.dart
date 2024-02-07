@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
+import 'package:hatly/presentation/components/my_shipments_card_deals.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/components/my_shipments_shimmer_card.dart';
@@ -16,7 +17,9 @@ import 'package:intl/intl.dart';
 
 class ShipmentsListBottomSheet extends StatefulWidget {
   TripsDto tripsDto;
-  ShipmentsListBottomSheet({required this.tripsDto});
+  Function showSuccessDialog;
+  ShipmentsListBottomSheet(
+      {required this.tripsDto, required this.showSuccessDialog});
 
   @override
   State<ShipmentsListBottomSheet> createState() =>
@@ -34,6 +37,7 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
 
   @override
   void initState() {
+    super.initState();
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
 
@@ -162,6 +166,8 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                                                 .format(myShipments[index]
                                                     .expectedDate!),
                                             isDealTap: true,
+                                            showSuccessDialog:
+                                                widget.showSuccessDialog,
                                             shipmentDto: myShipments[index],
                                             deal: Deal(
                                                 shipmentDto: myShipments[index],
@@ -237,6 +243,7 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                                   from: myShipments[index].from!,
                                   to: myShipments[index].to!,
                                   shipmentDto: myShipments[index],
+                                  showSuccessDialog: widget.showSuccessDialog,
                                   date: DateFormat('dd MMMM yyyy')
                                       .format(myShipments[index].expectedDate!),
                                   isDealTap: true,

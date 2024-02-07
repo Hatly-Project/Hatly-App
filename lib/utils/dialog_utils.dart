@@ -32,7 +32,7 @@ class DialogUtils {
         title: Text(
           alertMsg!,
           style:
-              TextStyle(color: alertMsg == 'Fail' ? Colors.red : Colors.black),
+              TextStyle(color: alertMsg == 'Fail' ? Colors.red : Colors.green),
         ),
         content: Text(
           alertContent!,

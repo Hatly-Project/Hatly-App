@@ -17,11 +17,12 @@ class MyShipmentCard extends StatelessWidget {
   bool isDealTap;
   Deal? deal;
   ShipmentDto shipmentDto;
-
+  Function? showSuccessDialog;
   MyShipmentCard(
       {required this.title,
       required this.from,
       required this.shipmentDto,
+      this.showSuccessDialog,
       required this.to,
       required this.date,
       this.deal,
@@ -36,7 +37,8 @@ class MyShipmentCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           if (isDealTap) {
-            _showTripDealConfirmationBottomSheet(context, deal!);
+            _showTripDealConfirmationBottomSheet(
+                context, deal!, showSuccessDialog!);
           } else {
             Navigator.pushNamed(context, MyShipmentDetails.routeName,
                 arguments:
@@ -212,7 +214,8 @@ class MyShipmentCard extends StatelessWidget {
     );
   }
 
-  void _showTripDealConfirmationBottomSheet(BuildContext context, Deal deal) {
+  void _showTripDealConfirmationBottomSheet(
+      BuildContext context, Deal deal, Function showSuccessDialog) {
     Navigator.pop(context);
     showModalBottomSheet(
       context: context,
@@ -221,6 +224,7 @@ class MyShipmentCard extends StatelessWidget {
       useSafeArea: true,
       builder: (context) => TripDealConfirmationBottomSheet(
         deal: deal,
+        showSuccessDialog: showSuccessDialog,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(

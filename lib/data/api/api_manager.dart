@@ -7,6 +7,8 @@ import 'package:hatly/data/api/item.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
 import 'package:hatly/data/api/login/login_request.dart';
 import 'package:hatly/data/api/login/login_response/login_response.dart';
+import 'package:hatly/data/api/refresh_token_request.dart';
+import 'package:hatly/data/api/refresh_token_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
 import 'package:hatly/data/api/register/register_request.dart';
 import 'package:hatly/data/api/shipment.dart';
@@ -292,6 +294,31 @@ class ApiManager {
         throw ServerErrorException(tripResponse.message!);
       }
       return tripResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<RefreshTokenResponse> refreshFCMToken(
+      {required String token, required String fcmToken}) async {
+    try {
+      var url = Uri.https(baseUrl, 'user/refreshFcm');
+      var requestBody = RefreshTokenRequest(fcmToken: fcmToken);
+      var response = await client.post(
+        url,
+        body: requestBody.toJson(),
+        headers: {
+          'content-type': 'application/json',
+          'authorization': 'Bearer $token'
+        },
+      );
+      var refreshTokenResponse = RefreshTokenResponse.fromJson(response.body);
+      if (refreshTokenResponse.status == false) {
+        throw ServerErrorException(refreshTokenResponse.message!);
+      }
+      return refreshTokenResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
     } on Exception catch (e) {
