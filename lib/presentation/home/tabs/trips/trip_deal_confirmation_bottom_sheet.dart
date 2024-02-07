@@ -16,7 +16,9 @@ import 'package:intl/intl.dart';
 
 class TripDealConfirmationBottomSheet extends StatefulWidget {
   Deal deal;
-  TripDealConfirmationBottomSheet({required this.deal});
+  Function showSuccessDialog;
+  TripDealConfirmationBottomSheet(
+      {required this.deal, required this.showSuccessDialog});
 
   @override
   State<TripDealConfirmationBottomSheet> createState() =>
@@ -88,17 +90,27 @@ class _TripDealConfirmationBottomSheetState
         if (state is CreateTripDealSuccessState) {
           print('Deal Success');
           var successMsg = state.responseDto.message;
-          if (Platform.isIOS) {
-            DialogUtils.showDialogIos(
-                alertMsg: 'Success',
-                alertContent: successMsg,
-                context: context);
-          } else {
-            DialogUtils.showDialogAndroid(
-                alertMsg: 'Success',
-                alertContent: successMsg,
-                context: context);
-          }
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pop();
+
+            widget.showSuccessDialog(successMsg);
+          });
+
+          // if (Platform.isIOS) {
+          // WidgetsBinding.instance.addPostFrameCallback((_) {
+          //   DialogUtils.showDialogIos(
+          //       alertMsg: 'Success',
+          //       alertContent: successMsg,
+          //       context: context);
+          // });
+          // } else {
+          //   WidgetsBinding.instance.addPostFrameCallback((_) {
+          //     DialogUtils.showDialogAndroid(
+          //         alertMsg: 'Success',
+          //         alertContent: successMsg,
+          //         context: context);
+          //   });
+          // }
         }
         return Stack(
           children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,9 +14,29 @@ import 'package:hatly/presentation/welcome/welcome_screen_arguments.dart';
 
 import '../login/login_screen.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   static const String routeName = 'Splash';
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    UserProvider userProvider =
+        BlocProvider.of<UserProvider>(context, listen: false);
+
+    getCountriesFlags().then((countries) => userProvider.state is LoggedInState
+        ? Navigator.pushReplacementNamed(context, HomeScreen.routeName,
+            arguments: HomeScreenArguments(countries))
+        : Navigator.pushReplacementNamed(context, WelcomeScreen.routeName,
+            arguments: WelcomeScreenArguments(countries)));
+  }
+
   ApiManager apiManager = ApiManager();
+
   CountriesDto? countriesList;
 
   Future<CountriesDto> getCountriesFlags() async {
@@ -27,14 +48,6 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    UserProvider userProvider =
-        BlocProvider.of<UserProvider>(context, listen: false);
-
-    getCountriesFlags().then((countries) => userProvider.state is LoggedInState
-        ? Navigator.pushReplacementNamed(context, HomeScreen.routeName,
-            arguments: HomeScreenArguments(countries))
-        : Navigator.pushReplacementNamed(context, WelcomeScreen.routeName,
-            arguments: WelcomeScreenArguments(countries)));
     return Scaffold(
       body: Image.asset(
         'images/splash.png',

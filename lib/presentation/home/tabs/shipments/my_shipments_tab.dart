@@ -307,49 +307,55 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                       ),
                     ],
                   ),
-                  body: isMyshipmentEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Image.asset('images/no_shipments.png'),
-                                Text(
-                                  "You don't have any shipments, press the add button to add a shipment",
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                          ),
+                  body: shimmerIsLoading
+                      ? ListView.builder(
+                          itemBuilder: (context, index) =>
+                              MyShipmentShimmerCard(),
+                          itemCount: 5,
                         )
-                      : ListView.builder(
-                          itemCount: myShipments.length,
-                          itemBuilder: (context, index) => MyShipmentCard(
-                            title: myShipments[index].title!,
-                            from: myShipments[index].from!,
-                            to: myShipments[index].to!,
-                            shipmentDto: myShipments[index],
+                      : isMyshipmentEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Image.asset('images/no_shipments.png'),
+                                    Text(
+                                      "You don't have any shipments, press the add button to add a shipment",
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: myShipments.length,
+                              itemBuilder: (context, index) => MyShipmentCard(
+                                title: myShipments[index].title!,
+                                from: myShipments[index].from!,
+                                to: myShipments[index].to!,
+                                shipmentDto: myShipments[index],
 
-                            date: DateFormat('dd MMMM yyyy')
-                                .format(myShipments[index].expectedDate!),
-                            shipImage: Image.network(
-                              myShipments[index]
-                                  .items!
-                                  .first
-                                  .photos!
-                                  .first
-                                  .photo!,
-                              fit: BoxFit.fitHeight,
-                              width: 100,
-                              height: 100,
-                            ), //
-                          ),
-                        ),
+                                date: DateFormat('dd MMMM yyyy')
+                                    .format(myShipments[index].expectedDate!),
+                                shipImage: Image.network(
+                                  myShipments[index]
+                                      .items!
+                                      .first
+                                      .photos!
+                                      .first
+                                      .photo!,
+                                  fit: BoxFit.fitHeight,
+                                  width: 100,
+                                  height: 100,
+                                ), //
+                              ),
+                            ),
                 ),
               );
       },

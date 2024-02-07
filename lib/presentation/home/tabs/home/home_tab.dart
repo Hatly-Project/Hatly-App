@@ -3,11 +3,13 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/components/shimmer_card.dart';
 import 'package:hatly/presentation/components/trip_card.dart';
@@ -59,6 +61,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
+
     tabController = TabController(length: 2, vsync: this);
     tabController.addListener(() {
       setState(() {

@@ -3,8 +3,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 class FCMProvider extends ChangeNotifier {
   RemoteNotification? notifMessage;
+  String? fcmToken;
   FCMProvider() {
     _configureFCM();
+    refreshToken();
   }
 
   void _configureFCM() {
@@ -20,6 +22,19 @@ class FCMProvider extends ChangeNotifier {
       // For example, notify listeners to rebuild UI
       notifMessage = message.notification;
       notifyListeners();
+    });
+  }
+
+  void refreshToken() {
+    FirebaseMessaging.instance.onTokenRefresh.listen((refreshedFcmToken) {
+      // TODO: If necessary send token to application server.
+      fcmToken = refreshedFcmToken;
+      print('refreshed Token : $fcmToken');
+      notifyListeners();
+      // Note: This callback is fired at each app startup and whenever a new
+      // token is generated.
+    }).onError((err) {
+      // Error getting token.
     });
   }
 }
