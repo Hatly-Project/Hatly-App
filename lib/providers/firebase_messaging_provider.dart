@@ -3,7 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 class FCMProvider extends ChangeNotifier {
   RemoteNotification? notifMessage;
-  String? fcmToken;
+  String? fcmToken, refreshedToken;
   FCMProvider() {
     _configureFCM();
     refreshToken();
@@ -25,16 +25,42 @@ class FCMProvider extends ChangeNotifier {
     });
   }
 
-  void refreshToken() {
-    FirebaseMessaging.instance.onTokenRefresh.listen((refreshedFcmToken) {
-      // TODO: If necessary send token to application server.
-      fcmToken = refreshedFcmToken;
-      print('refreshed Token : $fcmToken');
-      notifyListeners();
-      // Note: This callback is fired at each app startup and whenever a new
-      // token is generated.
-    }).onError((err) {
-      // Error getting token.
-    });
+  void setFcmToken(String initFcmToken) {
+    fcmToken = initFcmToken;
+    notifyListeners();
+  }
+
+  void loginAndRefresh() async {
+    try {
+      await FirebaseMessaging.instance.deleteToken();
+      var fcmToken = await FirebaseMessaging.instance.getToken();
+      print('fcm Token: $fcmToken');
+      setFcmToken(fcmToken!);
+    } on Exception catch (e) {
+      print('err: $e');
+    }
+  }
+
+  void refreshToken() async {
+    try {
+      // await FirebaseMessaging.instance.deleteToken();
+      // var fcmToken = await FirebaseMessaging.instance.getToken();
+      // print('fcm Token: $fcmToken');
+      // setFcmToken(fcmToken!);
+      FirebaseMessaging.instance.onTokenRefresh.listen((refreshedFcmToken) {
+        // TODO: If necessary send token to application server.
+        fcmToken = refreshedFcmToken;
+        refreshedToken = refreshedFcmToken;
+        print('refreshed Token : $fcmToken');
+        notifyListeners();
+        // Note: This callback is fired at each app startup and whenever a new
+        // token is generated.
+      }).onError((err) {
+        print('error');
+        // Error getting token.
+      });
+    } on Exception catch (e) {
+      print('err: $e');
+    }
   }
 }

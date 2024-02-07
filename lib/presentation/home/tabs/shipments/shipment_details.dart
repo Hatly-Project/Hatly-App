@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/components/shopping_items_card.dart';
 import 'package:hatly/presentation/home/bottom_nav_icon.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
+import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
+import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
 
 class ShipmentDetails extends StatefulWidget {
@@ -270,6 +274,8 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
                               padding:
                                   const EdgeInsets.symmetric(vertical: 12)),
                           onPressed: () {
+                            _showTripsListBottomSheet(
+                                context, showSuccessDialog, shipmentDto);
                             // login();
                           },
                           child: Text(
@@ -287,6 +293,36 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  void showSuccessDialog(String successMsg) {
+    if (Platform.isIOS) {
+      DialogUtils.showDialogIos(
+          alertMsg: 'Success', alertContent: successMsg, context: context);
+    } else {
+      DialogUtils.showDialogAndroid(
+          alertMsg: 'Success', alertContent: successMsg, context: context);
+    }
+  }
+
+  void _showTripsListBottomSheet(BuildContext contex,
+      Function showSuccessDialog, ShipmentDto shipmentDto) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[100],
+      // isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => TripsListBottomSheet(
+        showSuccessDialog: showSuccessDialog,
+        shipmentDto: shipmentDto,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
     );
   }

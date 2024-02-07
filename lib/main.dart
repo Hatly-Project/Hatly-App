@@ -33,7 +33,7 @@ void main() async {
   );
   NotificationService().initNotification();
   var fcmToken = await FirebaseMessaging.instance.getToken();
-  print('fcm Token: $fcmToken');
+  print('fcm main Token: $fcmToken');
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -72,7 +72,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  late String userToken;
+  String userToken = '';
+  static String fcmToken = '';
   MyApp({super.key});
 
   // This widget is the root of your application.
@@ -80,6 +81,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     FCMProvider fcmProvider = Provider.of<FCMProvider>(context);
     print('Notification Message: ${fcmProvider.notifMessage?.body}');
+
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: true);
 
@@ -89,6 +91,10 @@ class MyApp extends StatelessWidget {
       userToken = loggedInState.token;
       // Now you can use the 'token' variable as needed in your code.
       print('User token from main: $userToken');
+      if (fcmProvider.refreshedToken != null) {
+        ApiManager().refreshFCMToken(
+            token: userToken, fcmToken: fcmProvider.refreshedToken!);
+      }
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
@@ -98,10 +104,7 @@ class MyApp extends StatelessWidget {
           title: fcmProvider.notifMessage?.title,
           body: fcmProvider.notifMessage?.body);
     }
-    if (fcmProvider.fcmToken != null) {
-      ApiManager()
-          .refreshFCMToken(token: userToken, fcmToken: fcmProvider.fcmToken!);
-    }
+
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,

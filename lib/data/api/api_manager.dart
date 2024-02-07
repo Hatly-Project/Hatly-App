@@ -12,12 +12,16 @@ import 'package:hatly/data/api/refresh_token_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
 import 'package:hatly/data/api/register/register_request.dart';
 import 'package:hatly/data/api/shipment.dart';
+import 'package:hatly/data/api/shipment_deal/shipment_deal_request.dart';
+import 'package:hatly/data/api/shipment_deal/shipment_deal_response.dart';
 import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment_request.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_deals_response/my_shipment_deals_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
-import 'package:hatly/data/api/trip_deal/deals.dart';
+import 'package:hatly/data/api/trip_deal/deals.dart' as TripDeal;
+import 'package:hatly/data/api/shipment_deal/deals.dart' as ShipmentDeal;
+
 import 'package:hatly/data/api/trip_deal/trip_deal_request.dart';
 import 'package:hatly/data/api/trip_deal/trip_deal_response.dart';
 import 'package:hatly/data/api/trips/create_trip_request/create_trip_request.dart';
@@ -234,8 +238,8 @@ class ApiManager {
       var url = Uri.https(baseUrl, 'deal/trip', {
         'tripId': tripId.toString(),
       });
-      var requestBody =
-          TripDealRequest(deals: Deals(shipmentId: shipmentId, reward: reward));
+      var requestBody = TripDealRequest(
+          deals: TripDeal.Deals(shipmentId: shipmentId, reward: reward));
       print(url.toString());
       var response = await client.post(url,
           body: requestBody.toJson(),
@@ -249,6 +253,37 @@ class ApiManager {
         throw ServerErrorException(tripDealResponse.message!);
       }
       return tripDealResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<ShipmentDealResponse> sendShipmentDeal(
+      {required int? shipmentId,
+      required double? reward,
+      required String token,
+      required int tripId}) async {
+    try {
+      var url = Uri.https(baseUrl, 'deal/shipment', {
+        'shipmentId': shipmentId.toString(),
+      });
+      var requestBody = ShipmentDealRequest(
+          deals: ShipmentDeal.Deals(tripId: tripId, reward: reward));
+      print(url.toString());
+      var response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {
+            'content-type': 'application/json',
+            'authorization': 'Bearer $token'
+          });
+
+      var shipmentDealResponse = ShipmentDealResponse.fromJson(response.body);
+      if (shipmentDealResponse.status == false) {
+        throw ServerErrorException(shipmentDealResponse.message!);
+      }
+      return shipmentDealResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
     } on Exception catch (e) {
@@ -306,7 +341,7 @@ class ApiManager {
     try {
       var url = Uri.https(baseUrl, 'user/refreshFcm');
       var requestBody = RefreshTokenRequest(fcmToken: fcmToken);
-      var response = await client.post(
+      var response = await client.put(
         url,
         body: requestBody.toJson(),
         headers: {
