@@ -341,7 +341,7 @@ class ApiManager {
     try {
       var url = Uri.https(baseUrl, 'user/refreshFcm');
       var requestBody = RefreshTokenRequest(fcmToken: fcmToken);
-      var response = await client.put(
+      var response = await client.patch(
         url,
         body: requestBody.toJson(),
         headers: {

@@ -8,15 +8,23 @@ import 'traveler.dart';
 class Deal {
   int? id;
   String? dealStatus;
+  String? creatorEmail;
   int? reward;
   Traveler? traveler;
   Trip? trip;
 
-  Deal({this.id, this.dealStatus, this.reward, this.traveler, this.trip});
+  Deal(
+      {this.id,
+      this.dealStatus,
+      this.reward,
+      this.traveler,
+      this.trip,
+      this.creatorEmail});
 
   factory Deal.fromMap(Map<String, dynamic> data) => Deal(
         id: data['id'] as int?,
         dealStatus: data['dealStatus'] as String?,
+        creatorEmail: data['creatorEmail'] as String?,
         reward: data['reward'] as int?,
         traveler: data['traveler'] == null
             ? null
@@ -29,6 +37,7 @@ class Deal {
   Map<String, dynamic> toMap() => {
         'id': id,
         'dealStatus': dealStatus,
+        'creatorEmail': creatorEmail,
         'reward': reward,
         'traveler': traveler?.toMap(),
         'trip': trip?.toMap(),
@@ -50,6 +59,7 @@ class Deal {
     return DealDto(
         id: id,
         dealStatus: dealStatus,
+        creatorEmail: creatorEmail,
         reward: reward,
         traveler: traveler?.toTravelerDto(),
         trip: trip?.toTripsDto());
