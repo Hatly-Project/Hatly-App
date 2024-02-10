@@ -102,7 +102,7 @@ class _ShipmentsListBottomSheetState extends State<TripsListBottomSheet> {
           shimmerIsLoading = false;
         }
         return Container(
-          // height: 500,
+          height: 550,
           child: Platform.isIOS
               ? Scaffold(
                   backgroundColor: Colors.transparent,

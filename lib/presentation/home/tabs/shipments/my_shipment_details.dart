@@ -66,6 +66,9 @@ class _MyShipmentDetailsState extends State<MyShipmentDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments
+        as MyShipmentDetailsArguments;
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -75,7 +78,7 @@ class _MyShipmentDetailsState extends State<MyShipmentDetails> {
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
           title: Text(
-            'Alaa',
+            args.shipmentDto.title!,
             style: GoogleFonts.poppins(
                 fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),

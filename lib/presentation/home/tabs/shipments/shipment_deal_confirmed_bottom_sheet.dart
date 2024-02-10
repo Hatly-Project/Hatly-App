@@ -1,0 +1,360 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class DealConfirmedBottomSheet extends StatefulWidget {
+  const DealConfirmedBottomSheet({super.key});
+
+  @override
+  State<DealConfirmedBottomSheet> createState() =>
+      _DealConfirmedBottomSheetState();
+}
+
+class _DealConfirmedBottomSheetState extends State<DealConfirmedBottomSheet> {
+  //     final animationsMap = {
+  // 'containerOnPageLoadAnimation': AnimationInfo(
+  //   trigger: AnimationTrigger.onPageLoad,
+  //   effects: [
+  //     VisibilityEffect(duration: 1.ms),
+  //     FadeEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 0.ms,
+  //       duration: 300.ms,
+  //       begin: 0,
+  //       end: 1,
+  //     ),
+  //     ScaleEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 0.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0.8, 0.8),
+  //       end: Offset(1, 1),
+  //     ),
+  //     TiltEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 0.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 1.396),
+  //       end: Offset(0, 0),
+  //     ),
+  //     MoveEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 0.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 40),
+  //       end: Offset(0, 0),
+  //     ),
+  //   ],
+  // ),
+  // 'textOnPageLoadAnimation1': AnimationInfo(
+  //   trigger: AnimationTrigger.onPageLoad,
+  //   effects: [
+  //     VisibilityEffect(duration: 100.ms),
+  //     FadeEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 100.ms,
+  //       duration: 300.ms,
+  //       begin: 0,
+  //       end: 1,
+  //     ),
+  //     ScaleEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 100.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0.8, 0.8),
+  //       end: Offset(1, 1),
+  //     ),
+  //     TiltEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 100.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 1.396),
+  //       end: Offset(0, 0),
+  //     ),
+  //     MoveEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 100.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 40),
+  //       end: Offset(0, 0),
+  //     ),
+  //   ],
+  // ),
+  // 'textOnPageLoadAnimation2': AnimationInfo(
+  //   trigger: AnimationTrigger.onPageLoad,
+  //   effects: [
+  //     VisibilityEffect(duration: 150.ms),
+  //     FadeEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 150.ms,
+  //       duration: 300.ms,
+  //       begin: 0,
+  //       end: 1,
+  //     ),
+  //     ScaleEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 150.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0.8, 0.8),
+  //       end: Offset(1, 1),
+  //     ),
+  //     TiltEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 150.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 1.396),
+  //       end: Offset(0, 0),
+  //     ),
+  //     MoveEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 150.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 40),
+  //       end: Offset(0, 0),
+  //     ),
+  //   ],
+  // ),
+  // 'dividerOnPageLoadAnimation': AnimationInfo(
+  //   trigger: AnimationTrigger.onPageLoad,
+  //   effects: [
+  //     VisibilityEffect(duration: 200.ms),
+  //     FadeEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 200.ms,
+  //       duration: 300.ms,
+  //       begin: 0,
+  //       end: 1,
+  //     ),
+  //     ScaleEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 200.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0.8, 0.8),
+  //       end: Offset(1, 1),
+  //     ),
+  //     TiltEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 200.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 1.396),
+  //       end: Offset(0, 0),
+  //     ),
+  //     MoveEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 200.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 40),
+  //       end: Offset(0, 0),
+  //     ),
+  //   ],
+  // ),
+  // 'columnOnPageLoadAnimation': AnimationInfo(
+  //   trigger: AnimationTrigger.onPageLoad,
+  //   effects: [
+  //     VisibilityEffect(duration: 250.ms),
+  //     FadeEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 250.ms,
+  //       duration: 300.ms,
+  //       begin: 0,
+  //       end: 1,
+  //     ),
+  //     ScaleEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 250.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0.8, 0.8),
+  //       end: Offset(1, 1),
+  //     ),
+  //     TiltEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 250.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 1.396),
+  //       end: Offset(0, 0),
+  //     ),
+  //     MoveEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 250.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 40),
+  //       end: Offset(0, 0),
+  //     ),
+  //   ],
+  // ),
+  // 'buttonOnPageLoadAnimation': AnimationInfo(
+  //   trigger: AnimationTrigger.onPageLoad,
+  //   effects: [
+  //     VisibilityEffect(duration: 350.ms),
+  //     FadeEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 350.ms,
+  //       duration: 300.ms,
+  //       begin: 0,
+  //       end: 1,
+  //     ),
+  //     ScaleEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 350.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0.8, 0.8),
+  //       end: Offset(1, 1),
+  //     ),
+  //     TiltEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 350.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(1.222, 0),
+  //       end: Offset(0, 0),
+  //     ),
+  //     MoveEffect(
+  //       curve: Curves.easeInOut,
+  //       delay: 350.ms,
+  //       duration: 300.ms,
+  //       begin: Offset(0, 40),
+  //       end: Offset(0, 0),
+  //     ),
+  //   ],
+  //   ),
+  // };
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Generated code for this successBubble Widget...
+          Align(
+            alignment: AlignmentDirectional(0, -1),
+            child: Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(0, 44, 0, 0),
+                child: Container(
+                  width: 160,
+                  height: 160,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFc2f1ec),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Color(0xFF9ae7df),
+                      width: 4,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Container(
+                      width: 180,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF3ad2c0),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Color(0xFF3ad2c0),
+                          width: 4,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 70,
+                      ).animate(
+                        effects: [
+                          VisibilityEffect(duration: 3.ms),
+                          FadeEffect(
+                            curve: Curves.easeInOut,
+                            delay: 4.ms,
+                            duration: 300.ms,
+                            begin: 0,
+                            end: 1,
+                          ),
+                          ScaleEffect(
+                            curve: Curves.easeInOut,
+                            delay: 4.ms,
+                            duration: 300.ms,
+                            begin: Offset(0.8, 0.8),
+                            end: Offset(1, 1),
+                          ),
+                          MoveEffect(
+                            curve: Curves.easeInOut,
+                            delay: 4.ms,
+                            duration: 300.ms,
+                            begin: Offset(0, 40),
+                            end: Offset(0, 0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+                // .animateOnPageLoad(
+                //     animationsMap['containerOnPageLoadAnimation']!),
+                ),
+          ).animate(
+            effects: [
+              VisibilityEffect(duration: 3.ms),
+              FadeEffect(
+                curve: Curves.easeInOut,
+                delay: 0.ms,
+                duration: 300.ms,
+                begin: 0,
+                end: 1,
+              ),
+              ScaleEffect(
+                curve: Curves.easeInOut,
+                delay: 2.ms,
+                duration: 300.ms,
+                begin: Offset(0.8, 0.8),
+                end: Offset(1, 1),
+              ),
+              MoveEffect(
+                curve: Curves.easeInOut,
+                delay: 2.ms,
+                duration: 300.ms,
+                begin: Offset(0, 40),
+                end: Offset(0, 0),
+              ),
+            ],
+          ),
+
+          FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text(
+              "Your deal has \n been sent",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                  fontSize: 30,
+                  textStyle: TextStyle(wordSpacing: 3, letterSpacing: 5),
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor),
+            ).animate(
+              effects: [
+                VisibilityEffect(duration: 3.ms),
+                FadeEffect(
+                  curve: Curves.easeInOut,
+                  delay: 500.ms,
+                  duration: 300.ms,
+                  begin: 0,
+                  end: 1,
+                ),
+                ScaleEffect(
+                  curve: Curves.easeInOut,
+                  delay: 2.ms,
+                  duration: 300.ms,
+                  begin: Offset(0.8, 0.8),
+                  end: Offset(1, 1),
+                ),
+                MoveEffect(
+                  curve: Curves.easeInOut,
+                  delay: 2.ms,
+                  duration: 300.ms,
+                  begin: Offset(0, 40),
+                  end: Offset(0, 0),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

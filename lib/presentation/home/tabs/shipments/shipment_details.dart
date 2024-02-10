@@ -9,6 +9,7 @@ import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/components/shopping_items_card.dart';
 import 'package:hatly/presentation/home/bottom_nav_icon.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
 import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
 import 'package:hatly/utils/dialog_utils.dart';
@@ -298,21 +299,36 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
   }
 
   void showSuccessDialog(String successMsg) {
-    if (Platform.isIOS) {
-      DialogUtils.showDialogIos(
-          alertMsg: 'Success', alertContent: successMsg, context: context);
-    } else {
-      DialogUtils.showDialogAndroid(
-          alertMsg: 'Success', alertContent: successMsg, context: context);
-    }
+    _showShipmentDealConfirmedBottomSheet(context);
+    // if (Platform.isIOS) {
+    //   DialogUtils.showDialogIos(
+    //       alertMsg: 'Success', alertContent: successMsg, context: context);
+    // } else {
+    //   DialogUtils.showDialogAndroid(
+    //       alertMsg: 'Success', alertContent: successMsg, context: context);
+    // }
   }
 
-  void _showTripsListBottomSheet(BuildContext contex,
+  void _showShipmentDealConfirmedBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      builder: (context) => DealConfirmedBottomSheet(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void _showTripsListBottomSheet(BuildContext context,
       Function showSuccessDialog, ShipmentDto shipmentDto) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[100],
-      // isScrollControlled: true,
+      isScrollControlled: true,
       useSafeArea: true,
       builder: (context) => TripsListBottomSheet(
         showSuccessDialog: showSuccessDialog,

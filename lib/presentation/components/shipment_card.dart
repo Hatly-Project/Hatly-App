@@ -7,8 +7,10 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
+import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 
 class ShipmentCard extends StatelessWidget {
@@ -84,9 +86,12 @@ class ShipmentCard extends StatelessWidget {
                                 Row(
                                   children: [
                                     Container(
+                                      width: MediaQuery.sizeOf(context).width *
+                                          .27,
                                       margin: EdgeInsets.only(left: 10),
                                       child: Text(
                                         shipmentDto.from!,
+                                        overflow: TextOverflow.ellipsis,
                                         style: GoogleFonts.poppins(
                                             fontSize: 15,
                                             color: Colors.grey[600]),
@@ -190,7 +195,10 @@ class ShipmentCard extends StatelessWidget {
                                     backgroundColor: MaterialStatePropertyAll(
                                         Theme.of(context).primaryColor),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    _showTripsListBottomSheet(context,
+                                        showSuccessDialog, shipmentDto);
+                                  },
                                   child: Text(
                                     'Send offer',
                                     style: GoogleFonts.poppins(
@@ -229,6 +237,51 @@ class ShipmentCard extends StatelessWidget {
                 ],
               ),
             )),
+      ),
+    );
+  }
+
+  void showSuccessDialog(String successMsg, BuildContext context) {
+    _showShipmentDealConfirmedBottomSheet(context);
+    // if (Platform.isIOS) {
+    //   DialogUtils.showDialogIos(
+    //       alertMsg: 'Success', alertContent: successMsg, context: context);
+    // } else {
+    //   DialogUtils.showDialogAndroid(
+    //       alertMsg: 'Success', alertContent: successMsg, context: context);
+    // }
+  }
+
+  void _showShipmentDealConfirmedBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      builder: (context) => DealConfirmedBottomSheet(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void _showTripsListBottomSheet(BuildContext context,
+      Function showSuccessDialog, ShipmentDto shipmentDto) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[100],
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => TripsListBottomSheet(
+        showSuccessDialog: showSuccessDialog,
+        shipmentDto: shipmentDto,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
     );
   }
