@@ -5,6 +5,7 @@ import 'package:hatly/domain/models/traveler_dto.dart';
 class Traveler {
   int? id;
   String? email;
+  String? name;
   String? phone;
   dynamic profilePhoto;
   bool? verify;
@@ -12,6 +13,7 @@ class Traveler {
   Traveler({
     this.id,
     this.email,
+    this.name,
     this.phone,
     this.profilePhoto,
     this.verify,
@@ -20,6 +22,7 @@ class Traveler {
   factory Traveler.fromMap(Map<String, dynamic> data) => Traveler(
         id: data['id'] as int?,
         email: data['email'] as String?,
+        name: data['name'] as String?,
         phone: data['phone'] as String?,
         profilePhoto: data['profilePhoto'] as dynamic,
         verify: data['verify'] as bool?,
@@ -28,6 +31,7 @@ class Traveler {
   Map<String, dynamic> toMap() => {
         'id': id,
         'email': email,
+        'name': name,
         'phone': phone,
         'profilePhoto': profilePhoto,
         'verify': verify,
@@ -50,6 +54,7 @@ class Traveler {
         id: id,
         email: email,
         phone: phone,
+        name: name,
         profilePhoto: profilePhoto,
         verify: verify);
   }

@@ -8,15 +8,23 @@ import 'package:hatly/domain/models/trips_dto.dart';
 class DealDto {
   int? id;
   String? dealStatus;
+  String? creatorEmail;
   int? reward;
   TravelerDto? traveler;
   TripsDto? trip;
 
-  DealDto({this.id, this.dealStatus, this.reward, this.traveler, this.trip});
+  DealDto(
+      {this.id,
+      this.dealStatus,
+      this.reward,
+      this.traveler,
+      this.trip,
+      this.creatorEmail});
 
   factory DealDto.fromMap(Map<String, dynamic> data) => DealDto(
         id: data['id'] as int?,
         dealStatus: data['dealStatus'] as String?,
+        creatorEmail: data['creatorEmail'] as String?,
         reward: data['reward'] as int?,
         traveler: data['traveler'] == null
             ? null
@@ -29,6 +37,7 @@ class DealDto {
   Map<String, dynamic> toMap() => {
         'id': id,
         'dealStatus': dealStatus,
+        'creatorEmail': creatorEmail,
         'reward': reward,
         'traveler': traveler?.toMap(),
         'trip': trip?.toMap(),
@@ -50,6 +59,7 @@ class DealDto {
     return Deal(
         id: id,
         dealStatus: dealStatus,
+        creatorEmail: creatorEmail,
         reward: reward,
         traveler: traveler?.toTraveler(),
         trip: trip?.toTrip());

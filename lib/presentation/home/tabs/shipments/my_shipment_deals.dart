@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
+import 'package:hatly/presentation/components/my_shipment_deal_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_arguments.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_screen-viewmodel.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
+import 'package:hive/hive.dart';
 
 class MyShipmentDeals extends StatefulWidget {
   const MyShipmentDeals({super.key});
@@ -24,10 +26,11 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
   MyShipmentDetailsScreenViewModel viewModel =
       MyShipmentDetailsScreenViewModel();
 
-  List<DealDto>? deals;
+  List<DealDto> deals = [];
   bool isMyshipmentDealsEmpty = false;
   late String token;
-  bool isLoading = true;
+  late int shipmentId;
+  bool isLoading = false;
 
   Future<void> getMyshipmentDeals(
       {required String token, required int shipmentId}) async {
@@ -52,6 +55,44 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
+    getCachedMyShipmentsDeals().then((cachedDeals) async {
+      if (cachedDeals.isNotEmpty) {
+        setState(() {
+          deals = cachedDeals;
+        });
+      } else {
+        await viewModel.getMyshipmentDeals(
+            token: token, shipmentId: shipmentId);
+      }
+    });
+  }
+
+  // a method for caching the shipments list
+  Future<void> cacheMyShipmentsDeals(List<DealDto> shipmentsDeals) async {
+    final box = await Hive.openBox(
+        'shipmentsDeals_${loggedInState.user.email!.replaceAll('@', '_at_')}');
+
+    // Convert List<ShipmentDto> to List<Map<String, dynamic>>
+    final shipmentDealsMaps =
+        shipmentsDeals.map((deal) => deal.toJson()).toList();
+
+    // Clear existing data and store the new data in the box
+    print('done caching');
+    await box.clear();
+    await box.addAll(shipmentDealsMaps);
+  }
+
+  Future<List<DealDto>> getCachedMyShipmentsDeals() async {
+    final box = await Hive.openBox(
+        'shipmentsDeals_${loggedInState.user.email!.replaceAll('@', '_at_')}');
+    final shipmentDealsMaps = box.values.toList();
+
+    // Convert List<Map<String, dynamic>> to List<ShipmentDto>
+    final shipmentDeals = shipmentDealsMaps
+        .map((shipmentMap) => DealDto.fromJson(shipmentMap))
+        .toList();
+
+    return shipmentDeals;
   }
 
   @override
@@ -59,7 +100,8 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
     final args = ModalRoute.of(context)?.settings.arguments
         as MyShipmentDetailsArguments;
     var shipment = args.shipmentDto;
-    getMyshipmentDeals(token: token, shipmentId: shipment.id!);
+    shipmentId = shipment.id!;
+    // getMyshipmentDeals(token: token, shipmentId: shipment.id!);
 
     return BlocConsumer(
       bloc: viewModel,
@@ -107,10 +149,14 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
         if (state is MyshipmentDealsSuccessState) {
           print('getDeals success');
           deals = state.responseDto.deals ?? [];
-          if (deals!.isEmpty) {
+          print('reward ${deals.first.reward}');
+          if (deals.isEmpty) {
+            print('deal empty');
             isMyshipmentDealsEmpty = true;
           } else {
             isMyshipmentDealsEmpty = false;
+            cacheMyShipmentsDeals(deals);
+            print('deal not empty');
           }
         }
         return Stack(
@@ -121,20 +167,21 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
                 controller: scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
-                  // CupertinoSliverRefreshControl(
-                  //   onRefresh: () async {
-                  //     await viewModel.getMyShipments(token: token);
-                  //     cacheMyShipments(myShipments);
-                  //     setState(() {});
-                  //   },
-                  // ),
+                  CupertinoSliverRefreshControl(
+                    onRefresh: () async {
+                      await viewModel.getMyshipmentDeals(
+                          token: token, shipmentId: shipmentId);
+                      cacheMyShipmentsDeals(deals);
+                      setState(() {});
+                    },
+                  ),
                   // shimmerIsLoading
                   //     ?
-                  //     SliverList(
-                  //         delegate: SliverChildBuilderDelegate(
-                  //             (context, index) => MyShipmentShimmerCard(),
-                  //             childCount: 5),
-                  //       )
+                  // SliverList(
+                  //     delegate: SliverChildBuilderDelegate(
+                  //         (context, index) => MyShipmentShimmerCard(),
+                  //         childCount: 5),
+                  //   )
                   // : isMyshipmentEmpty
                   //     ?
                   isMyshipmentDealsEmpty
@@ -160,8 +207,12 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
                             ),
                           ),
                         )
-                      : SliverToBoxAdapter(
-                          child: Container(),
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                              (context, index) => MyShipmentDealCard(
+                                    dealDto: deals[index],
+                                  ),
+                              childCount: deals.length),
                         ),
                   // : SliverList(
                   //     delegate: SliverChildBuilderDelegate(
