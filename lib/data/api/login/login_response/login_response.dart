@@ -1,8 +1,7 @@
 import 'dart:convert';
 
+import 'package:hatly/data/api/user.dart';
 import 'package:hatly/domain/models/login_response_dto.dart';
-
-import '../../register/register_response/user.dart';
 
 class LoginResponse {
   String? token;

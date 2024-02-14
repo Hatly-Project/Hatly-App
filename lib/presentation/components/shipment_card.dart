@@ -15,9 +15,9 @@ import 'package:intl/intl.dart';
 
 class ShipmentCard extends StatelessWidget {
   ShipmentDto shipmentDto;
-  ShipmentCard({
-    required this.shipmentDto,
-  });
+  Function showConfirmedBottomSheet;
+  ShipmentCard(
+      {required this.shipmentDto, required this.showConfirmedBottomSheet});
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +168,7 @@ class ShipmentCard extends StatelessWidget {
                                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Text(
-                                        shipmentDto.user!.name!,
+                                        shipmentDto.user!.firstName!,
                                         style: GoogleFonts.poppins(
                                             fontSize: 13,
                                             color: Colors.black,
@@ -197,7 +197,7 @@ class ShipmentCard extends StatelessWidget {
                                   ),
                                   onPressed: () {
                                     _showTripsListBottomSheet(context,
-                                        showSuccessDialog, shipmentDto);
+                                        showConfirmedBottomSheet, shipmentDto);
                                   },
                                   child: Text(
                                     'Send offer',
@@ -237,31 +237,6 @@ class ShipmentCard extends StatelessWidget {
                 ],
               ),
             )),
-      ),
-    );
-  }
-
-  void showSuccessDialog(String successMsg, BuildContext context) {
-    _showShipmentDealConfirmedBottomSheet(context);
-    // if (Platform.isIOS) {
-    //   DialogUtils.showDialogIos(
-    //       alertMsg: 'Success', alertContent: successMsg, context: context);
-    // } else {
-    //   DialogUtils.showDialogAndroid(
-    //       alertMsg: 'Success', alertContent: successMsg, context: context);
-    // }
-  }
-
-  void _showShipmentDealConfirmedBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      useSafeArea: true,
-      builder: (context) => DealConfirmedBottomSheet(),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
       ),
     );
   }

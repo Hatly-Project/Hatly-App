@@ -4,11 +4,17 @@ import '../models/register_response_dto.dart';
 
 abstract class AuthRepository {
   Future<RegisterResponseDto> register(
-      {String? name,
-      String? email,
-      String? phone,
-      String? image,
+      {String? email,
       String? password,
-      String? fcmToken});
+      String? firstName,
+      String? lastName,
+      String? dob,
+      String? address,
+      String? city,
+      String? country,
+      String? phone,
+      String? postalCode,
+      String? ip,
+      required String? fcmToken});
   Future<LoginResponseDto> login(String email, String password);
 }

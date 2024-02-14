@@ -11,17 +11,24 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<RegisterResponseDto> register(
-      {String? name,
-      String? email,
-      String? phone,
-      String? image,
+      {String? email,
       String? password,
-      String? fcmToken}) async {
+      String? firstName,
+      String? lastName,
+      String? dob,
+      String? address,
+      String? city,
+      String? country,
+      String? phone,
+      String? postalCode,
+      String? ip,
+      required String? fcmToken}) async {
     return authDataSource.register(
-      name: name,
+      firstName: firstName,
+      lastName: lastName,
       email: email,
+      ip: ip,
       phone: phone,
-      image: image,
       password: password,
       fcmToken: fcmToken,
     );

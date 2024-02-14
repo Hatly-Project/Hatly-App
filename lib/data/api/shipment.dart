@@ -18,6 +18,8 @@ class Shipment {
   double? totalPrice;
   double? reward;
   DateTime? expectedDate;
+  DateTime? createdAt;
+
   List<Item>? items;
   Count? count;
 
@@ -26,6 +28,7 @@ class Shipment {
       this.user,
       this.title,
       this.trip,
+      this.createdAt,
       this.notes,
       this.fromCity,
       this.toCity,
@@ -56,6 +59,9 @@ class Shipment {
         expectedDate: data['expectedDate'] == null
             ? null
             : DateTime.parse(data['expectedDate'] as String),
+        createdAt: data['createdAt'] == null
+            ? null
+            : DateTime.parse(data['createdAt'] as String),
         items: (data['items'] as List<dynamic>?)
             ?.map((e) => Item.fromMap(e as Map<String, dynamic>))
             .toList(),
@@ -78,6 +84,7 @@ class Shipment {
         'total_price': totalPrice,
         'reward': reward,
         'expectedDate': expectedDate?.toIso8601String(),
+        'createdDate': createdAt?.toIso8601String(),
         'items': items?.map((e) => e.toMap()).toList(),
         '_count': count?.toMap(),
       };
@@ -102,6 +109,7 @@ class Shipment {
       wight: wight,
       from: from,
       fromCity: fromCity,
+      createdAt: createdAt,
       toCity: toCity,
       to: to,
       notes: notes,

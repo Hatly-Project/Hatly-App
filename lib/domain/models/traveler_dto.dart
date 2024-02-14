@@ -1,18 +1,21 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/shipments/my_shipment_deals_response/traveler.dart';
+import 'package:hatly/data/api/traveler.dart';
 
 class TravelerDto {
   int? id;
   String? email;
-  String? name;
+  String? firstName, lastName;
   String? phone;
   dynamic profilePhoto;
+  double? averageRating;
   bool? verify;
 
   TravelerDto({
     this.id,
-    this.name,
+    this.firstName,
+    this.lastName,
+    this.averageRating = 0,
     this.email,
     this.phone,
     this.profilePhoto,
@@ -22,8 +25,10 @@ class TravelerDto {
   factory TravelerDto.fromMap(Map<String, dynamic> data) => TravelerDto(
         id: data['id'] as int?,
         email: data['email'] as String?,
-        name: data['name'] as String?,
-        phone: data['phone'] as String,
+        firstName: data['firstName'] as String?,
+        lastName: data['lastName'] as String?,
+        averageRating: (data['averageRating'] as num?)?.toDouble(),
+        phone: data['phone'] as String?,
         profilePhoto: data['profilePhoto'] as dynamic,
         verify: data['verify'] as bool?,
       );
@@ -31,7 +36,9 @@ class TravelerDto {
   Map<String, dynamic> toMap() => {
         'id': id,
         'email': email,
-        'name': name,
+        'averageRating': averageRating,
+        'firstName': firstName,
+        'lastName': lastName,
         'phone': phone,
         'profilePhoto': profilePhoto,
         'verify': verify,
@@ -53,9 +60,11 @@ class TravelerDto {
     return Traveler(
         id: id,
         email: email,
-        name: name,
+        firstName: firstName,
+        lastName: lastName,
         phone: phone,
         profilePhoto: profilePhoto,
+        averageRating: averageRating,
         verify: verify);
   }
 }

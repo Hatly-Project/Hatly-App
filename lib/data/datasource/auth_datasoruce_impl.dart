@@ -1,5 +1,6 @@
 import 'package:hatly/domain/datasource/auth_datasource.dart';
 import 'package:hatly/domain/models/login_response_dto.dart';
+import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
 import 'package:hatly/domain/models/register_response_dto.dart';
 
 import '../api/api_manager.dart';
@@ -11,17 +12,24 @@ class AuthDataSourceImpl implements AuthDataSource {
 
   @override
   Future<RegisterResponseDto> register(
-      {String? name,
-      String? email,
-      String? phone,
-      String? image,
+      {String? email,
       String? password,
-      String? fcmToken}) async {
+      String? firstName,
+      String? lastName,
+      String? dob,
+      String? address,
+      String? city,
+      String? country,
+      String? phone,
+      String? postalCode,
+      String? ip,
+      required String? fcmToken}) async {
     var response = await apiManager.registerUser(
-      name: name,
+      firstName: firstName,
+      lastName: lastName,
       email: email,
       phone: phone,
-      image: image,
+      ip: ip,
       password: password,
       fcmToken: fcmToken,
     );
@@ -34,5 +42,12 @@ class AuthDataSourceImpl implements AuthDataSource {
     var response = await apiManager.loginUser(email, password);
 
     return response.toLoginDto();
+  }
+
+  @override
+  Future<MyShipmentDealsResponseDto> getMyShipmentDealDetails(
+      {required String token, required String dealId}) {
+    // TODO: implement getMyShipmentDealDetails
+    throw UnimplementedError();
   }
 }

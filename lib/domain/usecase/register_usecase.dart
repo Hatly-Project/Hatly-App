@@ -7,17 +7,24 @@ class RegisterUseCase {
   RegisterUseCase(this.authRepository);
 
   Future<RegisterResponseDto> invoke(
-      {String? name,
-      String? email,
-      String? phone,
-      String? image,
+      {String? email,
       String? password,
+      String? firstName,
+      String? lastName,
+      String? dob,
+      String? address,
+      String? city,
+      String? country,
+      String? phone,
+      String? postalCode,
+      required String? ip,
       required String? fcmToken}) async {
     return authRepository.register(
-        name: name,
+        firstName: firstName,
+        lastName: lastName,
         email: email,
+        ip: ip,
         phone: phone,
-        image: image,
         password: password,
         fcmToken: fcmToken);
   }

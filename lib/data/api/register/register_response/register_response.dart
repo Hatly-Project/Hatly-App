@@ -1,9 +1,8 @@
 import 'dart:convert';
 
+import 'package:hatly/data/api/user.dart';
 import 'package:hatly/domain/models/register_response_dto.dart';
 import 'package:hatly/domain/models/user_model.dart';
-
-import 'user.dart';
 
 class RegisterResponse {
   bool? status;
@@ -46,7 +45,8 @@ class RegisterResponse {
 
   UserDto toUserDto() {
     return UserDto(
-        name: user?.name,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
         phone: user?.phone,
         email: user?.email,
         profilePhoto: user?.profilePhoto);

@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/firebase_options.dart';
+import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/home/home_screen.dart';
@@ -78,7 +79,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  late String userToken;
+  String userToken = '';
   MyApp({super.key});
 
   // This widget is the root of your application.
@@ -132,7 +133,8 @@ class MyApp extends StatelessWidget {
         CreateTripScreen.routeName: (context) => CreateTripScreen(),
         ShipmentDetails.routeName: (context) => ShipmentDetails(),
         TripDetails.routeName: (context) => TripDetails(),
-        MyShipmentDetails.routeName: (context) => MyShipmentDetails()
+        MyShipmentDetails.routeName: (context) => MyShipmentDetails(),
+        MyShipmentDealDetails.routeName: (context) => MyShipmentDealDetails()
       },
     );
   }

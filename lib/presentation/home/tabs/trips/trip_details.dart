@@ -137,7 +137,7 @@ class _TripDetailsState extends State<TripDetails> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  trip.user!.name!,
+                                  trip.user!.firstName!,
                                   overflow: TextOverflow.fade,
                                   style: GoogleFonts.poppins(
                                       fontSize: 12,

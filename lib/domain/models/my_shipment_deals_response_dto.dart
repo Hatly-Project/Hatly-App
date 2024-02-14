@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/shipments/my_shipment_deals_response/deal.dart';
+import 'package:hatly/data/api/shipmentDeal.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
 
 class MyShipmentDealsResponseDto {

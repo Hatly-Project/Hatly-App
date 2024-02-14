@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:hatly/domain/models/user_model.dart';
 
 class User {
-  String? name;
+  String? firstName;
+  String? lastName;
+
   String? email;
   String? phone;
   String? profilePhoto;
@@ -11,7 +13,8 @@ class User {
   double? averageRating;
 
   User({
-    this.name,
+    this.firstName,
+    this.lastName,
     this.email,
     this.phone,
     this.profilePhoto,
@@ -20,7 +23,8 @@ class User {
   });
 
   factory User.fromMap(Map<String, dynamic> data) => User(
-        name: data['name'] as String?,
+        firstName: data['firstName'] as String?,
+        lastName: data['lastName'] as String?,
         email: data['email'] as String?,
         phone: data['phone'] as String?,
         profilePhoto: data['ProfilePhoto'] as String?,
@@ -29,7 +33,8 @@ class User {
       );
 
   Map<String, dynamic> toMap() => {
-        'name': name,
+        'firstName': firstName,
+        'lastName': lastName,
         'email': email,
         'phone': phone,
         'ProfilePhoto': profilePhoto,
@@ -51,7 +56,8 @@ class User {
 
   UserDto toUserDto() {
     return UserDto(
-        name: name,
+        firstName: firstName,
+        lastName: lastName,
         phone: phone,
         email: email,
         profilePhoto: profilePhoto,

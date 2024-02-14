@@ -1,4 +1,5 @@
 import 'package:hatly/domain/models/create_shipment_response_dto.dart';
+import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
 import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
 import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
@@ -31,4 +32,7 @@ abstract class ShipmentDataSource {
       required int? shipmentId,
       required double? reward,
       required int tripId});
+
+  Future<GetMyShipmentDealDetailsResponseDto> getMyShipmentDealDetails(
+      {required String token, required String dealId});
 }

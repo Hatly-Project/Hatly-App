@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/shipments/my_shipment_deals_response/deal.dart';
+import 'package:hatly/data/api/shipmentDeal.dart';
 import 'package:hatly/data/api/trip.dart';
 import 'package:hatly/domain/models/traveler_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
@@ -9,15 +9,18 @@ class DealDto {
   int? id;
   String? dealStatus;
   String? creatorEmail;
-  int? reward;
+  double? counterReward, finalReward, hatlyFees, paymentFees;
   TravelerDto? traveler;
   TripsDto? trip;
 
   DealDto(
       {this.id,
       this.dealStatus,
-      this.reward,
+      this.counterReward,
+      this.finalReward,
       this.traveler,
+      this.hatlyFees,
+      this.paymentFees,
       this.trip,
       this.creatorEmail});
 
@@ -25,7 +28,10 @@ class DealDto {
         id: data['id'] as int?,
         dealStatus: data['dealStatus'] as String?,
         creatorEmail: data['creatorEmail'] as String?,
-        reward: data['reward'] as int?,
+        counterReward: (data['counterReward'] as num?)?.toDouble(),
+        finalReward: (data['finalReward'] as num?)?.toDouble(),
+        hatlyFees: (data['fees'] as num?)?.toDouble(),
+        paymentFees: (data['paymentFees'] as num?)?.toDouble(),
         traveler: data['traveler'] == null
             ? null
             : TravelerDto.fromMap(data['traveler'] as Map<String, dynamic>),
@@ -38,8 +44,11 @@ class DealDto {
         'id': id,
         'dealStatus': dealStatus,
         'creatorEmail': creatorEmail,
-        'reward': reward,
+        'counterReward': counterReward,
+        'finalReward': finalReward,
         'traveler': traveler?.toMap(),
+        'fees': hatlyFees,
+        'paymentFees': paymentFees,
         'trip': trip?.toMap(),
       };
 
@@ -60,7 +69,10 @@ class DealDto {
         id: id,
         dealStatus: dealStatus,
         creatorEmail: creatorEmail,
-        reward: reward,
+        counterReward: counterReward,
+        hatlyFees: hatlyFees,
+        paymentFees: paymentFees,
+        finalReward: finalReward,
         traveler: traveler?.toTraveler(),
         trip: trip?.toTrip());
   }

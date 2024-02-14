@@ -3,37 +3,62 @@ import 'dart:convert';
 class RegisterRequest {
   String? email;
   String? password;
-  String? name;
+  String? firstName;
+  String? lastName;
+  String? dob;
+  String? address;
+  String? city;
+  String? country;
   String? phone;
-  String? image;
+  String? postalCode;
+  String? ip;
   String? fcmToken;
 
-  RegisterRequest(
-      {this.email,
-      this.password,
-      this.name,
-      this.image,
-      this.phone,
-      this.fcmToken});
+  RegisterRequest({
+    this.email,
+    this.password,
+    this.firstName,
+    this.lastName,
+    this.dob,
+    this.address,
+    this.city,
+    this.country,
+    this.phone,
+    this.postalCode,
+    this.ip,
+    this.fcmToken,
+  });
 
   factory RegisterRequest.fromMap(Map<String, dynamic> data) {
     return RegisterRequest(
       email: data['email'] as String?,
       password: data['password'] as String?,
-      name: data['name'] as String?,
-      fcmToken: data['fcmToken'] as String?,
+      firstName: data['firstName'] as String?,
+      lastName: data['lastName'] as String?,
+      dob: data['dob'] as String?,
+      address: data['address'] as String?,
+      city: data['city'] as String?,
+      country: data['country'] as String?,
       phone: data['phone'] as String?,
-      image: data['image'] as String?,
+      postalCode: data['postalCode'] as String?,
+      ip: data['ip'] as String?,
+      fcmToken: data['fcmToken'] as String?,
     );
   }
 
   Map<String, dynamic> toMap() => {
         'email': email,
         'password': password,
-        'fcmToken': fcmToken,
-        'name': name,
+        'firstName': firstName,
+        'lastName': lastName,
+        'dob': dob,
+        'address': address,
+        'city': city,
+        'country': country,
         'phone': phone,
-        'image': image,
+        'postalCode': postalCode,
+        'ip': ip,
+        'fcmToken': fcmToken,
       };
 
   /// `dart:convert`

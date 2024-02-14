@@ -5,15 +5,18 @@ import 'package:hatly/domain/models/traveler_dto.dart';
 class Traveler {
   int? id;
   String? email;
-  String? name;
+  String? firstName, lastName;
   String? phone;
+  double? averageRating;
   dynamic profilePhoto;
   bool? verify;
 
   Traveler({
     this.id,
     this.email,
-    this.name,
+    this.firstName,
+    this.lastName,
+    this.averageRating = 0,
     this.phone,
     this.profilePhoto,
     this.verify,
@@ -22,7 +25,9 @@ class Traveler {
   factory Traveler.fromMap(Map<String, dynamic> data) => Traveler(
         id: data['id'] as int?,
         email: data['email'] as String?,
-        name: data['name'] as String?,
+        firstName: data['firstName'] as String?,
+        lastName: data['lastName'] as String?,
+        averageRating: (data['averageRating'] as num?)?.toDouble(),
         phone: data['phone'] as String?,
         profilePhoto: data['profilePhoto'] as dynamic,
         verify: data['verify'] as bool?,
@@ -31,7 +36,9 @@ class Traveler {
   Map<String, dynamic> toMap() => {
         'id': id,
         'email': email,
-        'name': name,
+        'averageRating': averageRating,
+        'firstName': firstName,
+        'lastName': lastName,
         'phone': phone,
         'profilePhoto': profilePhoto,
         'verify': verify,
@@ -54,7 +61,9 @@ class Traveler {
         id: id,
         email: email,
         phone: phone,
-        name: name,
+        firstName: firstName,
+        lastName: lastName,
+        averageRating: averageRating,
         profilePhoto: profilePhoto,
         verify: verify);
   }

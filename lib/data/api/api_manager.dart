@@ -16,6 +16,7 @@ import 'package:hatly/data/api/shipment_deal/shipment_deal_request.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_response.dart';
 import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment_request.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
+import 'package:hatly/data/api/shipments/get_shipment_deal_details/get_shipment_deal_details.dart';
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_deals_response/my_shipment_deals_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
@@ -30,8 +31,10 @@ import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_respon
 import 'package:hatly/data/api/trips/get_user_trip_response/get_user_trip_response.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/models/book_info_dto.dart';
+import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
 import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -47,21 +50,33 @@ class ApiManager {
   );
 
   Future<RegisterResponse> registerUser(
-      {String? name,
-      String? email,
-      String? phone,
-      String? image,
+      {String? email,
       String? password,
-      String? fcmToken}) async {
+      String? firstName,
+      String? lastName,
+      String? dob,
+      String? address,
+      String? city,
+      String? country,
+      String? phone,
+      String? postalCode,
+      String? ip,
+      required String? fcmToken}) async {
     try {
       var url = Uri.https(baseUrl, 'user/register');
       var requestBody = RegisterRequest(
-        name: name,
+        firstName: firstName,
+        lastName: lastName,
         email: email,
-        phone: phone,
-        image: image,
+        phone: '+2$phone',
         password: password,
         fcmToken: fcmToken,
+        dob: '2000-02-02',
+        address: 'Moharram bek',
+        city: 'Alexandria',
+        country: 'EG',
+        postalCode: '10001',
+        ip: ip,
       );
       var response = await client.post(url,
           body: requestBody.toJson(),
@@ -148,6 +163,28 @@ class ApiManager {
       });
 
       var getResponse = MyShipmentDealsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(getResponse.message!);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<GetMyShipmentDealDetailsResponse> getMyShipmentDealDetails(
+      {required String token, required String dealId}) async {
+    try {
+      var url = Uri.https(baseUrl, 'deal', {'dealId': dealId});
+      var response = await client.get(url, headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $token'
+      });
+
+      var getResponse =
+          GetMyShipmentDealDetailsResponse.fromJson(response.body);
       if (getResponse.status == false) {
         throw ServerErrorException(getResponse.message!);
       }
@@ -270,7 +307,11 @@ class ApiManager {
         'shipmentId': shipmentId.toString(),
       });
       var requestBody = ShipmentDealRequest(
-          deals: ShipmentDeal.Deals(tripId: tripId, reward: reward));
+          deals: ShipmentDeal.Deals(
+              tripId: tripId,
+              reward: reward,
+              hatlyFees: 2.5,
+              paymentFees: 2.3));
       print(url.toString());
       var response = await client.post(url,
           body: requestBody.toJson(),

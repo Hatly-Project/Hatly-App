@@ -25,9 +25,12 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   String? fcmToken = '';
+  String ipAddress = '';
   @override
   void initState() {
     super.initState();
+
+    getIpAddress();
     getFcmToken().then((value) {
       fcmToken = value;
     });
@@ -38,9 +41,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return await FirebaseMessaging.instance.getToken();
   }
 
+  void getIpAddress() async {
+    try {
+      // Get the list of network interfaces
+      List<NetworkInterface> interfaces = await NetworkInterface.list(
+          includeLinkLocal: true, includeLoopback: true);
+
+      // Iterate through the interfaces to find the IP address
+      for (NetworkInterface interface in interfaces) {
+        for (InternetAddress address in interface.addresses) {
+          // Check if the address is an IPv4 address
+          if (address.type == InternetAddressType.IPv4) {
+            ipAddress = address.address;
+            print('IP Address: $ipAddress');
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      print('Error getting IP address: $e');
+    }
+  }
+
   var formKey = GlobalKey<FormState>();
 
-  var nameController = TextEditingController(text: '');
+  var firstNameController = TextEditingController(text: '');
+
+  var lastNameController = TextEditingController(text: '');
 
   var emailController = TextEditingController(text: '');
 
@@ -96,12 +123,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Container(
                         margin: const EdgeInsets.only(bottom: 25),
                         child: CustomFormField(
-                          controller: nameController,
-                          label: 'Full Name',
-                          hint: 'Enter Your Full Name',
+                          controller: firstNameController,
+                          label: 'First Name',
+                          hint: 'Enter Your First Name',
                           validator: (text) {
                             if (text == null || text.trim().isEmpty) {
-                              return 'please enter full name';
+                              return 'please enter first name';
+                            }
+                          },
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 25),
+                        child: CustomFormField(
+                          controller: lastNameController,
+                          label: 'Last Name',
+                          hint: 'Enter Your Last Name',
+                          validator: (text) {
+                            if (text == null || text.trim().isEmpty) {
+                              return 'please enter last name';
                             }
                           },
                         ),
@@ -289,8 +329,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     viewModel.register(
-        name: nameController.text,
+        firstName: firstNameController.text,
+        lastName: lastNameController.text,
         email: emailController.text,
+        ip: ipAddress,
         phone: mobileController.text,
         password: passwordController.text,
         fcmToken: fcmToken);

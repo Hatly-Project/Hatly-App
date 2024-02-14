@@ -149,7 +149,7 @@ class TripCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              tripsDto.user!.name!,
+                              tripsDto.user!.firstName!,
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 color: Colors.black,

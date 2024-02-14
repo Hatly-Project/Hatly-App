@@ -11,7 +11,9 @@ class UserProvider extends Cubit<CurrentUserState> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setBool('login', true);
     sharedPreferences.setString('token', loggedInState.token);
-    sharedPreferences.setString('userName', loggedInState.user.name!);
+    sharedPreferences.setString('userFirstName', loggedInState.user.firstName!);
+    sharedPreferences.setString('userLastName', loggedInState.user.lastName!);
+
     sharedPreferences.setString('userEmail', loggedInState.user.email!);
     sharedPreferences.setString('userPhone', loggedInState.user.phone!);
     sharedPreferences.setString(
@@ -31,7 +33,9 @@ class UserProvider extends Cubit<CurrentUserState> {
   void getIfUserLogin() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? token = sharedPreferences.getString('token');
-    String? name = sharedPreferences.getString('userName');
+    String? firstName = sharedPreferences.getString('userFirstName');
+    String? lastName = sharedPreferences.getString('userLastName');
+
     String? email = sharedPreferences.getString('userEmail');
     String? phone = sharedPreferences.getString('userPhone');
     String? profilePhoto = sharedPreferences.getString('userPhoto');
@@ -41,7 +45,8 @@ class UserProvider extends Cubit<CurrentUserState> {
     if (isLogin) {
       emit(LoggedInState(
           user: UserDto(
-              name: name,
+              firstName: firstName,
+              lastName: lastName,
               phone: phone,
               email: email,
               profilePhoto: profilePhoto,

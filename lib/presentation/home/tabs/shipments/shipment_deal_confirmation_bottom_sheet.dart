@@ -38,7 +38,7 @@ class _ShipmentDealConfirmationBottomSheetState
   void initState() {
     super.initState();
 
-    print('trip name : ${widget.deal.tripsDto.user?.name}');
+    // print('trip name : ${widget.deal.tripsDto.user?.name}');
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
 
@@ -175,7 +175,7 @@ class _ShipmentDealConfirmationBottomSheetState
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          deal.shipmentDto.user!.name!,
+                                          deal.shipmentDto.user!.firstName!,
                                           overflow: TextOverflow.fade,
                                           style: GoogleFonts.poppins(
                                               fontSize: 12,
@@ -191,7 +191,7 @@ class _ShipmentDealConfirmationBottomSheetState
                                               color: Colors.white),
                                         ),
                                         Text(
-                                          '${substractDates(deal.shipmentDto.expectedDate!)} days ago',
+                                          '${substractDates(deal.shipmentDto.createdAt!)} days ago',
                                           overflow: TextOverflow.fade,
                                           style: GoogleFonts.poppins(
                                               fontSize: 12,
