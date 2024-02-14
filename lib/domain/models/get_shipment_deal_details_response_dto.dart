@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:hatly/data/api/shipmentDeal.dart';
+import 'package:hatly/domain/models/deal_dto.dart';
 
 class GetMyShipmentDealDetailsResponseDto {
-  Deal? deal;
+  DealDto? deal;
   bool? status;
   String? message;
 
@@ -14,7 +15,7 @@ class GetMyShipmentDealDetailsResponseDto {
     return GetMyShipmentDealDetailsResponseDto(
       deal: data['deal'] == null
           ? null
-          : Deal.fromMap(data['deal'] as Map<String, dynamic>),
+          : DealDto.fromMap(data['deal'] as Map<String, dynamic>),
       status: data['status'] as bool?,
       message: data['message'] as String?,
     );

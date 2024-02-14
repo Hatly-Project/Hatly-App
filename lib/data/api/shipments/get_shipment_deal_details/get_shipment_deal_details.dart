@@ -43,7 +43,7 @@ class GetMyShipmentDealDetailsResponse {
     return GetMyShipmentDealDetailsResponseDto(
       status: status,
       message: message,
-      deal: deal,
+      deal: deal?.toDealDto(),
     );
   }
 }

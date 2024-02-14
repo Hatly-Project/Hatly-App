@@ -1,22 +1,21 @@
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
+import 'package:hatly/domain/models/deal_dto.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_viewmodel.dart';
-import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_arguments.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
 
 class MyShipmentDealDetails extends StatefulWidget {
   static const routeName = 'MyShipmentDealDetails';
-  const MyShipmentDealDetails({super.key});
+  MyShipmentDealDetailsArgument args;
+  MyShipmentDealDetails({required this.args});
 
   @override
   State<MyShipmentDealDetails> createState() => _MyShipmentDealDetailsState();
@@ -24,10 +23,11 @@ class MyShipmentDealDetails extends StatefulWidget {
 
 class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   ScrollController scrollController = ScrollController();
-  bool isLoading = false;
+  bool isLoading = true;
   late LoggedInState loggedInState;
   late String token;
   late String dealId;
+  DealDto? dealResponseDto;
 
   GetMyShipmentDealDetailsViewModel viewModel =
       GetMyShipmentDealDetailsViewModel();
@@ -55,15 +55,16 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
-    // viewModel.getMyShipmentDealDetails(dealId: dealId, token: token);
+    viewModel.getMyShipmentDealDetails(
+        dealId: widget.args.dealDto.id.toString(), token: token);
   }
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments
-        as MyShipmentDealDetailsArgument;
-    var dealDto = args.dealDto;
-    var shipmentDto = args.shipmentDto;
+    // final args = ModalRoute.of(context)?.settings.arguments
+    //     as MyShipmentDealDetailsArgument;
+    var dealDto = widget.args.dealDto;
+    var shipmentDto = widget.args.shipmentDto;
     dealId = dealDto.id.toString();
 
     return BlocConsumer(
@@ -97,7 +98,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
         },
         builder: (context, state) {
           if (state is GetMyShipmentDealDetailsSuccessState) {
-            var deal = state.responseDto.deal;
+            dealResponseDto = state.responseDto.deal;
           }
           return Stack(
             children: [
@@ -775,7 +776,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       color: Colors.white),
                                                 ),
                                                 Text(
-                                                  '${dealDto.counterReward} \$',
+                                                  '${dealResponseDto?.counterReward} \$',
                                                   overflow: TextOverflow.fade,
                                                   style: GoogleFonts.poppins(
                                                       fontSize: 16,
@@ -802,7 +803,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                         color: Colors.white),
                                                   ),
                                                   Text(
-                                                    '${dealDto.hatlyFees} \$',
+                                                    '${dealResponseDto?.hatlyFees} \$',
                                                     overflow: TextOverflow.fade,
                                                     style: GoogleFonts.poppins(
                                                         fontSize: 16,
@@ -830,7 +831,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                         color: Colors.white),
                                                   ),
                                                   Text(
-                                                    '${dealDto.paymentFees} \$',
+                                                    '${dealResponseDto?.paymentFees} \$',
                                                     overflow: TextOverflow.fade,
                                                     style: GoogleFonts.poppins(
                                                         fontSize: 16,
@@ -1620,7 +1621,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                         color: Colors.white),
                                                   ),
                                                   Text(
-                                                    '${dealDto.counterReward} \$',
+                                                    '${dealResponseDto?.counterReward} \$',
                                                     overflow: TextOverflow.fade,
                                                     style: GoogleFonts.poppins(
                                                         fontSize: 16,
@@ -1652,7 +1653,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                   Colors.white),
                                                     ),
                                                     Text(
-                                                      '${dealDto.hatlyFees} \$',
+                                                      '${dealResponseDto?.hatlyFees} \$',
                                                       overflow:
                                                           TextOverflow.fade,
                                                       style:
@@ -1689,7 +1690,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                   Colors.white),
                                                     ),
                                                     Text(
-                                                      '${dealDto.paymentFees} \$',
+                                                      '${dealResponseDto?.paymentFees} \$',
                                                       overflow:
                                                           TextOverflow.fade,
                                                       style:
