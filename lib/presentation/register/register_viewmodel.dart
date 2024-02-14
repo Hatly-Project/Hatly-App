@@ -21,21 +21,29 @@ class RegisterViewModel extends Cubit<RegisterViewState> {
     registerUseCase = RegisterUseCase(authRepository);
   }
 
-  void register(
-      {String? name,
-      String? email,
-      String? phone,
-      String? image,
-      String? password,
-      required String? fcmToken}) async {
+  void register({
+    String? email,
+    String? password,
+    String? firstName,
+    String? lastName,
+    String? dob,
+    String? address,
+    String? city,
+    String? country,
+    String? phone,
+    String? postalCode,
+    required String? ip,
+    required String? fcmToken,
+  }) async {
     emit(RegisterLoadingState('Loading...'));
 
     try {
       await registerUseCase.invoke(
-        name: name,
+        firstName: firstName,
+        lastName: lastName,
         email: email,
+        ip: ip,
         phone: phone,
-        image: image,
         password: password,
         fcmToken: fcmToken,
       );

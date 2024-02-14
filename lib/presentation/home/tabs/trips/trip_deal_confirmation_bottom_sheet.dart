@@ -170,7 +170,7 @@ class _TripDealConfirmationBottomSheetState
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          deal.tripsDto.user!.name!,
+                                          deal.tripsDto.user!.firstName!,
                                           overflow: TextOverflow.fade,
                                           style: GoogleFonts.poppins(
                                               fontSize: 12,

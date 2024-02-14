@@ -15,6 +15,7 @@ import 'package:hatly/presentation/components/shimmer_card.dart';
 import 'package:hatly/presentation/components/trip_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab_viewmodel.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/providers/firebase_messaging_provider.dart';
 import 'package:hatly/services/local_notifications_service.dart';
 import 'package:hive/hive.dart';
@@ -40,7 +41,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   int selectedTab = 0;
   List<ShipmentDto> shipments = [];
   List<TripsDto> trips = [];
-  late String token;
+  String token = '';
   bool shimmerIsLoading = true;
 
   HomeScreenViewModel viewModel = HomeScreenViewModel();
@@ -57,6 +58,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       token = loggedInState.token;
       // Now you can use the 'token' variable as needed in your code.
       print('User token: $token');
+      viewModel.create(token);
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
@@ -68,8 +70,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         selectedTab = tabController.index;
       });
     });
-
-    viewModel.create(token);
 
     // Check for cached shipments when initializing
     // Future.delayed(Duration(milliseconds: 400), () {
@@ -441,6 +441,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         (context, index) => selectedTab == 0
                                             ? ShipmentCard(
                                                 shipmentDto: shipments[index],
+                                                showConfirmedBottomSheet:
+                                                    showSuccessDialog,
                                               )
                                             // ShipmentCard(
                                             //     title: shipments[index].title!,
@@ -728,6 +730,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                           (context, index) => selectedTab == 0
                                               ? ShipmentCard(
                                                   shipmentDto: shipments[index],
+                                                  showConfirmedBottomSheet:
+                                                      showSuccessDialog,
                                                 )
                                               : Container(),
                                           childCount: shipments.length,
@@ -801,6 +805,31 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     //     });
     //   }
     // });
+  }
+
+  void showSuccessDialog(String successMsg) {
+    _showShipmentDealConfirmedBottomSheet(context);
+    // if (Platform.isIOS) {
+    //   DialogUtils.showDialogIos(
+    //       alertMsg: 'Success', alertContent: successMsg, context: context);
+    // } else {
+    //   DialogUtils.showDialogAndroid(
+    //       alertMsg: 'Success', alertContent: successMsg, context: context);
+    // }
+  }
+
+  void _showShipmentDealConfirmedBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      builder: (context) => DealConfirmedBottomSheet(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
   }
 
   void getShipments() {

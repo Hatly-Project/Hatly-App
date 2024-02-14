@@ -137,7 +137,9 @@ class _MyShipmentDetailsState extends State<MyShipmentDetails> {
         ),
         body: TabBarView(
           children: [
-            MyShipmentDeals(),
+            MyShipmentDeals(
+              shipmentDto: args.shipmentDto,
+            ),
             Container(),
             Container(),
           ],

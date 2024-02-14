@@ -2,18 +2,22 @@ import 'dart:convert';
 
 class Deals {
   int? tripId;
-  double? reward;
+  double? reward, hatlyFees, paymentFees;
 
-  Deals({this.tripId, this.reward});
+  Deals({this.tripId, this.reward, this.hatlyFees, this.paymentFees});
 
   factory Deals.fromMap(Map<String, dynamic> data) => Deals(
         tripId: data['tripId'] as int?,
         reward: (data['reward'] as num?)?.toDouble(),
+        hatlyFees: (data['fees'] as num?)?.toDouble(),
+        paymentFees: (data['paymentFees'] as num?)?.toDouble(),
       );
 
   Map<String, dynamic> toMap() => {
         'tripId': tripId,
         'reward': reward,
+        'fees': hatlyFees,
+        'paymentFees': paymentFees,
       };
 
   /// `dart:convert`

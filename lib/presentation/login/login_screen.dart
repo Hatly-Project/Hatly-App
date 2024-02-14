@@ -95,7 +95,9 @@ class _LoginScreenState extends State<LoginScreen> {
               user: state.loginResponseDto.user!,
               token: state.loginResponseDto.token!));
 
-          fcmProvider.loginAndRefresh();
+          if (Platform.isAndroid) {
+            fcmProvider.loginAndRefresh();
+          }
           // if (fcmProvider.fcmToken != null) {
           //   ApiManager().refreshFCMToken(
           //       token: state.loginResponseDto.token!,

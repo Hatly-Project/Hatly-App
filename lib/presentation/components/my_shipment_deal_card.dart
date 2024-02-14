@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
+import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
+import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:intl/intl.dart';
 
 class MyShipmentDealCard extends StatefulWidget {
   DealDto dealDto;
-  MyShipmentDealCard({required this.dealDto});
+  ShipmentDto shipmentDto;
+  MyShipmentDealCard({required this.dealDto, required this.shipmentDto});
 
   @override
   State<MyShipmentDealCard> createState() => _MyShipmentDealCardState();
@@ -36,8 +40,12 @@ class _MyShipmentDealCardState extends State<MyShipmentDealCard> {
       padding: EdgeInsets.all(10),
       child: InkWell(
         onTap: () {
-          // Navigator.pushNamed(context, TripDetails.routeName,
-          //   arguments: TripDetailsArguments(tripsDto: tripsDto));
+          Navigator.pushNamed(
+            context,
+            MyShipmentDealDetails.routeName,
+            arguments: MyShipmentDealDetailsArgument(
+                dealDto: widget.dealDto, shipmentDto: widget.shipmentDto),
+          );
         },
         child: Card(
           color: Colors.white,
@@ -59,7 +67,7 @@ class _MyShipmentDealCardState extends State<MyShipmentDealCard> {
                       color: Colors.amber),
                   child: Center(
                     child: Text(
-                      'An offer from traveller ${widget.dealDto.traveler?.name}',
+                      'An offer from traveller ${widget.dealDto.traveler?.firstName} ${widget.dealDto.traveler?.lastName}',
                       // textAlign: TextAlign.start,
                       style: TextStyle(
                           color: Colors.white,
@@ -195,7 +203,7 @@ class _MyShipmentDealCardState extends State<MyShipmentDealCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  widget.dealDto.traveler!.name!,
+                                  widget.dealDto.traveler!.firstName!,
                                   style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     color: Colors.black,
@@ -218,6 +226,33 @@ class _MyShipmentDealCardState extends State<MyShipmentDealCard> {
                             ),
                           ],
                         ),
+                        Container(
+                          width: MediaQuery.sizeOf(context).width * .25,
+                          height: MediaQuery.sizeOf(context).height * .04,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: widget.dealDto.dealStatus?.toLowerCase() ==
+                                      'pending'
+                                  ? Colors.amber
+                                  : widget.dealDto.dealStatus?.toLowerCase() ==
+                                          'accepted'
+                                      ? Colors.green
+                                      : widget.dealDto.dealStatus
+                                                  ?.toLowerCase() ==
+                                              'rejected'
+                                          ? Colors.red
+                                          : null),
+                          child: Center(
+                            child: Text(
+                              widget.dealDto.dealStatus!.toUpperCase(),
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ],
@@ -234,7 +269,7 @@ class _MyShipmentDealCardState extends State<MyShipmentDealCard> {
                     color: Theme.of(context).primaryColor),
                 child: Center(
                   child: Text(
-                    'Shipping Bonus ${widget.dealDto.reward} \$',
+                    'Shipping Bonus ${widget.dealDto.counterReward} \$',
                     // textAlign: TextAlign.start,
                     style: TextStyle(
                         color: Colors.white,

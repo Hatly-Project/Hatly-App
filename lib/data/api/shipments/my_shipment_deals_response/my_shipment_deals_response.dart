@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
 
-import 'deal.dart';
+import '../../shipmentDeal.dart';
 
 class MyShipmentDealsResponse {
   bool? status;

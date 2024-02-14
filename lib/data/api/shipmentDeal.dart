@@ -9,14 +9,17 @@ class Deal {
   int? id;
   String? dealStatus;
   String? creatorEmail;
-  int? reward;
+  double? counterReward, finalReward, hatlyFees, paymentFees;
   Traveler? traveler;
   Trip? trip;
 
   Deal(
       {this.id,
       this.dealStatus,
-      this.reward,
+      this.counterReward,
+      this.hatlyFees,
+      this.paymentFees,
+      this.finalReward,
       this.traveler,
       this.trip,
       this.creatorEmail});
@@ -25,7 +28,10 @@ class Deal {
         id: data['id'] as int?,
         dealStatus: data['dealStatus'] as String?,
         creatorEmail: data['creatorEmail'] as String?,
-        reward: data['reward'] as int?,
+        counterReward: (data['counterReward'] as num?)?.toDouble(),
+        finalReward: (data['finalReward'] as num?)?.toDouble(),
+        hatlyFees: (data['fees'] as num?)?.toDouble(),
+        paymentFees: (data['paymentFees'] as num?)?.toDouble(),
         traveler: data['traveler'] == null
             ? null
             : Traveler.fromMap(data['traveler'] as Map<String, dynamic>),
@@ -38,8 +44,11 @@ class Deal {
         'id': id,
         'dealStatus': dealStatus,
         'creatorEmail': creatorEmail,
-        'reward': reward,
+        'counterReward': counterReward,
+        'finalReward': finalReward,
         'traveler': traveler?.toMap(),
+        'fees': hatlyFees,
+        'paymentFees': paymentFees,
         'trip': trip?.toMap(),
       };
 
@@ -60,7 +69,10 @@ class Deal {
         id: id,
         dealStatus: dealStatus,
         creatorEmail: creatorEmail,
-        reward: reward,
+        counterReward: counterReward,
+        finalReward: finalReward,
+        hatlyFees: hatlyFees,
+        paymentFees: paymentFees,
         traveler: traveler?.toTravelerDto(),
         trip: trip?.toTripsDto());
   }
