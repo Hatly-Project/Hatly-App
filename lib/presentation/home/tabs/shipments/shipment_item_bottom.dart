@@ -215,48 +215,6 @@ class _ShipmentItemBottomSheetState extends State<ShipmentItemBottomSheet> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime selectedDate = DateTime.now();
-    if (Platform.isIOS) {
-      await showCupertinoModalPopup<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            height: 300,
-            child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.date,
-              initialDateTime: selectedDate,
-              onDateTimeChanged: (DateTime newDate) {
-                setState(() {
-                  selectedDate = newDate;
-                  final formattedDate = DateFormat('yyyy-MM-dd')
-                      .format(selectedDate); // Format the date
-                  nameController.text = formattedDate;
-                });
-              },
-            ),
-          );
-        },
-      );
-    } else if (Platform.isAndroid) {
-      var picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2101),
-      );
-
-      if (picked != null && picked != selectedDate) {
-        setState(() {
-          selectedDate = picked;
-          final formattedDate =
-              DateFormat('yyyy-MM-dd').format(selectedDate); // Format the date
-          nameController.text = formattedDate;
-        });
-      }
-    }
-  }
-
   void add(
       Function addItem, BuildContext context, Function onError, int? itemId,
       {bool? update = false}) async {

@@ -2,12 +2,16 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/material/card.dart' as card;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/accept_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_viewmodel.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_accepted_bottom_sheet.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
@@ -27,7 +31,10 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   late LoggedInState loggedInState;
   late String token;
   late String dealId;
+  String? paymentIntentId, clientSecret;
   DealDto? dealResponseDto;
+  AcceptShipmentDealResponseDto? acceptShipmentDealResponseDto;
+  bool isAccepted = false;
 
   GetMyShipmentDealDetailsViewModel viewModel =
       GetMyShipmentDealDetailsViewModel();
@@ -59,6 +66,99 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
         dealId: widget.args.dealDto.id.toString(), token: token);
   }
 
+  void _showShipmentDealAcceptedBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      builder: (context) => ShipmentDealAcceptedBottomSheet(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+
+    // Future.delayed(Duration(seconds: 5), () {
+    //   Navigator.of(context).pop();
+    // });
+  }
+
+  Future<void> makePayment() async {
+    try {
+      // paymentIntent = await createPaymentIntent('6000', 'USD');
+      // String id = paymentIntent!['id'];
+
+      //STEP 2: Initialize Payment Sheet
+      print('payment');
+
+      isAccepted = false;
+      if (paymentIntentId != null) {
+        await Stripe.instance.initPaymentSheet(
+            paymentSheetParameters: SetupPaymentSheetParameters(
+                paymentIntentClientSecret:
+                    clientSecret, //Gotten from payment intent
+                style: ThemeMode.light,
+                merchantDisplayName: 'Hatly'));
+
+        //STEP 3: Display Payment sheet
+        displayPaymentSheet(paymentIntentId!);
+      }
+    } catch (err) {
+      throw Exception(err.toString());
+    }
+  }
+
+  Future<void> displayPaymentSheet(String id) async {
+    print('display strip');
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) {
+        showDialog(
+            context: context,
+            builder: (_) => const AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 100.0,
+                      ),
+                      SizedBox(height: 10.0),
+                      Text("Payment Successful!"),
+                    ],
+                  ),
+                ));
+
+        // Future.delayed(Duration(minutes: 1), () {
+        //   capturePayments(id);
+        // });
+      }).onError((error, stackTrace) {
+        throw Exception(error);
+      });
+    } on StripeException catch (e) {
+      print('Error is:---> $e');
+      const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.cancel,
+                  color: Colors.red,
+                ),
+                Text("Payment Failed"),
+              ],
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      print('$e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // final args = ModalRoute.of(context)?.settings.arguments
@@ -85,13 +185,37 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                   context: context);
             }
           }
+          if (state is AcceptShipmentDealLoadingState) {
+            isLoading = true;
+          } else if (state is AcceptShipmentDealFailState) {
+            if (Platform.isIOS) {
+              DialogUtils.showDialogIos(
+                  context: context,
+                  alertMsg: 'Fail',
+                  alertContent: state.failMessage);
+            } else {
+              DialogUtils.showDialogAndroid(
+                  alertMsg: 'Fail',
+                  alertContent: state.failMessage,
+                  context: context);
+            }
+          }
         },
         listenWhen: (previous, current) {
           if (previous is GetMyShipmentDealDetailsLoadingState) {
             isLoading = false;
           }
+          if (previous is AcceptShipmentDealLoadingState) {
+            isLoading = false;
+          }
+          if (current is AcceptShipmentDealSuccessState) {
+            isAccepted = true;
+            print('trueeee');
+          }
           if (current is GetMyShipmentDealDetailsLoadingState ||
-              current is GetMyShipmentDealDetailsFailState) {
+              current is GetMyShipmentDealDetailsFailState ||
+              current is AcceptShipmentDealLoadingState ||
+              current is AcceptShipmentDealFailState) {
             return true;
           }
           return false;
@@ -100,10 +224,43 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
           if (state is GetMyShipmentDealDetailsSuccessState) {
             dealResponseDto = state.responseDto.deal;
           }
+
+          if (state is AcceptShipmentDealSuccessState) {
+            acceptShipmentDealResponseDto = state.responseDto;
+            paymentIntentId = acceptShipmentDealResponseDto?.paymentIntentId;
+            clientSecret = acceptShipmentDealResponseDto?.clientSecret;
+            if (isAccepted) {
+              print('accept build: $isAccepted');
+
+              makePayment();
+            }
+            print('accept: $isAccepted');
+            // WidgetsBinding.instance.addPostFrameCallback((_) {
+            //   _showShipmentDealAcceptedBottomSheet();
+            // });
+            // Future.delayed(Duration(seconds: 2), (() {
+            //   Navigator.of(context).pop();
+            // }));
+
+            // WidgetsBinding.instance.addPostFrameCallback((_) {
+            //   Navigator.of(context).pop();
+
+            //   // widget.showSuccessDialog(successMsg);
+            // });
+            // WidgetsBinding.instance.addPostFrameCallback((_) {
+            //   Navigator.of(context).pop();
+            //   // Future.delayed(Duration(seconds: 4), (() async {
+            //   Navigator.of(context).pop();
+
+            //   //   // await makePayment();
+            //   // }));
+            // });
+          }
           return Stack(
             children: [
               Scaffold(
                   backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  resizeToAvoidBottomInset: true,
                   appBar: AppBar(
                     backgroundColor: Theme.of(context).primaryColor,
                     centerTitle: true,
@@ -259,7 +416,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     SizedBox(
                                                       height: 10,
                                                     ),
-                                                    Card(
+                                                    card.Card(
                                                       color: Colors.white,
                                                       shape:
                                                           RoundedRectangleBorder(
@@ -887,6 +1044,12 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                   const EdgeInsets.symmetric(
                                                       vertical: 12)),
                                           onPressed: () {
+                                            viewModel.acceptShipmentDeal(
+                                                dealId: dealId,
+                                                status: 'accepted',
+                                                token: token);
+                                            // _showShipmentDealAcceptedBottomSheet();
+
                                             // _showTripsListBottomSheet(context,
                                             //     showSuccessDialog, shipmentDto);
                                             // login();
@@ -1116,7 +1279,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       SizedBox(
                                                         height: 10,
                                                       ),
-                                                      Card(
+                                                      card.Card(
                                                         color: Colors.white,
                                                         shape: RoundedRectangleBorder(
                                                             borderRadius:
@@ -1748,7 +1911,16 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                         255, 51, 114, 53),
                                                 padding: const EdgeInsets.symmetric(
                                                     vertical: 12)),
-                                            onPressed: () {
+                                            onPressed: () async {
+                                              await viewModel
+                                                  .acceptShipmentDeal(
+                                                      dealId: dealId,
+                                                      status: 'accepted',
+                                                      token: token);
+                                              // if (isAccepted) {
+                                              //   makePayment();
+                                              // }
+
                                               // _showTripsListBottomSheet(context,
                                               //     showSuccessDialog, shipmentDto);
                                               // login();
