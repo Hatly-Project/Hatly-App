@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/firebase_options.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
@@ -29,6 +30,8 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey =
+      "pk_test_51Oiyo0Gdjmy7Ru5OYJa0mjuh7fQw5HNjD96rDtEbfj0ZJ9m3GJPx5IU0nvuxZ2uGWsprWmxUJySrJuqkeVKEOEPG005XTYROft";
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
 

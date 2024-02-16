@@ -14,6 +14,7 @@ import 'package:hatly/data/api/register/register_request.dart';
 import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_request.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_response.dart';
+import 'package:hatly/data/api/shipments/accept_shipment_deal_response/accept_shipment_deal_response.dart';
 import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment_request.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
 import 'package:hatly/data/api/shipments/get_shipment_deal_details/get_shipment_deal_details.dart';
@@ -68,13 +69,13 @@ class ApiManager {
         firstName: firstName,
         lastName: lastName,
         email: email,
-        phone: '+2$phone',
+        phone: '+$phone',
         password: password,
         fcmToken: fcmToken,
         dob: '2000-02-02',
-        address: 'Moharram bek',
-        city: 'Alexandria',
-        country: 'EG',
+        address: 'Time Square',
+        city: 'New York',
+        country: 'US',
         postalCode: '10001',
         ip: ip,
       );
@@ -185,6 +186,32 @@ class ApiManager {
 
       var getResponse =
           GetMyShipmentDealDetailsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(getResponse.message!);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<AcceptShipmentDealResponse> acceptShipmentDeal(
+      {required String token,
+      required String dealId,
+      required String status}) async {
+    try {
+      var url = Uri.https(baseUrl, 'deal/choose/shipment', {
+        'status': status,
+        'dealId': dealId,
+      });
+      var response = await client.post(url, headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $token'
+      });
+
+      var getResponse = AcceptShipmentDealResponse.fromJson(response.body);
       if (getResponse.status == false) {
         throw ServerErrorException(getResponse.message!);
       }

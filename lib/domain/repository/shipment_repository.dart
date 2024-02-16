@@ -1,3 +1,4 @@
+import 'package:hatly/domain/models/accept_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/get_all_shipments_dto.dart';
 import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
 import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
@@ -34,4 +35,7 @@ abstract class ShipmentRepository {
       required int? shipmentId,
       required double? reward,
       required int tripId});
+
+  Future<AcceptShipmentDealResponseDto> acceptShipmentDeal(
+      {required String token, required String dealId, required String status});
 }
