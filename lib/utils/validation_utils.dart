@@ -7,8 +7,8 @@ class ValidationUtils {
 
   static bool isValidMobile(String? mobile) {
     if (mobile == null) return false;
-    var regex = RegExp(r"^\d{11}$");
+    // var regex = RegExp(r"^\d{11}$");
 
-    return regex.hasMatch(mobile);
+    return true;
   }
 }

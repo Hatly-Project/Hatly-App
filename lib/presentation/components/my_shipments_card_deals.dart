@@ -65,29 +65,35 @@ class MyShipmentCardForDeals extends StatelessWidget {
                         // crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            width: MediaQuery.sizeOf(context).width * .2,
-                            child: Text(
-                              from,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 13, color: Colors.grey[600]),
+                          Expanded(
+                            child: Container(
+                              width: MediaQuery.sizeOf(context).width * .2,
+                              child: Text(
+                                from,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 13, color: Colors.grey[600]),
+                              ),
                             ),
                           ),
-                          Container(
-                            child: Icon(
-                              Icons.flight_land_rounded,
-                              color: Colors.black,
-                              size: 20,
+                          Expanded(
+                            child: Container(
+                              child: Icon(
+                                Icons.flight_land_rounded,
+                                color: Colors.black,
+                                size: 20,
+                              ),
                             ),
                           ),
-                          Container(
-                            width: MediaQuery.sizeOf(context).width * .15,
-                            child: Text(
-                              to,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 13, color: Colors.grey[600]),
+                          Expanded(
+                            child: Container(
+                              width: MediaQuery.sizeOf(context).width * .15,
+                              child: Text(
+                                to,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 13, color: Colors.grey[600]),
+                              ),
                             ),
                           ),
                         ],

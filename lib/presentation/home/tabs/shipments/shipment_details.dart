@@ -105,10 +105,11 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
                           // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
-                              height: 35,
+                              height: 40,
                               width: MediaQuery.sizeOf(context).width * .3,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Expanded(
                                     child: Text(
@@ -147,7 +148,7 @@ class _ShipmentDetailsState extends State<ShipmentDetails> {
                                   Expanded(
                                     child: Text(
                                       shipmentDto.to!,
-                                      overflow: TextOverflow.clip,
+                                      overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.poppins(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold),

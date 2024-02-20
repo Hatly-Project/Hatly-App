@@ -83,38 +83,47 @@ class ShipmentCard extends StatelessWidget {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.sizeOf(context).width *
-                                          .27,
-                                      margin: EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        shipmentDto.from!,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 15,
-                                            color: Colors.grey[600]),
+                                Container(
+                                  width: MediaQuery.sizeOf(context).width * .62,
+                                  child: Row(
+                                    // mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          margin: EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            shipmentDto.from!,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 15,
+                                                color: Colors.grey[600]),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.only(left: 10),
-                                      child: Icon(
-                                        Icons.flight_land_rounded,
-                                        color: Colors.black,
-                                        size: 30,
+                                      Expanded(
+                                        child: Container(
+                                          margin: EdgeInsets.only(left: 10),
+                                          child: Icon(
+                                            Icons.flight_land_rounded,
+                                            color: Colors.black,
+                                            size: 30,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        shipmentDto.to!,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 15,
-                                            color: Colors.grey[600]),
+                                      Expanded(
+                                        child: Container(
+                                          margin: EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            shipmentDto.to!,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 15,
+                                                color: Colors.grey[600]),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 SizedBox(
                                   height: 15,

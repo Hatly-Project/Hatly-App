@@ -365,10 +365,13 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                                                 Container(
                                                   margin:
                                                       EdgeInsets.only(left: 5),
+                                                  width: 70,
                                                   child: Text(
                                                     toCountry.isEmpty
                                                         ? 'Country'
                                                         : toCountry,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     style: GoogleFonts.poppins(
                                                         fontSize: 15,
                                                         fontWeight:

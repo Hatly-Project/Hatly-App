@@ -317,7 +317,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
                                 }
                               : null,
                           child: Container(
-                            width: 150,
+                            width: MediaQuery.sizeOf(context).width * .4,
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.start,
