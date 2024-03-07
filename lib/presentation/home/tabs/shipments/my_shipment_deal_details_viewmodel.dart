@@ -2,19 +2,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/data/datasource/shipment_datasource_impl.dart';
 import 'package:hatly/data/repository/shipment_repository_impl.dart';
 import 'package:hatly/domain/datasource/shipment_datasource.dart';
-import 'package:hatly/domain/models/accept_shipment_deal_response_dto.dart';
-import 'package:hatly/domain/models/create_shipment_response_dto.dart';
+import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
-import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 import 'package:hatly/domain/usecase/accept_shipment_deal_usecase.dart';
-import 'package:hatly/domain/usecase/create_shipment_usecase.dart';
 import 'package:hatly/domain/usecase/get_my_shipment_deal_details_usecase.dart';
-import 'package:hatly/domain/usecase/get_user_shipments_usecase.dart';
-
 import '../../../../data/api/api_manager.dart';
 import '../../../../domain/customException/custom_exception.dart';
-import '../../../../domain/models/item_dto.dart';
 
 class GetMyShipmentDealDetailsViewModel
     extends Cubit<MyShipmentDealDetailsViewState> {
@@ -66,6 +60,24 @@ class GetMyShipmentDealDetailsViewModel
       emit(AcceptShipmentDealFailState(e.toString()));
     }
   }
+
+  Future<void> rejectShipmentDeal(
+      {required String dealId,
+      required String status,
+      required String token}) async {
+    emit(RejectShipmentDealLoadingState('Loading...'));
+
+    try {
+      var response = await acceptShipmentDealUsecase.acceptShipmentDeal(
+          token: token, dealId: dealId, status: status);
+      // createUserInDb(user);
+      emit(RejectShipmentDealSuccessState(response));
+    } on ServerErrorException catch (e) {
+      emit(RejectShipmentDealFailState(e.errorMessage));
+    } on Exception catch (e) {
+      emit(RejectShipmentDealFailState(e.toString()));
+    }
+  }
 }
 
 abstract class MyShipmentDealDetailsViewState {}
@@ -94,7 +106,7 @@ class GetMyShipmentDealDetailsFailState extends MyShipmentDealDetailsViewState {
 }
 
 class AcceptShipmentDealSuccessState extends MyShipmentDealDetailsViewState {
-  AcceptShipmentDealResponseDto responseDto;
+  AcceptOrRejectShipmentDealResponseDto responseDto;
 
   AcceptShipmentDealSuccessState(this.responseDto);
 }
@@ -109,4 +121,22 @@ class AcceptShipmentDealFailState extends MyShipmentDealDetailsViewState {
   String failMessage;
 
   AcceptShipmentDealFailState(this.failMessage);
+}
+
+class RejectShipmentDealSuccessState extends MyShipmentDealDetailsViewState {
+  AcceptOrRejectShipmentDealResponseDto responseDto;
+
+  RejectShipmentDealSuccessState(this.responseDto);
+}
+
+class RejectShipmentDealLoadingState extends MyShipmentDealDetailsViewState {
+  String loadingMessage;
+
+  RejectShipmentDealLoadingState(this.loadingMessage);
+}
+
+class RejectShipmentDealFailState extends MyShipmentDealDetailsViewState {
+  String failMessage;
+
+  RejectShipmentDealFailState(this.failMessage);
 }

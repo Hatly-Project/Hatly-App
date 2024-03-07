@@ -6,7 +6,7 @@ import 'package:flutter/src/material/card.dart' as card;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hatly/domain/models/accept_shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
@@ -33,8 +33,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   late String dealId;
   String? paymentIntentId, clientSecret;
   DealDto? dealResponseDto;
-  AcceptShipmentDealResponseDto? acceptShipmentDealResponseDto;
-  bool isAccepted = false;
+  AcceptOrRejectShipmentDealResponseDto? acceptShipmentDealResponseDto;
+  bool isAccepted = false, isRejected = false;
 
   GetMyShipmentDealDetailsViewModel viewModel =
       GetMyShipmentDealDetailsViewModel();
@@ -200,22 +200,44 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                   context: context);
             }
           }
+          if (state is RejectShipmentDealLoadingState) {
+            isLoading = true;
+          } else if (state is RejectShipmentDealFailState) {
+            if (Platform.isIOS) {
+              DialogUtils.showDialogIos(
+                  context: context,
+                  alertMsg: 'Fail',
+                  alertContent: state.failMessage);
+            } else {
+              DialogUtils.showDialogAndroid(
+                  alertMsg: 'Fail',
+                  alertContent: state.failMessage,
+                  context: context);
+            }
+          }
         },
         listenWhen: (previous, current) {
           if (previous is GetMyShipmentDealDetailsLoadingState) {
             isLoading = false;
           }
-          if (previous is AcceptShipmentDealLoadingState) {
+          if (previous is AcceptShipmentDealLoadingState ||
+              previous is RejectShipmentDealLoadingState) {
             isLoading = false;
           }
           if (current is AcceptShipmentDealSuccessState) {
             isAccepted = true;
             print('trueeee');
           }
+          if (current is RejectShipmentDealSuccessState) {
+            isRejected = true;
+            print('rejected');
+          }
           if (current is GetMyShipmentDealDetailsLoadingState ||
               current is GetMyShipmentDealDetailsFailState ||
               current is AcceptShipmentDealLoadingState ||
-              current is AcceptShipmentDealFailState) {
+              current is AcceptShipmentDealFailState ||
+              current is RejectShipmentDealLoadingState ||
+              current is RejectShipmentDealFailState) {
             return true;
           }
           return false;
@@ -235,26 +257,6 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
               makePayment();
             }
             print('accept: $isAccepted');
-            // WidgetsBinding.instance.addPostFrameCallback((_) {
-            //   _showShipmentDealAcceptedBottomSheet();
-            // });
-            // Future.delayed(Duration(seconds: 2), (() {
-            //   Navigator.of(context).pop();
-            // }));
-
-            // WidgetsBinding.instance.addPostFrameCallback((_) {
-            //   Navigator.of(context).pop();
-
-            //   // widget.showSuccessDialog(successMsg);
-            // });
-            // WidgetsBinding.instance.addPostFrameCallback((_) {
-            //   Navigator.of(context).pop();
-            //   // Future.delayed(Duration(seconds: 4), (() async {
-            //   Navigator.of(context).pop();
-
-            //   //   // await makePayment();
-            //   // }));
-            // });
           }
           return Stack(
             children: [
@@ -866,37 +868,6 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                   ],
                                                 ),
                                               ),
-                                              // Container(
-                                              //   width: double.infinity,
-                                              //   decoration: BoxDecoration(
-                                              //       color: Colors.amber,
-                                              //       borderRadius: BorderRadius.only(
-                                              //           bottomLeft: Radius.circular(12),
-                                              //           bottomRight: Radius.circular(12))),
-                                              //   child: ElevatedButton(
-                                              //     style: ElevatedButton.styleFrom(
-                                              //         minimumSize: Size(double.infinity, 50),
-                                              //         elevation: 0,
-                                              //         shape: RoundedRectangleBorder(
-                                              //             borderRadius: BorderRadius.only(
-                                              //                 bottomLeft: Radius.circular(12),
-                                              //                 bottomRight: Radius.circular(12))),
-                                              //         backgroundColor: Colors.amber,
-                                              //         padding:
-                                              //             const EdgeInsets.symmetric(vertical: 12)),
-                                              //     onPressed: () {
-                                              //       _showShipmentsListBottomSheet(
-                                              //           context, trip, showSuccessDialog);
-                                              //     },
-                                              //     child: Text(
-                                              //       'Send Offer',
-                                              //       style: TextStyle(
-                                              //           fontSize: 15,
-                                              //           color: Theme.of(context).primaryColor,
-                                              //           fontWeight: FontWeight.bold),
-                                              //     ),
-                                              //   ),
-                                              // ),
                                             ],
                                           ),
                                         ),
@@ -1043,17 +1014,29 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 12)),
-                                          onPressed: () {
-                                            viewModel.acceptShipmentDeal(
-                                                dealId: dealId,
-                                                status: 'accepted',
-                                                token: token);
-                                            // _showShipmentDealAcceptedBottomSheet();
-
-                                            // _showTripsListBottomSheet(context,
-                                            //     showSuccessDialog, shipmentDto);
-                                            // login();
-                                          },
+                                          onPressed: () => dealResponseDto
+                                                          ?.dealStatus ==
+                                                      'accepted' ||
+                                                  dealResponseDto?.dealStatus ==
+                                                      'rejected'
+                                              ? ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                  const SnackBar(
+                                                    backgroundColor: Colors.red,
+                                                    content: Text(
+                                                      'The deal is already accepted',
+                                                      style: TextStyle(
+                                                          fontSize: 17,
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                )
+                                              : viewModel.rejectShipmentDeal(
+                                                  dealId: dealId,
+                                                  status: 'rejected',
+                                                  token: token),
                                           child: const Text(
                                             'Accept',
                                             style: TextStyle(
@@ -1113,17 +1096,35 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           15)),
-                                              side: BorderSide(
+                                              side: const BorderSide(
                                                   color: Colors.red, width: 1),
                                               backgroundColor: Colors.red,
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 12)),
-                                          onPressed: () {
-                                            // _showTripsListBottomSheet(context,
-                                            //     showSuccessDialog, shipmentDto);
-                                            // login();
-                                          },
+                                          onPressed: () => dealResponseDto
+                                                          ?.dealStatus ==
+                                                      'accepted' ||
+                                                  dealResponseDto?.dealStatus ==
+                                                      'rejected'
+                                              ? ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                  const SnackBar(
+                                                    backgroundColor: Colors.red,
+                                                    content: Text(
+                                                      'You cannot reject an accepted deal',
+                                                      style: TextStyle(
+                                                          fontSize: 17,
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                )
+                                              : viewModel.rejectShipmentDeal(
+                                                  dealId: dealId,
+                                                  status: 'rejected',
+                                                  token: token),
                                           child: const Text(
                                             'Reject',
                                             style: TextStyle(
@@ -1400,7 +1401,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                     width: 20,
                                                                     height: 20,
                                                                   ),
-                                                                  Container(
+                                                                  SizedBox(
                                                                     width: MediaQuery.of(context)
                                                                             .size
                                                                             .width *
@@ -1437,7 +1438,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                     MainAxisAlignment
                                                                         .spaceBetween,
                                                                 children: [
-                                                                  Container(
+                                                                  SizedBox(
                                                                     width: MediaQuery.of(context)
                                                                             .size
                                                                             .width *
@@ -1460,7 +1461,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  Container(
+                                                                  SizedBox(
                                                                     width: MediaQuery.of(context)
                                                                             .size
                                                                             .width *
@@ -1495,7 +1496,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                     MainAxisAlignment
                                                                         .spaceBetween,
                                                                 children: [
-                                                                  Container(
+                                                                  SizedBox(
                                                                     width: MediaQuery.of(context)
                                                                             .size
                                                                             .width *
@@ -1518,7 +1519,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  Container(
+                                                                  SizedBox(
                                                                     width: MediaQuery.of(context)
                                                                             .size
                                                                             .width *
@@ -1553,7 +1554,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                 .all(8.0),
                                                         child: Container(
                                                           decoration:
-                                                              BoxDecoration(
+                                                              const BoxDecoration(
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .all(
@@ -1576,7 +1577,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                   MainAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                Container(
+                                                                SizedBox(
                                                                   width: MediaQuery.of(
                                                                               context)
                                                                           .size
@@ -1601,7 +1602,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                     ),
                                                                   ),
                                                                 ),
-                                                                Container(
+                                                                SizedBox(
                                                                   width: MediaQuery.of(
                                                                               context)
                                                                           .size
@@ -1638,7 +1639,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                 .all(8.0),
                                                         child: Container(
                                                           decoration:
-                                                              BoxDecoration(
+                                                              const BoxDecoration(
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .all(
@@ -1661,7 +1662,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                   MainAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                Container(
+                                                                SizedBox(
                                                                   width: MediaQuery.of(
                                                                               context)
                                                                           .size
@@ -1686,7 +1687,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                                     ),
                                                                   ),
                                                                 ),
-                                                                Container(
+                                                                SizedBox(
                                                                   width: MediaQuery.of(
                                                                               context)
                                                                           .size
@@ -1717,37 +1718,6 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     ],
                                                   ),
                                                 ),
-                                                // Container(
-                                                //   width: double.infinity,
-                                                //   decoration: BoxDecoration(
-                                                //       color: Colors.amber,
-                                                //       borderRadius: BorderRadius.only(
-                                                //           bottomLeft: Radius.circular(12),
-                                                //           bottomRight: Radius.circular(12))),
-                                                //   child: ElevatedButton(
-                                                //     style: ElevatedButton.styleFrom(
-                                                //         minimumSize: Size(double.infinity, 50),
-                                                //         elevation: 0,
-                                                //         shape: RoundedRectangleBorder(
-                                                //             borderRadius: BorderRadius.only(
-                                                //                 bottomLeft: Radius.circular(12),
-                                                //                 bottomRight: Radius.circular(12))),
-                                                //         backgroundColor: Colors.amber,
-                                                //         padding:
-                                                //             const EdgeInsets.symmetric(vertical: 12)),
-                                                //     onPressed: () {
-                                                //       _showShipmentsListBottomSheet(
-                                                //           context, trip, showSuccessDialog);
-                                                //     },
-                                                //     child: Text(
-                                                //       'Send Offer',
-                                                //       style: TextStyle(
-                                                //           fontSize: 15,
-                                                //           color: Theme.of(context).primaryColor,
-                                                //           fontWeight: FontWeight.bold),
-                                                //     ),
-                                                //   ),
-                                                // ),
                                               ],
                                             ),
                                           ),
@@ -1761,8 +1731,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                         decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(12),
-                                            color:
-                                                Color.fromRGBO(47, 40, 77, 30)),
+                                            color: const Color.fromRGBO(
+                                                47, 40, 77, 30)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(13.0),
                                           child: Column(
@@ -1795,8 +1765,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                 ],
                                               ),
                                               Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 10),
+                                                margin: const EdgeInsets.only(
+                                                    top: 10),
                                                 child: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -1832,8 +1802,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                 ),
                                               ),
                                               Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 10),
+                                                margin: const EdgeInsets.only(
+                                                    top: 10),
                                                 child: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -1902,8 +1872,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             15)),
-                                                side: BorderSide(
-                                                    color: const Color.fromARGB(
+                                                side: const BorderSide(
+                                                    color: Color.fromARGB(
                                                         255, 51, 114, 53),
                                                     width: 1),
                                                 backgroundColor:
@@ -1911,21 +1881,18 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                         255, 51, 114, 53),
                                                 padding: const EdgeInsets.symmetric(
                                                     vertical: 12)),
-                                            onPressed: () async {
-                                              await viewModel
-                                                  .acceptShipmentDeal(
-                                                      dealId: dealId,
-                                                      status: 'accepted',
-                                                      token: token);
-                                              // if (isAccepted) {
-                                              //   makePayment();
-                                              // }
-
-                                              // _showTripsListBottomSheet(context,
-                                              //     showSuccessDialog, shipmentDto);
-                                              // login();
-                                            },
-                                            child: Text(
+                                            onPressed: () => dealResponseDto
+                                                            ?.dealStatus ==
+                                                        'accepted' ||
+                                                    dealResponseDto
+                                                            ?.dealStatus ==
+                                                        'rejected'
+                                                ? null
+                                                : viewModel.rejectShipmentDeal(
+                                                    dealId: dealId,
+                                                    status: 'accepted',
+                                                    token: token),
+                                            child: const Text(
                                               'Accept',
                                               style: TextStyle(
                                                   fontSize: 20,
@@ -1947,18 +1914,14 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             15)),
-                                                side: BorderSide(
+                                                side: const BorderSide(
                                                     color: Colors.amber,
                                                     width: 1),
                                                 backgroundColor: Colors.amber,
                                                 padding:
                                                     const EdgeInsets.symmetric(
                                                         vertical: 12)),
-                                            onPressed: () {
-                                              // _showTripsListBottomSheet(context,
-                                              //     showSuccessDialog, shipmentDto);
-                                              // login();
-                                            },
+                                            onPressed: () {},
                                             child: const FittedBox(
                                               fit: BoxFit.fitWidth,
                                               child: Text(
@@ -1985,19 +1948,25 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             15)),
-                                                side: BorderSide(
+                                                side: const BorderSide(
                                                     color: Colors.red,
                                                     width: 1),
                                                 backgroundColor: Colors.red,
                                                 padding:
                                                     const EdgeInsets.symmetric(
                                                         vertical: 12)),
-                                            onPressed: () {
-                                              // _showTripsListBottomSheet(context,
-                                              //     showSuccessDialog, shipmentDto);
-                                              // login();
-                                            },
-                                            child: Text(
+                                            onPressed: () => dealResponseDto
+                                                            ?.dealStatus ==
+                                                        'accepted' ||
+                                                    dealResponseDto
+                                                            ?.dealStatus ==
+                                                        'rejected'
+                                                ? null
+                                                : viewModel.rejectShipmentDeal(
+                                                    dealId: dealId,
+                                                    status: 'rejected',
+                                                    token: token),
+                                            child: const Text(
                                               'Reject',
                                               style: TextStyle(
                                                   fontSize: 20,

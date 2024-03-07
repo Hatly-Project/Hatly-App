@@ -1,4 +1,4 @@
-import 'package:hatly/domain/models/accept_shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/create_shipment_response_dto.dart';
 import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
 import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
@@ -37,6 +37,9 @@ abstract class ShipmentDataSource {
   Future<GetMyShipmentDealDetailsResponseDto> getMyShipmentDealDetails(
       {required String token, required String dealId});
 
-  Future<AcceptShipmentDealResponseDto> acceptShipmentDeal(
+  Future<AcceptOrRejectShipmentDealResponseDto> acceptShipmentDeal(
+      {required String token, required String dealId, required String status});
+
+  Future<AcceptOrRejectShipmentDealResponseDto> rejectShipmentDeal(
       {required String token, required String dealId, required String status});
 }

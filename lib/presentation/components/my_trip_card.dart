@@ -33,7 +33,7 @@ class MyTripCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        elevation: 0,
+        elevation: 1.5,
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(

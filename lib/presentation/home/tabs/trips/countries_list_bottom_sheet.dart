@@ -40,7 +40,6 @@ class _CountriesListBottomSheetState extends State<CountriesListBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    print('length: ${widget.countries.countries!.length}');
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -51,7 +50,10 @@ class _CountriesListBottomSheetState extends State<CountriesListBottomSheet> {
               onChanged: (value) {
                 filterList(value);
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(17)),
+                ),
                 labelText: 'Search',
                 hintText: 'Search Countries...',
               ),
