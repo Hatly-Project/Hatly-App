@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'dart:ffi';
 import 'package:hatly/data/api/book_info.dart';
 import 'package:hatly/data/api/countries_states/countries.dart';
-import 'package:hatly/data/api/countries_states/countries_states.dart';
 import 'package:hatly/data/api/item.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
 import 'package:hatly/data/api/login/login_request.dart';
@@ -11,7 +8,6 @@ import 'package:hatly/data/api/refresh_token_request.dart';
 import 'package:hatly/data/api/refresh_token_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
 import 'package:hatly/data/api/register/register_request.dart';
-import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_request.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_response.dart';
 import 'package:hatly/data/api/shipments/accept_reject_shipment_deal_response/accept_reject_shipment_deal_response.dart';
@@ -23,7 +19,6 @@ import 'package:hatly/data/api/shipments/my_shipment_deals_response/my_shipment_
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
 import 'package:hatly/data/api/trip_deal/deals.dart' as TripDeal;
 import 'package:hatly/data/api/shipment_deal/deals.dart' as ShipmentDeal;
-
 import 'package:hatly/data/api/trip_deal/trip_deal_request.dart';
 import 'package:hatly/data/api/trip_deal/trip_deal_response.dart';
 import 'package:hatly/data/api/trips/create_trip_request/create_trip_request.dart';
@@ -31,13 +26,7 @@ import 'package:hatly/data/api/trips/create_trip_response/create_trip_response.d
 import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_response/get_all_trips_response.dart';
 import 'package:hatly/data/api/trips/get_user_trip_response/get_user_trip_response.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
-import 'package:hatly/domain/models/book_info_dto.dart';
-import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
-import 'package:hatly/domain/models/item_dto.dart';
-import 'package:hatly/domain/models/shipment_dto.dart';
-import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
-import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 import 'interceptor/LoggingInterceptor.dart';
@@ -64,7 +53,7 @@ class ApiManager {
       String? ip,
       required String? fcmToken}) async {
     try {
-      var url = Uri.https(baseUrl, 'user/register');
+      var url = Uri.https(baseUrl, 'auth/register');
       var requestBody = RegisterRequest(
         firstName: firstName,
         lastName: lastName,
@@ -111,7 +100,7 @@ class ApiManager {
 
   Future<LoginResponse> loginUser(String email, String password) async {
     try {
-      var url = Uri.https(baseUrl, 'user/login');
+      var url = Uri.https(baseUrl, 'auth/login');
       var requestBody = LoginRequest(
         email: email,
         password: password,
@@ -135,7 +124,7 @@ class ApiManager {
 
   Future<GetShipmentsResponse> getAllShipments({required String token}) async {
     try {
-      var url = Uri.https(baseUrl, 'shipment/all');
+      var url = Uri.https(baseUrl, 'shipments');
       var response = await client.get(url, headers: {
         'content-type': 'application/json',
         'authorization': 'Bearer $token'
@@ -156,8 +145,7 @@ class ApiManager {
   Future<MyShipmentDealsResponse> getMyShipmentDeals(
       {required String token, required int shipmentId}) async {
     try {
-      var url = Uri.https(
-          baseUrl, 'shipment/deals', {'shipmentId': shipmentId.toString()});
+      var url = Uri.https(baseUrl, 'shipments/${shipmentId.toString()}/deals');
       var response = await client.get(url, headers: {
         'content-type': 'application/json',
         'authorization': 'Bearer $token'
@@ -178,7 +166,7 @@ class ApiManager {
   Future<GetMyShipmentDealDetailsResponse> getMyShipmentDealDetails(
       {required String token, required String dealId}) async {
     try {
-      var url = Uri.https(baseUrl, 'deal', {'dealId': dealId});
+      var url = Uri.https(baseUrl, 'deals/${dealId.toString()}');
       var response = await client.get(url, headers: {
         'content-type': 'application/json',
         'authorization': 'Bearer $token'
@@ -202,9 +190,8 @@ class ApiManager {
       required String dealId,
       required String status}) async {
     try {
-      var url = Uri.https(baseUrl, 'deal/choose/shipment', {
+      var url = Uri.https(baseUrl, 'deal/${dealId.toString()}/shipment', {
         'status': status,
-        'dealId': dealId,
       });
       var response = await client.post(url, headers: {
         'content-type': 'application/json',
@@ -229,9 +216,8 @@ class ApiManager {
       required String dealId,
       required String status}) async {
     try {
-      var url = Uri.https(baseUrl, 'deal/choose/shipment', {
+      var url = Uri.https(baseUrl, 'deal/${dealId.toString()}/shipment', {
         'status': status,
-        'dealId': dealId,
       });
       var response = await client.post(url, headers: {
         'content-type': 'application/json',
@@ -253,7 +239,7 @@ class ApiManager {
 
   Future<GetAllTripsResponse> getAllTrips({required String token}) async {
     try {
-      var url = Uri.https(baseUrl, 'trip/all');
+      var url = Uri.https(baseUrl, 'trips');
       var response =
           await client.get(url, headers: {'authorization': 'Bearer $token'});
       var getResponse = GetAllTripsResponse.fromJson(response.body);
@@ -272,7 +258,7 @@ class ApiManager {
 
   Future<MyShipmentResponse> getUserShipments({required String token}) async {
     try {
-      var url = Uri.https(baseUrl, 'user/shipments');
+      var url = Uri.https(baseUrl, 'users/shipments');
       var response = await client.get(
         url,
         headers: {
@@ -298,7 +284,7 @@ class ApiManager {
 
   Future<GetUserTripResponse> getUserTrips({required String token}) async {
     try {
-      var url = Uri.https(baseUrl, 'user/trips');
+      var url = Uri.https(baseUrl, 'users/trips');
       var response = await client.get(
         url,
         headers: {
@@ -327,7 +313,7 @@ class ApiManager {
       required String token,
       required int tripId}) async {
     try {
-      var url = Uri.https(baseUrl, 'deal/trip', {
+      var url = Uri.https(baseUrl, 'deals/trip', {
         'tripId': tripId.toString(),
       });
       var requestBody = TripDealRequest(
@@ -358,7 +344,7 @@ class ApiManager {
       required String token,
       required int tripId}) async {
     try {
-      var url = Uri.https(baseUrl, 'deal/shipment', {
+      var url = Uri.https(baseUrl, 'deals/shipment', {
         'shipmentId': shipmentId.toString(),
       });
       var requestBody = ShipmentDealRequest(
@@ -401,7 +387,7 @@ class ApiManager {
       List<ItemsNotAllowed>? itemsNotAllowed,
       required String token}) async {
     try {
-      var url = Uri.https(baseUrl, 'trip/new');
+      var url = Uri.https(baseUrl, 'trips');
       var requestBody = CreateTripRequest(
           origin: origin,
           destination: destination,
@@ -435,7 +421,7 @@ class ApiManager {
   Future<RefreshTokenResponse> refreshFCMToken(
       {required String token, required String fcmToken}) async {
     try {
-      var url = Uri.https(baseUrl, 'user/refreshFcm');
+      var url = Uri.https(baseUrl, 'users/refresh-fcm');
       var requestBody = RefreshTokenRequest(fcmToken: fcmToken);
       var response = await client.patch(
         url,
@@ -470,7 +456,7 @@ class ApiManager {
       required String token}) async {
     try {
       print('item api: $note');
-      var url = Uri.https(baseUrl, 'shipment/new');
+      var url = Uri.https(baseUrl, 'shipments');
       var requestBody = CreateShipmentRequest(
           title: title,
           from: from,
