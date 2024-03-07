@@ -31,8 +31,12 @@ class DialogUtils {
       builder: (BuildContext context) => CupertinoAlertDialog(
         title: Text(
           alertMsg!,
-          style:
-              TextStyle(color: alertMsg == 'Fail' ? Colors.red : Colors.green),
+          style: TextStyle(
+              color: alertMsg == 'Fail'
+                  ? Colors.red
+                  : alertMsg == 'success'
+                      ? Colors.green
+                      : Colors.black),
         ),
         content: Text(
           alertContent!,

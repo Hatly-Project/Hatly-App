@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -71,7 +70,6 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    GlobalKey<CSCPickerState> _cscPickerKey = GlobalKey();
     countries = widget.countriesDto;
     return Scaffold(
       backgroundColor: Colors.transparent,

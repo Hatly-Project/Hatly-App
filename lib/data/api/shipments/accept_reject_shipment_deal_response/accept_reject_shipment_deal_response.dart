@@ -1,16 +1,16 @@
 import 'dart:convert';
 
 import 'package:hatly/data/api/shipmentDeal.dart';
-import 'package:hatly/domain/models/accept_shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 
-class AcceptShipmentDealResponse {
+class AcceptOrRejectShipmentDealResponse {
   bool? status;
   String? message;
   Deal? deal;
   String? clientSecret;
   String? paymentIntentId;
 
-  AcceptShipmentDealResponse({
+  AcceptOrRejectShipmentDealResponse({
     this.status,
     this.deal,
     this.message,
@@ -18,8 +18,9 @@ class AcceptShipmentDealResponse {
     this.paymentIntentId,
   });
 
-  factory AcceptShipmentDealResponse.fromMap(Map<String, dynamic> data) {
-    return AcceptShipmentDealResponse(
+  factory AcceptOrRejectShipmentDealResponse.fromMap(
+      Map<String, dynamic> data) {
+    return AcceptOrRejectShipmentDealResponse(
       status: data['status'] as bool?,
       deal: data['deal'] == null
           ? null
@@ -40,19 +41,19 @@ class AcceptShipmentDealResponse {
 
   /// `dart:convert`
   ///
-  /// Parses the string and returns the resulting Json object as [AcceptShipmentDealResponse].
-  factory AcceptShipmentDealResponse.fromJson(String data) {
-    return AcceptShipmentDealResponse.fromMap(
+  /// Parses the string and returns the resulting Json object as [AcceptOrRejectShipmentDealResponse].
+  factory AcceptOrRejectShipmentDealResponse.fromJson(String data) {
+    return AcceptOrRejectShipmentDealResponse.fromMap(
         json.decode(data) as Map<String, dynamic>);
   }
 
   /// `dart:convert`
   ///
-  /// Converts [AcceptShipmentDealResponse] to a JSON string.
+  /// Converts [AcceptOrRejectShipmentDealResponse] to a JSON string.
   String toJson() => json.encode(toMap());
 
-  AcceptShipmentDealResponseDto toResponseDto() {
-    return AcceptShipmentDealResponseDto(
+  AcceptOrRejectShipmentDealResponseDto toResponseDto() {
+    return AcceptOrRejectShipmentDealResponseDto(
         status: status,
         message: message,
         clientSecret: clientSecret,

@@ -3,22 +3,23 @@ import 'dart:convert';
 import 'package:hatly/data/api/shipmentDeal.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
 
-class AcceptShipmentDealResponseDto {
+class AcceptOrRejectShipmentDealResponseDto {
   bool? status;
   DealDto? deal;
   String? clientSecret;
   String? paymentIntentId;
   String? message;
 
-  AcceptShipmentDealResponseDto(
+  AcceptOrRejectShipmentDealResponseDto(
       {this.status,
       this.deal,
       this.clientSecret,
       this.paymentIntentId,
       this.message});
 
-  factory AcceptShipmentDealResponseDto.fromMap(Map<String, dynamic> data) {
-    return AcceptShipmentDealResponseDto(
+  factory AcceptOrRejectShipmentDealResponseDto.fromMap(
+      Map<String, dynamic> data) {
+    return AcceptOrRejectShipmentDealResponseDto(
       status: data['status'] as bool?,
       deal: data['deal'] == null
           ? null
@@ -39,14 +40,14 @@ class AcceptShipmentDealResponseDto {
 
   /// `dart:convert`
   ///
-  /// Parses the string and returns the resulting Json object as [AcceptShipmentDealResponseDto].
-  factory AcceptShipmentDealResponseDto.fromJson(String data) {
-    return AcceptShipmentDealResponseDto.fromMap(
+  /// Parses the string and returns the resulting Json object as [AcceptOrRejectShipmentDealResponseDto].
+  factory AcceptOrRejectShipmentDealResponseDto.fromJson(String data) {
+    return AcceptOrRejectShipmentDealResponseDto.fromMap(
         json.decode(data) as Map<String, dynamic>);
   }
 
   /// `dart:convert`
   ///
-  /// Converts [AcceptShipmentDealResponseDto] to a JSON string.
+  /// Converts [AcceptOrRejectShipmentDealResponseDto] to a JSON string.
   String toJson() => json.encode(toMap());
 }
