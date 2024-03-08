@@ -1,11 +1,15 @@
+import 'dart:ffi';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/data/datasource/shipment_datasource_impl.dart';
 import 'package:hatly/data/repository/shipment_repository_impl.dart';
 import 'package:hatly/domain/datasource/shipment_datasource.dart';
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/counter_offer_response_dto.dart';
 import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 import 'package:hatly/domain/usecase/accept_shipment_deal_usecase.dart';
+import 'package:hatly/domain/usecase/counter_offer_usecase.dart';
 import 'package:hatly/domain/usecase/get_my_shipment_deal_details_usecase.dart';
 import '../../../../data/api/api_manager.dart';
 import '../../../../domain/customException/custom_exception.dart';
@@ -17,6 +21,7 @@ class GetMyShipmentDealDetailsViewModel
   late ShipmentDataSource shipmentDataSource;
   late GetMyShipmentDealDetailsUsecase usecase;
   late AcceptShipmentDealUsecase acceptShipmentDealUsecase;
+  late ShipmentCounterOfferUsecase shipmentCounterOfferUsecase;
 
   GetMyShipmentDealDetailsViewModel()
       : super(MyShipmentDealDetailsInitialState()) {
@@ -25,6 +30,8 @@ class GetMyShipmentDealDetailsViewModel
     shipmentRepository = ShipmentRepositoryImpl(shipmentDataSource);
     usecase = GetMyShipmentDealDetailsUsecase(repository: shipmentRepository);
     acceptShipmentDealUsecase = AcceptShipmentDealUsecase(shipmentRepository);
+    shipmentCounterOfferUsecase =
+        ShipmentCounterOfferUsecase(shipmentRepository: shipmentRepository);
   }
 
   Future<void> getMyShipmentDealDetails(
@@ -76,6 +83,23 @@ class GetMyShipmentDealDetailsViewModel
       emit(RejectShipmentDealFailState(e.errorMessage));
     } on Exception catch (e) {
       emit(RejectShipmentDealFailState(e.toString()));
+    }
+  }
+
+  Future<void> makeCounterOffer(
+      {required String token,
+      required int dealId,
+      required double reward}) async {
+    emit(CounterOfferLoadingState('Loading...'));
+
+    try {
+      var response = await shipmentCounterOfferUsecase.invoke(
+          token: token, dealId: dealId, reward: reward);
+      emit(CounterOfferSuccessState(response));
+    } on ServerErrorException catch (e) {
+      emit(CounterOfferFailState(e.errorMessage));
+    } on Exception catch (e) {
+      emit(CounterOfferFailState(e.toString()));
     }
   }
 }
@@ -139,4 +163,20 @@ class RejectShipmentDealFailState extends MyShipmentDealDetailsViewState {
   String failMessage;
 
   RejectShipmentDealFailState(this.failMessage);
+}
+
+class CounterOfferLoadingState extends MyShipmentDealDetailsViewState {
+  String loadingMessage;
+  CounterOfferLoadingState(this.loadingMessage);
+}
+
+class CounterOfferSuccessState extends MyShipmentDealDetailsViewState {
+  CounterOfferResponseDto responseDto;
+  CounterOfferSuccessState(this.responseDto);
+}
+
+class CounterOfferFailState extends MyShipmentDealDetailsViewState {
+  String failMessage;
+
+  CounterOfferFailState(this.failMessage);
 }
