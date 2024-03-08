@@ -1,3 +1,4 @@
+import 'dart:ffi' as size;
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
+import 'package:hatly/presentation/components/counter_offer_dialog.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_viewmodel.dart';
@@ -1067,9 +1069,15 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                   const EdgeInsets.symmetric(
                                                       vertical: 12)),
                                           onPressed: () {
-                                            // _showTripsListBottomSheet(context,
-                                            //     showSuccessDialog, shipmentDto);
-                                            // login();
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                    content: CounterOfferDialog(
+                                                  sendReward: sendCounterReward,
+                                                ));
+                                              },
+                                            );
                                           },
                                           child: const FittedBox(
                                             fit: BoxFit.fitWidth,
@@ -1887,10 +1895,25 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     dealResponseDto
                                                             ?.dealStatus ==
                                                         'rejected'
-                                                ? null
+                                                ? ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                    const SnackBar(
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      content: Text(
+                                                        'The deal is already accepted',
+                                                        style: TextStyle(
+                                                            fontSize: 17,
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ),
+                                                  )
                                                 : viewModel.rejectShipmentDeal(
                                                     dealId: dealId,
-                                                    status: 'accepted',
+                                                    status: 'rejected',
                                                     token: token),
                                             child: const Text(
                                               'Accept',
@@ -1921,7 +1944,19 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                 padding:
                                                     const EdgeInsets.symmetric(
                                                         vertical: 12)),
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                      content:
+                                                          CounterOfferDialog(
+                                                    sendReward:
+                                                        sendCounterReward,
+                                                  ));
+                                                },
+                                              );
+                                            },
                                             child: const FittedBox(
                                               fit: BoxFit.fitWidth,
                                               child: Text(
@@ -1961,7 +1996,22 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     dealResponseDto
                                                             ?.dealStatus ==
                                                         'rejected'
-                                                ? null
+                                                ? ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                    const SnackBar(
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      content: Text(
+                                                        'You cannot reject an accepted deal',
+                                                        style: TextStyle(
+                                                            fontSize: 17,
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ),
+                                                  )
                                                 : viewModel.rejectShipmentDeal(
                                                     dealId: dealId,
                                                     status: 'rejected',
@@ -2003,6 +2053,11 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
             ],
           );
         });
+  }
+
+  void sendCounterReward(double reward) {
+    viewModel.makeCounterOffer(
+        token: token, dealId: widget.args.dealDto.id!, reward: reward);
   }
 
   String substractDates(DateTime dateTime) {

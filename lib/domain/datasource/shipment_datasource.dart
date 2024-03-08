@@ -1,4 +1,5 @@
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/counter_offer_response_dto.dart';
 import 'package:hatly/domain/models/create_shipment_response_dto.dart';
 import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
 import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
@@ -42,4 +43,7 @@ abstract class ShipmentDataSource {
 
   Future<AcceptOrRejectShipmentDealResponseDto> rejectShipmentDeal(
       {required String token, required String dealId, required String status});
+
+  Future<CounterOfferResponseDto> makeCounterOffer(
+      {required String token, required int dealId, required double reward});
 }

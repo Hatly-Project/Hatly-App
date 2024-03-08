@@ -1,5 +1,6 @@
 import 'package:hatly/domain/datasource/shipment_datasource.dart';
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/counter_offer_response_dto.dart';
 import 'package:hatly/domain/models/create_shipment_response_dto.dart';
 import 'package:hatly/domain/models/get_all_shipments_dto.dart';
 import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
@@ -85,5 +86,12 @@ class ShipmentRepositoryImpl implements ShipmentRepository {
       {required String token, required String dealId, required String status}) {
     return shipmentDataSource.rejectShipmentDeal(
         token: token, dealId: dealId, status: status);
+  }
+
+  @override
+  Future<CounterOfferResponseDto> makeCounterOffer(
+      {required String token, required int dealId, required double reward}) {
+    return shipmentDataSource.makeCounterOffer(
+        token: token, dealId: dealId, reward: reward);
   }
 }

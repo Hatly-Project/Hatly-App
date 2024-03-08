@@ -1,4 +1,5 @@
 import 'package:hatly/data/api/book_info.dart';
+import 'package:hatly/data/api/counter_offer.dart';
 import 'package:hatly/data/api/countries_states/countries.dart';
 import 'package:hatly/data/api/item.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
@@ -436,6 +437,29 @@ class ApiManager {
         throw ServerErrorException(refreshTokenResponse.message!);
       }
       return refreshTokenResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<CounterOfferResponse> makeCounterOffer(
+      {required int dealId,
+      required double reward,
+      required String token}) async {
+    try {
+      var url = Uri.https(baseUrl, 'deals/${dealId.toString()}/counter-offer', {
+        'reward': reward,
+      });
+      var response = await client.patch(url, headers: {
+        'authorization': 'Bearer $token',
+      });
+      var counterOfferResponse = CounterOfferResponse.fromJson(response.body);
+      if (counterOfferResponse.status == false) {
+        throw ServerErrorException(counterOfferResponse.message!);
+      }
+      return counterOfferResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
     } on Exception catch (e) {
