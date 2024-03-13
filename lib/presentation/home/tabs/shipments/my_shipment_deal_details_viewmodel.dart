@@ -5,10 +5,12 @@ import 'package:hatly/data/datasource/shipment_datasource_impl.dart';
 import 'package:hatly/data/repository/shipment_repository_impl.dart';
 import 'package:hatly/domain/datasource/shipment_datasource.dart';
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/cancel_deal_response_dto.dart';
 import 'package:hatly/domain/models/counter_offer_response_dto.dart';
 import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 import 'package:hatly/domain/usecase/accept_shipment_deal_usecase.dart';
+import 'package:hatly/domain/usecase/cancel_shipment_deal_usecase.dart';
 import 'package:hatly/domain/usecase/counter_offer_usecase.dart';
 import 'package:hatly/domain/usecase/get_my_shipment_deal_details_usecase.dart';
 import '../../../../data/api/api_manager.dart';
@@ -16,22 +18,24 @@ import '../../../../domain/customException/custom_exception.dart';
 
 class GetMyShipmentDealDetailsViewModel
     extends Cubit<MyShipmentDealDetailsViewState> {
-  late ApiManager apiManager;
-  late ShipmentRepository shipmentRepository;
-  late ShipmentDataSource shipmentDataSource;
-  late GetMyShipmentDealDetailsUsecase usecase;
-  late AcceptShipmentDealUsecase acceptShipmentDealUsecase;
-  late ShipmentCounterOfferUsecase shipmentCounterOfferUsecase;
+  late ApiManager _apiManager;
+  late ShipmentRepository _shipmentRepository;
+  late ShipmentDataSource _shipmentDataSource;
+  late GetMyShipmentDealDetailsUsecase _usecase;
+  late AcceptShipmentDealUsecase _acceptShipmentDealUsecase;
+  late ShipmentCounterOfferUsecase _shipmentCounterOfferUsecase;
+  late CancelShipmentDealUsecae _cancelShipmentDealUsecae;
 
   GetMyShipmentDealDetailsViewModel()
       : super(MyShipmentDealDetailsInitialState()) {
-    apiManager = ApiManager();
-    shipmentDataSource = ShipmentDataSourceImpl(apiManager);
-    shipmentRepository = ShipmentRepositoryImpl(shipmentDataSource);
-    usecase = GetMyShipmentDealDetailsUsecase(repository: shipmentRepository);
-    acceptShipmentDealUsecase = AcceptShipmentDealUsecase(shipmentRepository);
-    shipmentCounterOfferUsecase =
-        ShipmentCounterOfferUsecase(shipmentRepository: shipmentRepository);
+    _apiManager = ApiManager();
+    _shipmentDataSource = ShipmentDataSourceImpl(_apiManager);
+    _shipmentRepository = ShipmentRepositoryImpl(_shipmentDataSource);
+    _usecase = GetMyShipmentDealDetailsUsecase(repository: _shipmentRepository);
+    _acceptShipmentDealUsecase = AcceptShipmentDealUsecase(_shipmentRepository);
+    _shipmentCounterOfferUsecase =
+        ShipmentCounterOfferUsecase(shipmentRepository: _shipmentRepository);
+    _cancelShipmentDealUsecae = CancelShipmentDealUsecae(_shipmentRepository);
   }
 
   Future<void> getMyShipmentDealDetails(
@@ -40,7 +44,7 @@ class GetMyShipmentDealDetailsViewModel
 
     try {
       var response =
-          await usecase.getMyShipmentDealDetails(token: token, dealId: dealId);
+          await _usecase.getMyShipmentDealDetails(token: token, dealId: dealId);
       // createUserInDb(user);
       emit(GetMyShipmentDealDetailsSuccessState(response));
     } on ServerErrorException catch (e) {
@@ -51,14 +55,12 @@ class GetMyShipmentDealDetailsViewModel
   }
 
   Future<void> acceptShipmentDeal(
-      {required String dealId,
-      required String status,
-      required String token}) async {
+      {required String dealId, required String token}) async {
     emit(AcceptShipmentDealLoadingState('Loading...'));
 
     try {
-      var response = await acceptShipmentDealUsecase.acceptShipmentDeal(
-          token: token, dealId: dealId, status: status);
+      var response = await _acceptShipmentDealUsecase.acceptShipmentDeal(
+          token: token, dealId: dealId, status: 'accepted');
       // createUserInDb(user);
       emit(AcceptShipmentDealSuccessState(response));
     } on ServerErrorException catch (e) {
@@ -69,20 +71,34 @@ class GetMyShipmentDealDetailsViewModel
   }
 
   Future<void> rejectShipmentDeal(
-      {required String dealId,
-      required String status,
-      required String token}) async {
+      {required String dealId, required String token}) async {
     emit(RejectShipmentDealLoadingState('Loading...'));
 
     try {
-      var response = await acceptShipmentDealUsecase.acceptShipmentDeal(
-          token: token, dealId: dealId, status: status);
+      var response = await _acceptShipmentDealUsecase.acceptShipmentDeal(
+          token: token, dealId: dealId, status: 'rejected');
       // createUserInDb(user);
       emit(RejectShipmentDealSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(RejectShipmentDealFailState(e.errorMessage));
     } on Exception catch (e) {
       emit(RejectShipmentDealFailState(e.toString()));
+    }
+  }
+
+  Future<void> cancelShipmentDeal(
+      {required int dealId, required String token}) async {
+    emit(CancelShipmentDealLoadingState('Loading...'));
+
+    try {
+      var response =
+          await _cancelShipmentDealUsecae.invoke(token: token, dealId: dealId);
+      // createUserInDb(user);
+      emit(CancelShipmentDealSuccessState(response));
+    } on ServerErrorException catch (e) {
+      emit(CancelShipmentDealFailState(e.errorMessage));
+    } on Exception catch (e) {
+      emit(CancelShipmentDealFailState(e.toString()));
     }
   }
 
@@ -93,7 +109,7 @@ class GetMyShipmentDealDetailsViewModel
     emit(CounterOfferLoadingState('Loading...'));
 
     try {
-      var response = await shipmentCounterOfferUsecase.invoke(
+      var response = await _shipmentCounterOfferUsecase.invoke(
           token: token, dealId: dealId, reward: reward);
       emit(CounterOfferSuccessState(response));
     } on ServerErrorException catch (e) {
@@ -179,4 +195,20 @@ class CounterOfferFailState extends MyShipmentDealDetailsViewState {
   String failMessage;
 
   CounterOfferFailState(this.failMessage);
+}
+
+class CancelShipmentDealLoadingState extends MyShipmentDealDetailsViewState {
+  String loadingMessage;
+  CancelShipmentDealLoadingState(this.loadingMessage);
+}
+
+class CancelShipmentDealSuccessState extends MyShipmentDealDetailsViewState {
+  CancelDealResponseDto responseDto;
+  CancelShipmentDealSuccessState(this.responseDto);
+}
+
+class CancelShipmentDealFailState extends MyShipmentDealDetailsViewState {
+  String failMessage;
+
+  CancelShipmentDealFailState(this.failMessage);
 }

@@ -4,11 +4,14 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/material/card.dart' as card;
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
+import 'package:hatly/presentation/components/animated_alert_dialog.dart';
+import 'package:hatly/presentation/components/confirm_cancel_deal_dialog.dart';
 import 'package:hatly/presentation/components/counter_offer_dialog.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
@@ -35,6 +38,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   late String dealId;
   String? paymentIntentId, clientSecret;
   DealDto? dealResponseDto;
+  late String? dealCreatorEmail;
   AcceptOrRejectShipmentDealResponseDto? acceptShipmentDealResponseDto;
   bool isAccepted = false, isRejected = false;
 
@@ -58,6 +62,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
       loggedInState = userProvider.state as LoggedInState;
       token = loggedInState.token;
       // Now you can use the 'token' variable as needed in your code.
+      dealCreatorEmail = loggedInState.user.email;
       print('User token: $token');
       print('user email ${loggedInState.user.email}');
     } else {
@@ -1021,24 +1026,67 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       'accepted' ||
                                                   dealResponseDto?.dealStatus ==
                                                       'rejected'
-                                              ? ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                  const SnackBar(
-                                                    backgroundColor: Colors.red,
-                                                    content: Text(
-                                                      'The deal is already accepted',
-                                                      style: TextStyle(
-                                                          fontSize: 17,
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                )
-                                              : viewModel.rejectShipmentDeal(
-                                                  dealId: dealId,
-                                                  status: 'rejected',
-                                                  token: token),
+                                              ? dealResponseDto?.dealStatus ==
+                                                      'accepted'
+                                                  ? ScaffoldMessenger.of(
+                                                          context)
+                                                      .showSnackBar(
+                                                      const SnackBar(
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        content: Text(
+                                                          'You cannot accept the deal twice',
+                                                          style: TextStyle(
+                                                              fontSize: 17,
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : dealResponseDto
+                                                              ?.dealStatus ==
+                                                          'rejected'
+                                                      ? ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                          const SnackBar(
+                                                            backgroundColor:
+                                                                Colors.red,
+                                                            content: Text(
+                                                              'You cannot reject an accepted deal',
+                                                              style: TextStyle(
+                                                                  fontSize: 17,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                          SnackBar(
+                                                            backgroundColor:
+                                                                Colors.red,
+                                                            content: Text(
+                                                              'You cannot reject an ${dealResponseDto?.dealStatus} deal',
+                                                              style: const TextStyle(
+                                                                  fontSize: 17,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                        )
+                                              : viewModel.acceptShipmentDeal(
+                                                  dealId: dealId, token: token),
                                           child: const Text(
                                             'Accept',
                                             style: TextStyle(
@@ -1069,21 +1117,65 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                   const EdgeInsets.symmetric(
                                                       vertical: 12)),
                                           onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                    content: CounterOfferDialog(
-                                                  sendReward: sendCounterReward,
-                                                ));
-                                              },
-                                            );
+                                            dealDto.creatorEmail !=
+                                                    dealCreatorEmail
+                                                ? 'accepted' ==
+                                                            dealDto.dealStatus!
+                                                                .toLowerCase() ||
+                                                        'rejected' ==
+                                                            dealDto.dealStatus!
+                                                                .toLowerCase()
+                                                    ? ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                        SnackBar(
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          content: Text(
+                                                            'You cannot send counter offer for an ${dealResponseDto?.dealStatus} deal',
+                                                            style: const TextStyle(
+                                                                fontSize: 16,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return AnimatedAlertDialog(
+                                                            dialogContent:
+                                                                CounterOfferDialog(
+                                                              sendReward:
+                                                                  sendCounterReward,
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                : showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AnimatedAlertDialog(
+                                                        dialogContent:
+                                                            ConfirmCancelDealDialog(
+                                                          confirmCancellation:
+                                                              cancelDeal,
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
                                           },
-                                          child: const FittedBox(
+                                          child: FittedBox(
                                             fit: BoxFit.fitWidth,
                                             child: Text(
-                                              'Counter Offer',
-                                              style: TextStyle(
+                                              dealDto.creatorEmail ==
+                                                      dealCreatorEmail
+                                                  ? 'Cancel'
+                                                  : 'Counter offer',
+                                              style: const TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold),
@@ -1115,24 +1207,67 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       'accepted' ||
                                                   dealResponseDto?.dealStatus ==
                                                       'rejected'
-                                              ? ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                  const SnackBar(
-                                                    backgroundColor: Colors.red,
-                                                    content: Text(
-                                                      'You cannot reject an accepted deal',
-                                                      style: TextStyle(
-                                                          fontSize: 17,
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                )
+                                              ? dealResponseDto?.dealStatus ==
+                                                      'accepted'
+                                                  ? ScaffoldMessenger.of(
+                                                          context)
+                                                      .showSnackBar(
+                                                      const SnackBar(
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        content: Text(
+                                                          'You cannot reject an accepted deal',
+                                                          style: TextStyle(
+                                                              fontSize: 17,
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : dealResponseDto
+                                                              ?.dealStatus ==
+                                                          'rejected'
+                                                      ? ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                          const SnackBar(
+                                                            backgroundColor:
+                                                                Colors.red,
+                                                            content: Text(
+                                                              'You cannot reject the deal twice',
+                                                              style: TextStyle(
+                                                                  fontSize: 17,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                          SnackBar(
+                                                            backgroundColor:
+                                                                Colors.red,
+                                                            content: Text(
+                                                              'You cannot reject an ${dealResponseDto?.dealStatus} deal',
+                                                              style: const TextStyle(
+                                                                  fontSize: 17,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                        )
                                               : viewModel.rejectShipmentDeal(
-                                                  dealId: dealId,
-                                                  status: 'rejected',
-                                                  token: token),
+                                                  dealId: dealId, token: token),
                                           child: const Text(
                                             'Reject',
                                             style: TextStyle(
@@ -1911,9 +2046,107 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       ),
                                                     ),
                                                   )
-                                                : viewModel.rejectShipmentDeal(
+                                                : viewModel.acceptShipmentDeal(
                                                     dealId: dealId,
-                                                    status: 'rejected',
+                                                    token: token),
+                                            child: const Text(
+                                              'Accept',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                fixedSize: Size(
+                                                    MediaQuery.sizeOf(context)
+                                                            .width *
+                                                        .3,
+                                                    MediaQuery.sizeOf(context)
+                                                            .height *
+                                                        .07),
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15)),
+                                                side: const BorderSide(
+                                                    color: Colors.amber,
+                                                    width: 1),
+                                                backgroundColor: Colors.amber,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12)),
+                                            onPressed: () => dealResponseDto
+                                                            ?.dealStatus ==
+                                                        'accepted' ||
+                                                    dealResponseDto
+                                                            ?.dealStatus ==
+                                                        'rejected'
+                                                ? dealResponseDto?.dealStatus ==
+                                                        'accepted'
+                                                    ? ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                        const SnackBar(
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          content: Text(
+                                                            'You cannot accept the deal twice',
+                                                            style: TextStyle(
+                                                                fontSize: 17,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : dealResponseDto
+                                                                ?.dealStatus ==
+                                                            'rejected'
+                                                        ? ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                            const SnackBar(
+                                                              backgroundColor:
+                                                                  Colors.red,
+                                                              content: Text(
+                                                                'You cannot reject an accepted deal',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        17,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                            SnackBar(
+                                                              backgroundColor:
+                                                                  Colors.red,
+                                                              content: Text(
+                                                                'You cannot reject an ${dealResponseDto?.dealStatus} deal',
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        17,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                          )
+                                                : viewModel.acceptShipmentDeal(
+                                                    dealId: dealId,
                                                     token: token),
                                             child: const Text(
                                               'Accept',
@@ -1945,23 +2178,67 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     const EdgeInsets.symmetric(
                                                         vertical: 12)),
                                             onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return AlertDialog(
-                                                      content:
-                                                          CounterOfferDialog(
-                                                    sendReward:
-                                                        sendCounterReward,
-                                                  ));
-                                                },
-                                              );
+                                              dealDto.creatorEmail !=
+                                                      dealCreatorEmail
+                                                  ? 'accepted' ==
+                                                              dealDto
+                                                                  .dealStatus!
+                                                                  .toLowerCase() ||
+                                                          'rejected' ==
+                                                              dealDto
+                                                                  .dealStatus!
+                                                                  .toLowerCase()
+                                                      ? ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                          SnackBar(
+                                                            backgroundColor:
+                                                                Colors.red,
+                                                            content: Text(
+                                                              'You cannot send counter offer for an ${dealResponseDto?.dealStatus} deal',
+                                                              style: const TextStyle(
+                                                                  fontSize: 16,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : showDialog(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return AnimatedAlertDialog(
+                                                              dialogContent:
+                                                                  CounterOfferDialog(
+                                                                sendReward:
+                                                                    sendCounterReward,
+                                                              ),
+                                                            );
+                                                          },
+                                                        )
+                                                  : showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return AnimatedAlertDialog(
+                                                          dialogContent:
+                                                              ConfirmCancelDealDialog(
+                                                            confirmCancellation:
+                                                                cancelDeal,
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
                                             },
-                                            child: const FittedBox(
+                                            child: FittedBox(
                                               fit: BoxFit.fitWidth,
                                               child: Text(
-                                                'Counter Offer',
-                                                style: TextStyle(
+                                                dealDto.creatorEmail ==
+                                                        dealCreatorEmail
+                                                    ? 'Cancel'
+                                                    : 'Counter offer',
+                                                style: const TextStyle(
                                                     fontSize: 16,
                                                     color: Colors.white,
                                                     fontWeight:
@@ -2014,7 +2291,6 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                   )
                                                 : viewModel.rejectShipmentDeal(
                                                     dealId: dealId,
-                                                    status: 'rejected',
                                                     token: token),
                                             child: const Text(
                                               'Reject',
@@ -2058,6 +2334,10 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   void sendCounterReward(double reward) {
     viewModel.makeCounterOffer(
         token: token, dealId: widget.args.dealDto.id!, reward: reward);
+  }
+
+  void cancelDeal() {
+    viewModel.cancelShipmentDeal(dealId: widget.args.dealDto.id!, token: token);
   }
 
   String substractDates(DateTime dateTime) {

@@ -1,4 +1,5 @@
 import 'package:hatly/data/api/book_info.dart';
+import 'package:hatly/data/api/cancel_deal_response.dart';
 import 'package:hatly/data/api/counter_offer.dart';
 import 'package:hatly/data/api/countries_states/countries.dart';
 import 'package:hatly/data/api/item.dart';
@@ -460,6 +461,25 @@ class ApiManager {
         throw ServerErrorException(counterOfferResponse.message!);
       }
       return counterOfferResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(e.toString());
+    }
+  }
+
+  Future<CancelDealResponse> cancelDeal(
+      {required int dealId, required String token}) async {
+    try {
+      var url = Uri.https(baseUrl, 'deals/${dealId.toString()}/cancel');
+      var response = await client.patch(url, headers: {
+        'authorization': 'Bearer $token',
+      });
+      var cancelDealResponse = CancelDealResponse.fromJson(response.body);
+      if (cancelDealResponse.status == false) {
+        throw ServerErrorException(cancelDealResponse.message!);
+      }
+      return cancelDealResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(e.errorMessage);
     } on Exception catch (e) {
