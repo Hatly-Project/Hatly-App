@@ -1,6 +1,7 @@
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/domain/datasource/shipment_datasource.dart';
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/cancel_deal_response_dto.dart';
 import 'package:hatly/domain/models/counter_offer_response_dto.dart';
 import 'package:hatly/domain/models/create_shipment_response_dto.dart';
 import 'package:hatly/domain/models/get_all_shipments_dto.dart';
@@ -118,5 +119,12 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
         dealId: dealId, reward: reward, token: token);
 
     return response.toResponseDto();
+  }
+
+  @override
+  Future<CancelDealResponseDto> cancelDeal(
+      {required String token, required int dealId}) {
+    // TODO: implement cancelDeal
+    throw UnimplementedError();
   }
 }
