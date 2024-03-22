@@ -42,8 +42,9 @@ class ShipmentRepositoryImpl implements ShipmentRepository {
   }
 
   @override
-  Future<GetAllShipmentResponseDto> getAllShipments(String token) {
-    return shipmentDataSource.getAllShipments(token);
+  Future<GetAllShipmentResponseDto> getAllShipments(
+      {required String token, int page = 1}) {
+    return shipmentDataSource.getAllShipments(token: token, page: page);
   }
 
   @override

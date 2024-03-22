@@ -7,7 +7,8 @@ import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trip_deal_response.dart';
 
 abstract class TripsDatasource {
-  Future<GetAllTripsResponseDto> getAllTrips(String token);
+  Future<GetAllTripsResponseDto> getAllTrips(
+      {required String token, int page = 1});
   Future<CreateTripResponseDto> createTrip(
       {String? origin,
       String? destination,
