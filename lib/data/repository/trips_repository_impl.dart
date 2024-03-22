@@ -14,8 +14,9 @@ class TripsRepositoryImpl implements TripsRepository {
   TripsRepositoryImpl(this.tripsDatasource);
 
   @override
-  Future<GetAllTripsResponseDto> getAllTrips(String token) {
-    return tripsDatasource.getAllTrips(token);
+  Future<GetAllTripsResponseDto> getAllTrips(
+      {required String token, int page = 1}) {
+    return tripsDatasource.getAllTrips(token: token, page: page);
   }
 
   @override

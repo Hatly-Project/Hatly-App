@@ -42,7 +42,14 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   List<ShipmentDto> shipments = [];
   List<TripsDto> trips = [];
   String token = '';
-  bool shimmerIsLoading = true;
+  int totalShipmentsPage = 2,
+      currentShipmentsPage = 1,
+      totalTripsPage = 2,
+      currentTripsPage = 1;
+
+  bool shimmerIsLoading = true,
+      isShipmentPaginationLoading = false,
+      isTripPaginationLoading = false;
 
   HomeScreenViewModel viewModel = HomeScreenViewModel();
   @override
@@ -162,6 +169,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             //       alertContent: state.loadingMessage,
             //       context: context);
             // }
+          } else if (state is GetAllShipsPaginationLoadingState) {
+            isShipmentPaginationLoading = true;
           } else if (state is GetAllShipsFailState) {
             if (Platform.isIOS) {
               DialogUtils.showDialogIos(
@@ -175,6 +184,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                   context: context);
             }
           }
+
           if (state is GetAllTripsLoadingState) {
             shimmerIsLoading = true;
             // ListView.builder(
@@ -212,10 +222,14 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             shimmerIsLoading = false;
             // DialogUtils.hideDialog(context);
           }
+          if (previous is GetAllShipsPaginationLoadingState) {
+            isShipmentPaginationLoading = false;
+          }
           if (current is GetAllShipsLoadingState ||
               current is GetAllShipsFailState ||
               current is GetAllTripsLoadingState ||
-              current is GetAllTripsFailState) {
+              current is GetAllTripsFailState ||
+              current is GetAllShipsPaginationLoadingState) {
             print(current);
             return true;
           }
@@ -223,7 +237,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         },
         builder: (context, state) {
           if (state is GetAllShipsSuccessState) {
-            shipments = state.responseDto.shipments!;
+            for (var shipment in state.shipmentDto) {
+              shipments.add(shipment);
+            }
+            currentShipmentsPage = state.currentPage;
+            print('ship length ${shipments.length}');
             if (shipments.isEmpty) {
               shipmentsIsEmpty = true;
               print("emptyyyy");
@@ -236,7 +254,10 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
           }
           if (state is GetAllTripsSuccessState) {
             print('tripss');
-            trips = state.responseDto.trips!;
+            for (var trip in state.tripsDto) {
+              trips.add(trip);
+            }
+            currentTripsPage = state.currentPage;
             if (trips.isEmpty) {
               tripsIsEmpty = true;
               print('trips empty');
@@ -270,14 +291,14 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                         ),
                         actions: [
                           Container(
-                            margin: EdgeInsets.only(right: 10),
+                            margin: const EdgeInsets.only(right: 10),
                             child: Row(
                               // mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Container(
                                     // margin: EdgeInsets.only(right: 20),
                                     ),
-                                Icon(
+                                const Icon(
                                   Icons.search,
                                   color: Colors.white,
                                   size: 30,
@@ -389,21 +410,26 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                             final box = await Hive.openBox('shipments');
                             await box.clear();
                             await box.close();
-                            await viewModel.create(token);
+                            await viewModel.create(token, isRefresh: true);
+                            setState(() {
+                              shipments.clear();
+                            });
                           } else {
                             final box = await Hive.openBox('trips');
                             await box.clear();
                             await box.close();
-                            await viewModel.getAlltrips(token);
+                            await viewModel.getAlltrips(token, isRefresh: true);
+                            setState(() {
+                              trips.clear();
+                            });
                           }
-                          setState(() {});
                         },
                       ),
                       selectedTab == 0
                           ? shimmerIsLoading
                               ? SliverList(
                                   delegate: SliverChildBuilderDelegate(
-                                    (context, index) => ShimmerCard(),
+                                    (context, index) => const ShimmerCard(),
                                     childCount: 2,
                                   ),
                                 )
@@ -436,53 +462,12 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ))
-                                  : SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                        (context, index) => selectedTab == 0
-                                            ? ShipmentCard(
-                                                shipmentDto: shipments[index],
-                                                showConfirmedBottomSheet:
-                                                    showSuccessDialog,
-                                              )
-                                            // ShipmentCard(
-                                            //     title: shipments[index].title!,
-                                            //     from: shipments[index].from!,
-                                            //     to: shipments[index].to!,
-                                            //     date: shipments[index]
-                                            //         .expectedDate!,
-                                            //     userName: shipments[index]
-                                            //         .user!
-                                            //         .name!,
-                                            //     shipImage: shipments[index]
-                                            //                 .items![0]
-                                            //                 .photo ==
-                                            //             null
-                                            //         ? null
-                                            //         : base64ToImage(
-                                            //             shipments[index]
-                                            //                 .items![0]
-                                            //                 .photo!),
-                                            //     userImage: shipments[index]
-                                            //                 .user!
-                                            //                 .profilePhoto ==
-                                            //             null
-                                            //         ? null
-                                            //         : base64ToUserImage(
-                                            //             shipments[index]
-                                            //                 .user!
-                                            //                 .profilePhoto!),
-                                            //     bonus: shipments[index]
-                                            //         .reward
-                                            //         .toString(),
-                                            //   )
-                                            : Container(),
-                                        childCount: shipments.length,
-                                      ),
-                                    )
+                                  : buildShipmentsList(
+                                      state as GetAllShipsSuccessState)
                           : shimmerIsLoading
                               ? SliverList(
                                   delegate: SliverChildBuilderDelegate(
-                                    (context, index) => ShimmerCard(),
+                                    (context, index) => const ShimmerCard(),
                                     childCount: 2,
                                   ),
                                 )
@@ -515,16 +500,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ))
-                                  : SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                        (context, index) => selectedTab == 1
-                                            ? TripCard(
-                                                tripsDto: trips[index],
-                                              )
-                                            : Container(),
-                                        childCount: trips.length,
-                                      ),
-                                    )
+                                  : buildTripsList(
+                                      state as GetAllTripsSuccessState)
                     ],
                   ),
                 )
@@ -571,14 +548,14 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                           ),
                           actions: [
                             Container(
-                              margin: EdgeInsets.only(right: 10),
+                              margin: const EdgeInsets.only(right: 10),
                               child: Row(
                                 // mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Container(
                                       // margin: EdgeInsets.only(right: 20),
                                       ),
-                                  Icon(
+                                  const Icon(
                                     Icons.search,
                                     color: Colors.white,
                                     size: 30,
@@ -692,7 +669,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                             ? shimmerIsLoading
                                 ? SliverList(
                                     delegate: SliverChildBuilderDelegate(
-                                      (context, index) => ShimmerCard(),
+                                      (context, index) => const ShimmerCard(),
                                       childCount: 2,
                                     ),
                                   )
@@ -725,22 +702,12 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ))
-                                    : SliverList(
-                                        delegate: SliverChildBuilderDelegate(
-                                          (context, index) => selectedTab == 0
-                                              ? ShipmentCard(
-                                                  shipmentDto: shipments[index],
-                                                  showConfirmedBottomSheet:
-                                                      showSuccessDialog,
-                                                )
-                                              : Container(),
-                                          childCount: shipments.length,
-                                        ),
-                                      )
+                                    : buildShipmentsList(
+                                        state as GetAllShipsSuccessState)
                             : shimmerIsLoading
                                 ? SliverList(
                                     delegate: SliverChildBuilderDelegate(
-                                      (context, index) => ShimmerCard(),
+                                      (context, index) => const ShimmerCard(),
                                       childCount: 2,
                                     ),
                                   )
@@ -773,16 +740,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ))
-                                    : SliverList(
-                                        delegate: SliverChildBuilderDelegate(
-                                          (context, index) => selectedTab == 1
-                                              ? TripCard(
-                                                  tripsDto: trips[index],
-                                                )
-                                              : Container(),
-                                          childCount: trips.length,
-                                        ),
-                                      )
+                                    : buildTripsList(
+                                        state as GetAllTripsSuccessState)
                       ],
                     ),
                   ),
@@ -818,11 +777,108 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     // }
   }
 
+  Widget buildShipmentsList(GetAllShipsSuccessState state) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        childCount:
+            state.hasReachedMax ? shipments.length : shipments.length + 1,
+        (context, index) {
+          if (index < shipments.length) {
+            return ShipmentCard(
+              shipmentDto: shipments[index],
+              showConfirmedBottomSheet: showSuccessDialog,
+            );
+          } else {
+            if (totalShipmentsPage >= currentShipmentsPage) {
+              viewModel.create(token, isPagination: true);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Platform.isIOS
+                      ? const CupertinoActivityIndicator(
+                          radius: 11,
+                          color: Colors.black,
+                        )
+                      : const CircularProgressIndicator(),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  Text(
+                    "Loading",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[400]),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                ],
+              );
+            }
+
+            // return Container();
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
+  Widget buildTripsList(GetAllTripsSuccessState state) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        childCount: state.hasReachedMax ? trips.length : trips.length + 1,
+        (context, index) {
+          if (index < trips.length) {
+            return TripCard(
+              tripsDto: trips[index],
+              // showConfirmedBottomSheet: showSuccessDialog,
+            );
+          } else {
+            if (totalTripsPage >= currentTripsPage) {
+              viewModel.getAlltrips(token, isPagination: true);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Platform.isIOS
+                      ? const CupertinoActivityIndicator(
+                          radius: 11,
+                          color: Colors.black,
+                        )
+                      : const CircularProgressIndicator(),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  Text(
+                    "Loading",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[400]),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                ],
+              );
+            }
+
+            // return Container();
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
   void _showShipmentDealConfirmedBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
-      builder: (context) => DealConfirmedBottomSheet(),
+      builder: (context) => const DealConfirmedBottomSheet(),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),

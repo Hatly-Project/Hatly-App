@@ -6,7 +6,8 @@ class GetAllShipmentsUsecase {
 
   GetAllShipmentsUsecase(this.shipmentRepository);
 
-  Future<GetAllShipmentResponseDto> invoke(String token) {
-    return shipmentRepository.getAllShipments(token);
+  Future<GetAllShipmentResponseDto> invoke(
+      {required String token, int page = 1}) {
+    return shipmentRepository.getAllShipments(token: token, page: page);
   }
 }

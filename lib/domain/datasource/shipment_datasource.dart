@@ -23,7 +23,8 @@ abstract class ShipmentDataSource {
       List<ItemDto>? items,
       required String token});
 
-  Future<GetAllShipmentResponseDto> getAllShipments(String token);
+  Future<GetAllShipmentResponseDto> getAllShipments(
+      {required String token, int page = 1});
 
   Future<GetUserShipmentsDto> getUserShipments({required String token});
 
