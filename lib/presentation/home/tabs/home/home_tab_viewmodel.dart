@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hatly/data/datasource/shipment_datasource_impl.dart';
 import 'package:hatly/data/datasource/trips_datasource_impl.dart';
 import 'package:hatly/data/repository/shipment_repository_impl.dart';
@@ -15,6 +16,7 @@ import 'package:hatly/domain/repository/trips_repository.dart';
 import 'package:hatly/domain/usecase/create_shipment_usecase.dart';
 import 'package:hatly/domain/usecase/get_all_shipments_usecase.dart';
 import 'package:hatly/domain/usecase/get_all_trips_usecase.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 
 import '../../../../data/api/api_manager.dart';
 import '../../../../domain/customException/custom_exception.dart';
@@ -28,14 +30,16 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
   late TripsRepository tripsRepository;
   late TripsDatasource tripsDatasource;
   late GetAllTripsUsecase getAllTripsUsecase;
+  AccessTokenProvider accessTokenProvider;
   List<ShipmentDto> shipments = [];
   List<TripsDto> trips = [];
 
   bool hasShipmentsReachedMax = false, hasTripsReachedMax = false;
   int shipmentsPage = 1, tripsPage = 1;
 
-  HomeScreenViewModel() : super(GetAllShipmentsInitialState()) {
-    apiManager = ApiManager();
+  HomeScreenViewModel(this.accessTokenProvider)
+      : super(GetAllShipmentsInitialState()) {
+    apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     shipmentDataSource = ShipmentDataSourceImpl(apiManager);
     shipmentRepository = ShipmentRepositoryImpl(shipmentDataSource);
     getAllShipmentsUsecase = GetAllShipmentsUsecase(shipmentRepository);
@@ -52,17 +56,23 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
 
     try {
       if (isPagination) {
+        emit(GetAllShipsPaginationLoadingState('Loading...'));
+
         var response = await getAllShipmentsUsecase.invoke(
             token: token, page: shipmentsPage);
         shipments = response.shipments!;
+        print('pagination length ${shipments.length}');
         hasShipmentsReachedMax = response.shipments!.isEmpty;
       } else {
         if (isRefresh) {
+          print('api refresh');
           shipmentsPage = 1;
           var response = await getAllShipmentsUsecase.invoke(token: token);
           shipments = response.shipments!;
           hasShipmentsReachedMax = response.shipments!.isEmpty;
         } else {
+          print('api normal');
+
           var response = await getAllShipmentsUsecase.invoke(token: token);
           shipments = response.shipments!;
           hasShipmentsReachedMax = response.shipments!.isEmpty;
@@ -80,9 +90,25 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           hasReachedMax: hasShipmentsReachedMax,
           currentPage: shipmentsPage));
     } on ServerErrorException catch (e) {
-      emit(GetAllShipsFailState(e.errorMessage));
+      emit(GetAllShipsFailState(e.errorMessage, statusCode: e.statusCode));
     } on Exception catch (e) {
       emit(GetAllShipsFailState(e.toString()));
+    }
+  }
+
+  Future<void> refreshAccessToken() async {
+    // emit(GetAllShipsLoadingState('Loading...'));
+
+    try {
+      String newAccessToken = await apiManager.refreshAccessToken();
+      await const FlutterSecureStorage()
+          .write(key: 'accessToken', value: newAccessToken);
+      print('new tokennnnnnnnn $newAccessToken');
+      await create(newAccessToken);
+    } on ServerErrorException catch (e) {
+      emit(RefreshTokenFailState(e.errorMessage));
+    } on Exception catch (e) {
+      emit(RefreshTokenFailState(e.toString()));
     }
   }
 
@@ -158,8 +184,8 @@ class GetAllShipsPaginationLoadingState extends HomeViewState {
 
 class GetAllShipsFailState extends HomeViewState {
   String failMessage;
-
-  GetAllShipsFailState(this.failMessage);
+  int? statusCode;
+  GetAllShipsFailState(this.failMessage, {this.statusCode});
 }
 
 class GetAllTripsSuccessState extends HomeViewState {
@@ -183,4 +209,16 @@ class GetAllTripsFailState extends HomeViewState {
   String failMessage;
 
   GetAllTripsFailState(this.failMessage);
+}
+
+class RefreshTokenSuccessState extends HomeViewState {
+  String newAccessToken;
+
+  RefreshTokenSuccessState({required this.newAccessToken});
+}
+
+class RefreshTokenFailState extends HomeViewState {
+  String failMessage;
+
+  RefreshTokenFailState(this.failMessage);
 }
