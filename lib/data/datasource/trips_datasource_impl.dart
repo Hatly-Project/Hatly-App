@@ -16,7 +16,7 @@ class TripsDatasourceImpl implements TripsDatasource {
   @override
   Future<GetAllTripsResponseDto> getAllTrips(
       {required String token, int page = 1}) async {
-    var response = await apiManager.getAllTrips(token: token);
+    var response = await apiManager.getAllTrips(accessToken: token);
 
     return response.toTripsResponseDto();
   }
@@ -35,7 +35,7 @@ class TripsDatasourceImpl implements TripsDatasource {
       List<ItemsNotAllowedDto>? itemsNotAllowed,
       required String token}) async {
     var response = await apiManager.createTrip(
-        token: token,
+        accessToken: token,
         origin: origin,
         originCity: originCity,
         destinationCity: destinationCity,
@@ -52,7 +52,7 @@ class TripsDatasourceImpl implements TripsDatasource {
 
   @override
   Future<GetUserTripResponseDto> getUserTrip({required String token}) async {
-    var response = await apiManager.getUserTrips(token: token);
+    var response = await apiManager.getUserTrips(accessToken: token);
 
     return response.toUserTripResponseDto();
   }
@@ -64,7 +64,10 @@ class TripsDatasourceImpl implements TripsDatasource {
       required String token,
       required int tripId}) async {
     var response = await apiManager.sendTripDeal(
-        token: token, tripId: tripId, shipmentId: shipmentId, reward: reward);
+        accessToken: token,
+        tripId: tripId,
+        shipmentId: shipmentId,
+        reward: reward);
 
     return response.toTripDealResponseDto();
   }

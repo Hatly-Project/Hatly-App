@@ -30,7 +30,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.token;
+      token = loggedInState.accessToken;
       Navigator.pushNamed(context, HomeTab.routeName);
     } else {
       print(

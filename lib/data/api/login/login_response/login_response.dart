@@ -4,16 +4,16 @@ import 'package:hatly/data/api/user.dart';
 import 'package:hatly/domain/models/login_response_dto.dart';
 
 class LoginResponse {
-  String? token;
+  String? accessToken;
   String? message;
 
   User? user;
   bool? status;
 
-  LoginResponse({this.token, this.user, this.status, this.message});
+  LoginResponse({this.accessToken, this.user, this.status, this.message});
 
   factory LoginResponse.fromMap(Map<String, dynamic> data) => LoginResponse(
-        token: data['token'] as String?,
+        accessToken: data['accessToken'] as String?,
         message: data['message'] as String?,
         user: data['user'] == null
             ? null
@@ -22,7 +22,7 @@ class LoginResponse {
       );
 
   Map<String, dynamic> toMap() => {
-        'token': token,
+        'accessToken': accessToken,
         'message': message,
         'user': user?.toMap(),
         'status': status,
@@ -42,7 +42,7 @@ class LoginResponse {
 
   LoginResponseDto toLoginDto() {
     return LoginResponseDto(
-        token: token,
+        accessToken: accessToken,
         user: user?.toUserDto(),
         message: message,
         status: status);

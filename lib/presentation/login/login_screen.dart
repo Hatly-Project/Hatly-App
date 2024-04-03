@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hatly/data/api/api_manager.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/home/home_screen.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
@@ -37,9 +39,25 @@ class _LoginScreenState extends State<LoginScreen> {
   var passwordController = TextEditingController(text: '');
 
   LoginViewModel viewModel = LoginViewModel();
+  FlutterSecureStorage storage = const FlutterSecureStorage();
+  String? refreshToken;
+
+  Future<String?> getRefreshToken() async {
+    print('aaaaaaaaaaaaa');
+    String? refreshToken = await storage.read(key: 'refreshToken');
+    if (refreshToken == null) {
+      print('token null');
+    } else {
+      print('token success');
+    }
+    return refreshToken;
+  }
+
   @override
   Widget build(BuildContext context) {
     FCMProvider fcmProvider = Provider.of<FCMProvider>(context);
+    AccessTokenProvider accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context);
 
     final args =
         ModalRoute.of(context)!.settings.arguments as LoginScreenArguments;
@@ -89,11 +107,17 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           print('load');
         } else if (state is LoginSuccessState) {
-          UserProvider userProvider =
-              BlocProvider.of<UserProvider>(context, listen: false);
-          userProvider.login(LoggedInState(
+          getRefreshToken().then((refreshToken) {
+            UserProvider userProvider =
+                BlocProvider.of<UserProvider>(context, listen: false);
+            userProvider.login(LoggedInState(
               user: state.loginResponseDto.user!,
-              token: state.loginResponseDto.token!));
+              accessToken: state.loginResponseDto.accessToken!,
+              refreshToken: refreshToken!,
+            ));
+            accessTokenProvider
+                .setAccessToken(state.loginResponseDto.accessToken!);
+          });
 
           if (Platform.isAndroid) {
             fcmProvider.loginAndRefresh();

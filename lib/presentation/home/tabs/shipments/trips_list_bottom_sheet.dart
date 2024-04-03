@@ -46,7 +46,7 @@ class _ShipmentsListBottomSheetState extends State<TripsListBottomSheet> {
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.token;
+      token = loggedInState.accessToken;
       // Now you can use the 'token' variable as needed in your code.
       print('User token: $token');
       print('user email ${loggedInState.user.email}');

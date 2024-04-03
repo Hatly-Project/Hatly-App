@@ -30,7 +30,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       required String token}) async {
     print('item data: $note');
     var response = await apiManager.createShipment(
-        token: token,
+        accessToken: token,
         title: title,
         note: note,
         from: from,
@@ -47,13 +47,15 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   @override
   Future<GetAllShipmentResponseDto> getAllShipments(
       {required String token, int page = 1}) async {
-    var response = await apiManager.getAllShipments(token: token, page: page);
+    var response = await apiManager.getAllShipmentsWithCheckAccessToken(
+        accessToken: token, page: page);
     return response.toGetAllShipmetnsDto();
   }
 
   @override
   Future<GetUserShipmentsDto> getUserShipments({required String token}) async {
-    var response = await apiManager.getUserShipments(token: token);
+    var response =
+        await apiManager.getMyShipmentsWithCheckAccessToken(accessToken: token);
     print('datasource');
 
     return response.toUserShipmentDto();
@@ -63,7 +65,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   Future<MyShipmentDealsResponseDto> getMyShipmentDeals(
       {required String token, required int shipmentId}) async {
     var response = await apiManager.getMyShipmentDeals(
-        token: token, shipmentId: shipmentId);
+        accessToken: token, shipmentId: shipmentId);
 
     return response.toMyShipmentDealsResponseDto();
   }
@@ -75,7 +77,10 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       required double? reward,
       required int tripId}) async {
     var response = await apiManager.sendShipmentDeal(
-        shipmentId: shipmentId, reward: reward, token: token, tripId: tripId);
+        shipmentId: shipmentId,
+        reward: reward,
+        accessToken: token,
+        tripId: tripId);
 
     return response.toShipmentDealResponseDto();
   }
@@ -83,8 +88,8 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   @override
   Future<GetMyShipmentDealDetailsResponseDto> getMyShipmentDealDetails(
       {required String token, required String dealId}) async {
-    var response =
-        await apiManager.getMyShipmentDealDetails(token: token, dealId: dealId);
+    var response = await apiManager.getMyShipmentDealDetails(
+        accessToken: token, dealId: dealId);
 
     return response.toResponseDto();
   }
@@ -95,7 +100,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       required String dealId,
       required String status}) async {
     var response = await apiManager.acceptShipmentDeal(
-        token: token, dealId: dealId, status: status);
+        accessToken: token, dealId: dealId, status: status);
 
     return response.toResponseDto();
   }
@@ -106,7 +111,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       required String dealId,
       required String status}) async {
     var response = await apiManager.rejectShipmentDeal(
-        token: token, dealId: dealId, status: status);
+        accessToken: token, dealId: dealId, status: status);
 
     return response.toResponseDto();
   }
@@ -117,7 +122,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       required int dealId,
       required double reward}) async {
     var response = await apiManager.makeCounterOffer(
-        dealId: dealId, reward: reward, token: token);
+        dealId: dealId, reward: reward, accessToken: token);
 
     return response.toResponseDto();
   }

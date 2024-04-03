@@ -11,6 +11,7 @@ import 'package:hatly/firebase_options.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/home/home_screen.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
@@ -70,6 +71,9 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => FCMProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => AccessTokenProvider(),
+        ),
         // Add more providers as needed
       ],
       child: MyApp(),
@@ -90,6 +94,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FCMProvider fcmProvider = Provider.of<FCMProvider>(context);
+    AccessTokenProvider accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context);
     print('Notification Message: ${fcmProvider.notifMessage?.body}');
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: true);
@@ -97,7 +103,12 @@ class MyApp extends StatelessWidget {
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
-      userToken = loggedInState.token;
+
+      if (accessTokenProvider.accessToken != loggedInState.accessToken) {
+        userProvider.refreshAccessToken();
+      }
+      userToken = loggedInState.accessToken;
+
       // Now you can use the 'token' variable as needed in your code.
       print('User token from main: $userToken');
     } else {
@@ -110,8 +121,8 @@ class MyApp extends StatelessWidget {
           body: fcmProvider.notifMessage?.body);
     }
     if (fcmProvider.fcmToken != null) {
-      ApiManager()
-          .refreshFCMToken(token: userToken, fcmToken: fcmProvider.fcmToken!);
+      ApiManager().refreshFCMToken(
+          accessToken: userToken, fcmToken: fcmProvider.fcmToken!);
     }
     return MaterialApp(
       title: 'Flutter Demo',

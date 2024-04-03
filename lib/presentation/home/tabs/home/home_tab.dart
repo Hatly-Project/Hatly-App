@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
@@ -16,6 +17,7 @@ import 'package:hatly/presentation/components/trip_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab_viewmodel.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/firebase_messaging_provider.dart';
 import 'package:hatly/services/local_notifications_service.dart';
 import 'package:hive/hive.dart';
@@ -41,20 +43,24 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   int selectedTab = 0;
   List<ShipmentDto> shipments = [];
   List<TripsDto> trips = [];
+  FlutterSecureStorage storage = FlutterSecureStorage();
   String token = '';
   int totalShipmentsPage = 2,
       currentShipmentsPage = 1,
       totalTripsPage = 2,
       currentTripsPage = 1;
-
+  late HomeScreenViewModel viewModel;
+  late AccessTokenProvider accessTokenProvider;
   bool shimmerIsLoading = true,
       isShipmentPaginationLoading = false,
       isTripPaginationLoading = false;
 
-  HomeScreenViewModel viewModel = HomeScreenViewModel();
   @override
   void initState() {
     super.initState();
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = HomeScreenViewModel(accessTokenProvider);
 
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
@@ -62,10 +68,9 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.token;
+      // token = loggedInState.accessToken;
       // Now you can use the 'token' variable as needed in your code.
-      print('User token: $token');
-      viewModel.create(token);
+      getAccessToken(accessTokenProvider);
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
@@ -100,6 +105,19 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   void dispose() {
     tabController.dispose();
     super.dispose();
+  }
+
+  Future<String> getAccessToken(AccessTokenProvider accessTokenProvider) async {
+    // String? accessToken = await storage.read(key: 'accessToken');
+
+    if (accessTokenProvider.accessToken != null) {
+      token = accessTokenProvider.accessToken!;
+      print('access $token');
+      viewModel.create(token);
+    }
+
+    setState(() {});
+    return token;
   }
 
   // a method for caching the shipments list
@@ -152,6 +170,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = BlocProvider.of<UserProvider>(context);
+
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {
@@ -228,7 +248,9 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
           if (current is GetAllShipsLoadingState ||
               current is GetAllShipsFailState ||
               current is GetAllTripsLoadingState ||
+              current is RefreshTokenFailState ||
               current is GetAllTripsFailState ||
+              current is GetAllShipsPaginationLoadingState ||
               current is GetAllShipsPaginationLoadingState) {
             print(current);
             return true;
@@ -237,6 +259,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         },
         builder: (context, state) {
           if (state is GetAllShipsSuccessState) {
+            print('shipment from build ${state.shipmentDto.length}');
             for (var shipment in state.shipmentDto) {
               shipments.add(shipment);
             }
@@ -410,7 +433,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                             final box = await Hive.openBox('shipments');
                             await box.clear();
                             await box.close();
-                            await viewModel.create(token, isRefresh: true);
+                            if (accessTokenProvider.accessToken != null) {
+                              await viewModel.create(
+                                  accessTokenProvider.accessToken!,
+                                  isRefresh: true);
+                            }
                             setState(() {
                               shipments.clear();
                             });
@@ -462,8 +489,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ))
-                                  : buildShipmentsList(
-                                      state as GetAllShipsSuccessState)
+                                  : !isShipmentPaginationLoading
+                                      ? buildShipmentsList(
+                                          state as GetAllShipsSuccessState)
+                                      : buildShipmentsList(state
+                                          as GetAllShipsPaginationLoadingState)
                           : shimmerIsLoading
                               ? SliverList(
                                   delegate: SliverChildBuilderDelegate(
@@ -702,8 +732,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ))
-                                    : buildShipmentsList(
-                                        state as GetAllShipsSuccessState)
+                                    : !isShipmentPaginationLoading
+                                        ? buildShipmentsList(
+                                            state as GetAllShipsSuccessState)
+                                        : buildShipmentsList(state
+                                            as GetAllShipsPaginationLoadingState)
                             : shimmerIsLoading
                                 ? SliverList(
                                     delegate: SliverChildBuilderDelegate(
@@ -777,53 +810,111 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     // }
   }
 
-  Widget buildShipmentsList(GetAllShipsSuccessState state) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount:
-            state.hasReachedMax ? shipments.length : shipments.length + 1,
-        (context, index) {
-          if (index < shipments.length) {
-            return ShipmentCard(
-              shipmentDto: shipments[index],
-              showConfirmedBottomSheet: showSuccessDialog,
-            );
-          } else {
-            if (totalShipmentsPage >= currentShipmentsPage) {
-              viewModel.create(token, isPagination: true);
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Platform.isIOS
-                      ? const CupertinoActivityIndicator(
-                          radius: 11,
-                          color: Colors.black,
-                        )
-                      : const CircularProgressIndicator(),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Text(
-                    "Loading",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[400]),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                ],
-              );
-            }
+  Widget buildShipmentsList(Object? state) {
+    AccessTokenProvider accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context);
+    // String? accessToken = await storage.read(key: 'accessToken');
 
-            // return Container();
-          }
-          return Container();
-        },
-      ),
-    );
+    return state is GetAllShipsSuccessState
+        ? SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount:
+                  state.hasReachedMax ? shipments.length : shipments.length + 1,
+              (context, index) {
+                if (index < shipments.length) {
+                  return ShipmentCard(
+                    shipmentDto: shipments[index],
+                    showConfirmedBottomSheet: showSuccessDialog,
+                  );
+                } else {
+                  if (totalShipmentsPage >= currentShipmentsPage) {
+                    if (accessTokenProvider.accessToken != null) {
+                      viewModel.create(accessTokenProvider.accessToken!,
+                          isPagination: true);
+                    }
+                    // return Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     Platform.isIOS
+                    //         ? const CupertinoActivityIndicator(
+                    //             radius: 11,
+                    //             color: Colors.black,
+                    //           )
+                    //         : const CircularProgressIndicator(),
+                    //     const SizedBox(
+                    //       width: 15,
+                    //     ),
+                    //     Text(
+                    //       "Loading",
+                    //       textAlign: TextAlign.center,
+                    //       style: GoogleFonts.poppins(
+                    //           fontSize: 15,
+                    //           fontWeight: FontWeight.bold,
+                    //           color: Colors.grey[400]),
+                    //     ),
+                    //     const SizedBox(
+                    //       height: 10,
+                    //     ),
+                    //   ],
+                    // );
+                  }
+
+                  // return Container();
+                }
+                return Container();
+              },
+            ),
+          )
+        : SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount: shipments.length + 1,
+              (context, index) {
+                if (index < shipments.length) {
+                  print('trueeeeee');
+                  return ShipmentCard(
+                    shipmentDto: shipments[index],
+                    showConfirmedBottomSheet: showSuccessDialog,
+                  );
+                } else {
+                  print('1st else');
+                  print(
+                      'total $totalShipmentsPage current $currentShipmentsPage');
+                  if (totalShipmentsPage >= currentShipmentsPage) {
+                    print('elseeeee');
+
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Platform.isIOS
+                            ? const CupertinoActivityIndicator(
+                                radius: 11,
+                                color: Colors.black,
+                              )
+                            : const CircularProgressIndicator(),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Text(
+                          "Loading",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[400]),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    );
+                  }
+
+                  // return Container();
+                }
+                return Container();
+              },
+            ),
+          );
   }
 
   Widget buildTripsList(GetAllTripsSuccessState state) {
