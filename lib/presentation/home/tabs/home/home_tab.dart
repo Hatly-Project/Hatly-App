@@ -45,9 +45,9 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   List<TripsDto> trips = [];
   FlutterSecureStorage storage = FlutterSecureStorage();
   String token = '';
-  int totalShipmentsPage = 2,
+  int? totalShipmentsPage,
       currentShipmentsPage = 1,
-      totalTripsPage = 2,
+      totalTripsPage,
       currentTripsPage = 1;
   late HomeScreenViewModel viewModel;
   late AccessTokenProvider accessTokenProvider;
@@ -70,7 +70,9 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
       // token = loggedInState.accessToken;
       // Now you can use the 'token' variable as needed in your code.
-      getAccessToken(accessTokenProvider);
+      getAccessToken(accessTokenProvider).then(
+        (accessToken) => viewModel.create(token),
+      );
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
@@ -113,7 +115,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     if (accessTokenProvider.accessToken != null) {
       token = accessTokenProvider.accessToken!;
       print('access $token');
-      viewModel.create(token);
     }
 
     setState(() {});
@@ -191,6 +192,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             // }
           } else if (state is GetAllShipsPaginationLoadingState) {
             isShipmentPaginationLoading = true;
+          } else if (state is GetAllTripsPaginationLoadingState) {
+            isTripPaginationLoading = true;
           } else if (state is GetAllShipsFailState) {
             if (Platform.isIOS) {
               DialogUtils.showDialogIos(
@@ -245,13 +248,16 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
           if (previous is GetAllShipsPaginationLoadingState) {
             isShipmentPaginationLoading = false;
           }
+          if (previous is GetAllTripsPaginationLoadingState) {
+            isTripPaginationLoading = false;
+          }
           if (current is GetAllShipsLoadingState ||
               current is GetAllShipsFailState ||
               current is GetAllTripsLoadingState ||
               current is RefreshTokenFailState ||
               current is GetAllTripsFailState ||
               current is GetAllShipsPaginationLoadingState ||
-              current is GetAllShipsPaginationLoadingState) {
+              current is GetAllTripsPaginationLoadingState) {
             print(current);
             return true;
           }
@@ -264,6 +270,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               shipments.add(shipment);
             }
             currentShipmentsPage = state.currentPage;
+            totalShipmentsPage = state.totalPages;
             print('ship length ${shipments.length}');
             if (shipments.isEmpty) {
               shipmentsIsEmpty = true;
@@ -281,6 +288,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               trips.add(trip);
             }
             currentTripsPage = state.currentPage;
+            totalTripsPage = state.totalPages;
             if (trips.isEmpty) {
               tripsIsEmpty = true;
               print('trips empty');
@@ -379,8 +387,14 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                           print('index $index');
                                           if (selectedTab == 1) {
                                             getTrips();
+                                            setState(() {
+                                              trips.clear();
+                                            });
                                           } else {
                                             getShipments();
+                                            setState(() {
+                                              shipments.clear();
+                                            });
                                           }
                                         },
                                         tabs: const [
@@ -445,7 +459,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                             final box = await Hive.openBox('trips');
                             await box.clear();
                             await box.close();
-                            await viewModel.getAlltrips(token, isRefresh: true);
+                            if (accessTokenProvider.accessToken != null) {
+                              await viewModel.getAlltrips(
+                                  accessTokenProvider.accessToken!,
+                                  isRefresh: true);
+                            }
                             setState(() {
                               trips.clear();
                             });
@@ -530,8 +548,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ))
-                                  : buildTripsList(
-                                      state as GetAllTripsSuccessState)
+                                  : !isTripPaginationLoading
+                                      ? buildTripsList(
+                                          state as GetAllTripsSuccessState)
+                                      : buildTripsList(state
+                                          as GetAllTripsPaginationLoadingState)
                     ],
                   ),
                 )
@@ -646,8 +667,15 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                             print('index $index');
                                             if (selectedTab == 1) {
                                               getTrips();
+                                              setState(() {
+                                                trips.clear();
+                                              });
                                             } else {
                                               getShipments();
+                                              print('tabeeed');
+                                              setState(() {
+                                                shipments.clear();
+                                              });
                                             }
                                           },
                                           tabs: const [
@@ -782,8 +810,9 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         });
   }
 
-  void getTrips() {
-    viewModel.getAlltrips(token);
+  void getTrips() async {
+    String accessToken = await getAccessToken(accessTokenProvider);
+    viewModel.getAlltrips(accessToken);
 
     // getChachedtrips().then((cachedTrips) {
     //   if (cachedTrips.isNotEmpty) {
@@ -827,7 +856,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                     showConfirmedBottomSheet: showSuccessDialog,
                   );
                 } else {
-                  if (totalShipmentsPage >= currentShipmentsPage) {
+                  if (totalShipmentsPage! >= currentShipmentsPage!) {
                     if (accessTokenProvider.accessToken != null) {
                       viewModel.create(accessTokenProvider.accessToken!,
                           isPagination: true);
@@ -879,7 +908,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                   print('1st else');
                   print(
                       'total $totalShipmentsPage current $currentShipmentsPage');
-                  if (totalShipmentsPage >= currentShipmentsPage) {
+                  if (totalShipmentsPage! >= currentShipmentsPage!) {
                     print('elseeeee');
 
                     return Row(
@@ -917,52 +946,78 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
           );
   }
 
-  Widget buildTripsList(GetAllTripsSuccessState state) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: state.hasReachedMax ? trips.length : trips.length + 1,
-        (context, index) {
-          if (index < trips.length) {
-            return TripCard(
-              tripsDto: trips[index],
-              // showConfirmedBottomSheet: showSuccessDialog,
-            );
-          } else {
-            if (totalTripsPage >= currentTripsPage) {
-              viewModel.getAlltrips(token, isPagination: true);
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Platform.isIOS
-                      ? const CupertinoActivityIndicator(
-                          radius: 11,
-                          color: Colors.black,
-                        )
-                      : const CircularProgressIndicator(),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Text(
-                    "Loading",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[400]),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                ],
-              );
-            }
+  Widget buildTripsList(Object? state) {
+    return state is GetAllTripsSuccessState
+        ? SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount: state.hasReachedMax ? trips.length : trips.length + 1,
+              (context, index) {
+                if (index < trips.length) {
+                  return TripCard(
+                    tripsDto: trips[index],
+                    // showConfirmedBottomSheet: showSuccessDialog,
+                  );
+                } else {
+                  if (totalTripsPage! >= currentTripsPage!) {
+                    if (accessTokenProvider.accessToken != null) {
+                      viewModel.getAlltrips(accessTokenProvider.accessToken!,
+                          isPagination: true);
+                    }
+                  }
+                }
+                return Container();
+              },
+            ),
+          )
+        : SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount: trips.length + 1,
+              (context, index) {
+                if (index < trips.length) {
+                  print('trueeeeee');
+                  return TripCard(
+                    tripsDto: trips[index],
+                    // showConfirmedBottomSheet: showSuccessDialog,
+                  );
+                } else {
+                  print('1st else');
+                  print('total $totalTripsPage current $currentTripsPage');
+                  if (totalTripsPage! >= currentTripsPage!) {
+                    print('elseeeee');
 
-            // return Container();
-          }
-          return Container();
-        },
-      ),
-    );
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Platform.isIOS
+                            ? const CupertinoActivityIndicator(
+                                radius: 11,
+                                color: Colors.black,
+                              )
+                            : const CircularProgressIndicator(),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Text(
+                          "Loading",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[400]),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    );
+                  }
+
+                  // return Container();
+                }
+                return Container();
+              },
+            ),
+          );
   }
 
   void _showShipmentDealConfirmedBottomSheet(BuildContext context) {
@@ -979,8 +1034,10 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     );
   }
 
-  void getShipments() {
-    viewModel.create(token);
+  void getShipments() async {
+    String accessToken = await getAccessToken(accessTokenProvider);
+
+    viewModel.create(accessToken);
 
     // getCachedShipments().then((cachedShipments) {
     //   if (cachedShipments.isNotEmpty) {
