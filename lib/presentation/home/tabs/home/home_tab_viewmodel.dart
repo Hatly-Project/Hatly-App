@@ -36,6 +36,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
 
   bool hasShipmentsReachedMax = false, hasTripsReachedMax = false;
   int shipmentsPage = 1, tripsPage = 1;
+  int? totalShipmentPages, totalTripsPages;
 
   HomeScreenViewModel(this.accessTokenProvider)
       : super(GetAllShipmentsInitialState()) {
@@ -61,6 +62,9 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
         var response = await getAllShipmentsUsecase.invoke(
             token: token, page: shipmentsPage);
         shipments = response.shipments!;
+        totalShipmentPages = response.totalPages;
+        print('total pages $totalShipmentPages');
+
         print('pagination length ${shipments.length}');
         hasShipmentsReachedMax = response.shipments!.isEmpty;
       } else {
@@ -69,13 +73,17 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           shipmentsPage = 1;
           var response = await getAllShipmentsUsecase.invoke(token: token);
           shipments = response.shipments!;
+          totalShipmentPages = response.totalPages;
+          print('total pages $totalShipmentPages');
           hasShipmentsReachedMax = response.shipments!.isEmpty;
         } else {
           print('api normal');
-
+          shipmentsPage = 1;
           var response = await getAllShipmentsUsecase.invoke(token: token);
           shipments = response.shipments!;
           hasShipmentsReachedMax = response.shipments!.isEmpty;
+          totalShipmentPages = response.totalPages;
+          print('total pages $totalShipmentPages');
         }
       }
       shipmentsPage++;
@@ -87,6 +95,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
       // createUserInDb(user);
       emit(GetAllShipsSuccessState(
           shipmentDto: shipments,
+          totalPages: totalShipmentPages!,
           hasReachedMax: hasShipmentsReachedMax,
           currentPage: shipmentsPage));
     } on ServerErrorException catch (e) {
@@ -120,19 +129,25 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
 
     try {
       if (isPagination) {
+        emit(GetAllTripsPaginationLoadingState('Loading...'));
         var response =
             await getAllTripsUsecase.invoke(token: token, page: tripsPage);
         trips = response.trips!;
+        totalTripsPages = response.totalPages;
         hasShipmentsReachedMax = response.trips!.isEmpty;
       } else {
         if (isRefresh) {
           tripsPage = 1;
           var response = await getAllTripsUsecase.invoke(token: token);
           trips = response.trips!;
+          totalTripsPages = response.totalPages;
+
           hasTripsReachedMax = response.trips!.isEmpty;
         } else {
           var response = await getAllTripsUsecase.invoke(token: token);
           trips = response.trips!;
+          totalTripsPages = response.totalPages;
+          tripsPage = 1;
           hasTripsReachedMax = response.trips!.isEmpty;
         }
       }
@@ -146,6 +161,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
       emit(GetAllTripsSuccessState(
           tripsDto: trips,
           hasReachedMax: hasTripsReachedMax,
+          totalPages: totalTripsPages!,
           currentPage: tripsPage));
     } on ServerErrorException catch (e) {
       emit(GetAllTripsFailState(e.errorMessage));
@@ -162,10 +178,11 @@ class GetAllShipmentsInitialState extends HomeViewState {}
 class GetAllShipsSuccessState extends HomeViewState {
   List<ShipmentDto> shipmentDto;
   bool hasReachedMax;
-  int currentPage;
+  int currentPage, totalPages;
 
   GetAllShipsSuccessState(
       {required this.hasReachedMax,
+      required this.totalPages,
       required this.shipmentDto,
       required this.currentPage});
 }
@@ -191,10 +208,11 @@ class GetAllShipsFailState extends HomeViewState {
 class GetAllTripsSuccessState extends HomeViewState {
   List<TripsDto> tripsDto;
   bool hasReachedMax;
-  int currentPage;
+  int currentPage, totalPages;
 
   GetAllTripsSuccessState(
       {required this.currentPage,
+      required this.totalPages,
       required this.hasReachedMax,
       required this.tripsDto});
 }
@@ -203,6 +221,12 @@ class GetAllTripsLoadingState extends HomeViewState {
   String loadingMessage;
 
   GetAllTripsLoadingState(this.loadingMessage);
+}
+
+class GetAllTripsPaginationLoadingState extends HomeViewState {
+  String loadingMessage;
+
+  GetAllTripsPaginationLoadingState(this.loadingMessage);
 }
 
 class GetAllTripsFailState extends HomeViewState {

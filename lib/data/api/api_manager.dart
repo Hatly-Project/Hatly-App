@@ -399,6 +399,22 @@ class ApiManager {
     }
   }
 
+  Future<GetAllTripsResponse> getAllTripsWithCheckAccessToken(
+      {required String accessToken, int page = 1}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await getAllTrips(accessToken: accessToken, page: page);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await getAllTrips(accessToken: newAccessToken, page: page);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<GetAllTripsResponse> getAllTrips(
       {required String accessToken, int page = 1}) async {
     late Response response;
@@ -411,14 +427,9 @@ class ApiManager {
       print('trip api');
 
       if (getResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          getAllTrips(accessToken: newAccessToken, page: page);
-        } else {
-          throw ServerErrorException(
-              errorMessage: getResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
       }
       return getResponse;
     } on ServerErrorException catch (e) {

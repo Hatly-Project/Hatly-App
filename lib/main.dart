@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     FCMProvider fcmProvider = Provider.of<FCMProvider>(context);
     AccessTokenProvider accessTokenProvider =
-        Provider.of<AccessTokenProvider>(context);
+        Provider.of<AccessTokenProvider>(context, listen: true);
     print('Notification Message: ${fcmProvider.notifMessage?.body}');
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: true);
@@ -104,12 +104,16 @@ class MyApp extends StatelessWidget {
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
 
-      if (accessTokenProvider.accessToken != loggedInState.accessToken) {
-        userProvider.refreshAccessToken();
+      if (accessTokenProvider.accessToken != null) {
+        if (accessTokenProvider.accessToken != loggedInState.accessToken) {
+          userProvider.refreshAccessToken();
+        }
+        userToken = loggedInState.accessToken;
       }
-      userToken = loggedInState.accessToken;
 
       // Now you can use the 'token' variable as needed in your code.
+      print('access token from main: ${accessTokenProvider.accessToken}');
+
       print('User token from main: $userToken');
     } else {
       print(
