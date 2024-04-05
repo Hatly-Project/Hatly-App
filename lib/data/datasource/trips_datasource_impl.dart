@@ -16,8 +16,8 @@ class TripsDatasourceImpl implements TripsDatasource {
   @override
   Future<GetAllTripsResponseDto> getAllTrips(
       {required String token, int page = 1}) async {
-    var response =
-        await apiManager.getAllTripsWithCheckAccessToken(accessToken: token);
+    var response = await apiManager.getAllTripsWithCheckAccessToken(
+        accessToken: token, page: page);
 
     return response.toTripsResponseDto();
   }

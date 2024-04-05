@@ -61,12 +61,14 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
 
         var response = await getAllShipmentsUsecase.invoke(
             token: token, page: shipmentsPage);
-        shipments = response.shipments!;
         totalShipmentPages = response.totalPages;
         print('total pages $totalShipmentPages');
 
         print('pagination length ${shipments.length}');
         hasShipmentsReachedMax = response.shipments!.isEmpty;
+        for (var shipment in response.shipments!) {
+          shipments.add(shipment);
+        }
       } else {
         if (isRefresh) {
           print('api refresh');
@@ -83,9 +85,9 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           shipments = response.shipments!;
           hasShipmentsReachedMax = response.shipments!.isEmpty;
           totalShipmentPages = response.totalPages;
-          print('total pages $totalShipmentPages');
         }
       }
+
       shipmentsPage++;
       print('page $shipmentsPage');
       // for (var shipment in response.shipments!) {
@@ -129,12 +131,15 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
 
     try {
       if (isPagination) {
+        print('page pagination $tripsPage');
         emit(GetAllTripsPaginationLoadingState('Loading...'));
         var response =
             await getAllTripsUsecase.invoke(token: token, page: tripsPage);
-        trips = response.trips!;
         totalTripsPages = response.totalPages;
-        hasShipmentsReachedMax = response.trips!.isEmpty;
+        hasTripsReachedMax = response.trips!.isEmpty;
+        for (var trip in response.trips!) {
+          trips.add(trip);
+        }
       } else {
         if (isRefresh) {
           tripsPage = 1;

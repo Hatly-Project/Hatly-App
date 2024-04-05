@@ -266,9 +266,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         builder: (context, state) {
           if (state is GetAllShipsSuccessState) {
             print('shipment from build ${state.shipmentDto.length}');
-            for (var shipment in state.shipmentDto) {
-              shipments.add(shipment);
-            }
+            shipments = state.shipmentDto;
             currentShipmentsPage = state.currentPage;
             totalShipmentsPage = state.totalPages;
             print('ship length ${shipments.length}');
@@ -284,9 +282,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
           }
           if (state is GetAllTripsSuccessState) {
             print('tripss');
-            for (var trip in state.tripsDto) {
-              trips.add(trip);
-            }
+            trips = state.tripsDto;
             currentTripsPage = state.currentPage;
             totalTripsPage = state.totalPages;
             if (trips.isEmpty) {
