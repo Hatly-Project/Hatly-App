@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/firebase_options.dart';
+import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
@@ -152,6 +153,7 @@ class MyApp extends StatelessWidget {
         CreateTripScreen.routeName: (context) => CreateTripScreen(),
         ShipmentDetails.routeName: (context) => ShipmentDetails(),
         TripDetails.routeName: (context) => TripDetails(),
+        ProfileScreen.routeName: (context) => ProfileScreen(),
         MyShipmentDetails.routeName: (context) => MyShipmentDetails(),
         MyShipmentDealDetails.routeName: (context) => MyShipmentDealDetails(
               args: ModalRoute.of(context)?.settings.arguments
