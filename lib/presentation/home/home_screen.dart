@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/presentation/components/shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab.dart';
+import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipments_tab.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips.dart';
 import 'bottom_nav_icon.dart';
@@ -18,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var selectedIndex = 0;
   var isSelected = false;
-  var tabs = [HomeTab(), MyShipmentsTab(), MyTripsTab()];
+  var tabs = [HomeTab(), MyShipmentsTab(), MyTripsTab(), ProfileScreen()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
               icon: BottomNavIcon('profile', selectedIndex == 3),
-              label: ''),
+              label: 'Profile'),
         ],
       ),
     );
