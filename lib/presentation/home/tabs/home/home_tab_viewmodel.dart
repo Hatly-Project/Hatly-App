@@ -101,7 +101,8 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           hasReachedMax: hasShipmentsReachedMax,
           currentPage: shipmentsPage));
     } on ServerErrorException catch (e) {
-      emit(GetAllShipsFailState(e.errorMessage, statusCode: e.statusCode));
+      emit(GetAllShipsFailState('${e.errorMessage} Please Login',
+          statusCode: e.statusCode));
     } on Exception catch (e) {
       emit(GetAllShipsFailState(e.toString()));
     }

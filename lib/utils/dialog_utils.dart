@@ -24,7 +24,11 @@ class DialogUtils {
 
   // This shows a CupertinoModalPopup which hosts a CupertinoAlertDialog.
   static void showDialogIos(
-      {required BuildContext context, String? alertMsg, String? alertContent}) {
+      {required BuildContext context,
+      String? alertMsg,
+      String? alertContent,
+      void Function()? onAction,
+      int? statusCode}) {
     showCupertinoModalPopup<void>(
       context: context,
       barrierDismissible: false,
@@ -48,10 +52,10 @@ class DialogUtils {
             /// a destructive action such as deletion, and turns
             /// the action's text color to red.
             isDefaultAction: true,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Ok'),
+            onPressed: statusCode == 401
+                ? onAction
+                : () => Navigator.of(context).pop(),
+            child: statusCode == 401 ? const Text('Login') : const Text('Ok'),
           ),
         ],
       ),

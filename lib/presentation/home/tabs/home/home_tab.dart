@@ -17,6 +17,7 @@ import 'package:hatly/presentation/components/trip_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab_viewmodel.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
+import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/firebase_messaging_provider.dart';
 import 'package:hatly/services/local_notifications_service.dart';
@@ -49,6 +50,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       currentShipmentsPage = 1,
       totalTripsPage,
       currentTripsPage = 1;
+  HomeScreenArguments? args;
   late HomeScreenViewModel viewModel;
   late AccessTokenProvider accessTokenProvider;
   bool shimmerIsLoading = true,
@@ -172,7 +174,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = BlocProvider.of<UserProvider>(context);
-
+    args = ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {
@@ -195,10 +197,18 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
           } else if (state is GetAllTripsPaginationLoadingState) {
             isTripPaginationLoading = true;
           } else if (state is GetAllShipsFailState) {
+            print('status code ${state.statusCode}');
             if (Platform.isIOS) {
               DialogUtils.showDialogIos(
                   alertMsg: 'Fail',
                   alertContent: state.failMessage,
+                  statusCode: state.statusCode,
+                  onAction: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, 'Login',
+                        arguments:
+                            LoginScreenArguments(args!.countriesFlagsDto));
+                  },
                   context: context);
             } else {
               DialogUtils.showDialogAndroid(
@@ -503,11 +513,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ))
-                                  : !isShipmentPaginationLoading
-                                      ? buildShipmentsList(
-                                          state as GetAllShipsSuccessState)
-                                      : buildShipmentsList(state
-                                          as GetAllShipsPaginationLoadingState)
+                                  : buildShipmentsList(state)
                           : shimmerIsLoading
                               ? SliverList(
                                   delegate: SliverChildBuilderDelegate(
@@ -890,56 +896,58 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               },
             ),
           )
-        : SliverList(
-            delegate: SliverChildBuilderDelegate(
-              childCount: shipments.length + 1,
-              (context, index) {
-                if (index < shipments.length) {
-                  print('trueeeeee');
-                  return ShipmentCard(
-                    shipmentDto: shipments[index],
-                    showConfirmedBottomSheet: showSuccessDialog,
-                  );
-                } else {
-                  print('1st else');
-                  print(
-                      'total $totalShipmentsPage current $currentShipmentsPage');
-                  if (totalShipmentsPage! >= currentShipmentsPage!) {
-                    print('elseeeee');
+        : state is GetAllShipsPaginationLoadingState
+            ? SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  childCount: shipments.length + 1,
+                  (context, index) {
+                    if (index < shipments.length) {
+                      print('trueeeeee');
+                      return ShipmentCard(
+                        shipmentDto: shipments[index],
+                        showConfirmedBottomSheet: showSuccessDialog,
+                      );
+                    } else {
+                      print('1st else');
+                      print(
+                          'total $totalShipmentsPage current $currentShipmentsPage');
+                      if (totalShipmentsPage! >= currentShipmentsPage!) {
+                        print('elseeeee');
 
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Platform.isIOS
-                            ? const CupertinoActivityIndicator(
-                                radius: 11,
-                                color: Colors.black,
-                              )
-                            : const CircularProgressIndicator(),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Text(
-                          "Loading",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[400]),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                      ],
-                    );
-                  }
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Platform.isIOS
+                                ? const CupertinoActivityIndicator(
+                                    radius: 11,
+                                    color: Colors.black,
+                                  )
+                                : const CircularProgressIndicator(),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Text(
+                              "Loading",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[400]),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        );
+                      }
 
-                  // return Container();
-                }
-                return Container();
-              },
-            ),
-          );
+                      // return Container();
+                    }
+                    return Container();
+                  },
+                ),
+              )
+            : SliverToBoxAdapter(child: Container());
   }
 
   Widget buildTripsList(Object? state) {

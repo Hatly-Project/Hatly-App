@@ -168,7 +168,7 @@ class ApiManager {
       var refreshResponse = RefreshAccessTokenResponse.fromJson(response.body);
 
       if (refreshResponse.status == false) {
-        print('error ${refreshResponse.message}');
+        print('error ${response.statusCode}');
         throw ServerErrorException(
             errorMessage: refreshResponse.message!,
             statusCode: response.statusCode);
@@ -220,7 +220,8 @@ class ApiManager {
         return await getAllShipments(accessToken: newAccessToken, page: page);
       }
     } on ServerErrorException catch (e) {
-      throw ServerErrorException(errorMessage: e.errorMessage);
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: e.statusCode);
     } on Exception catch (e) {
       throw ServerErrorException(errorMessage: e.toString());
     }
