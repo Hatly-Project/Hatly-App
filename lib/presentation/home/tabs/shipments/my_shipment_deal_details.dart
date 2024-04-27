@@ -252,6 +252,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
         builder: (context, state) {
           if (state is GetMyShipmentDealDetailsSuccessState) {
             dealResponseDto = state.responseDto.deal;
+            print('deall ${dealResponseDto?.creatorEmail}');
           }
 
           if (state is AcceptShipmentDealSuccessState) {

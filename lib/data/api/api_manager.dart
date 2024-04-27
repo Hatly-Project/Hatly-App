@@ -31,6 +31,8 @@ import 'package:hatly/data/api/trips/create_trip_request/create_trip_request.dar
 import 'package:hatly/data/api/trips/create_trip_response/create_trip_response.dart';
 import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_response/get_all_trips_response.dart';
 import 'package:hatly/data/api/trips/get_user_trip_response/get_user_trip_response.dart';
+import 'package:hatly/data/api/update_payment_info_request.dart';
+import 'package:hatly/data/api/update_payment_info_response.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
@@ -70,15 +72,15 @@ class ApiManager {
         firstName: firstName,
         lastName: lastName,
         email: email,
-        phone: '+$phone',
+        // phone: '+$phone',
         password: password,
         fcmToken: fcmToken,
-        dob: '2000-02-02',
-        address: 'London',
-        city: 'London',
-        country: 'GB',
-        postalCode: 'SO15',
-        ip: ip,
+        // dob: '2000-02-02',
+        // address: 'London',
+        // city: 'London',
+        // country: 'GB',
+        // postalCode: 'SO15',
+        // ip: ip,
       );
       response = await client.post(url,
           body: requestBody.toJson(),
@@ -108,6 +110,48 @@ class ApiManager {
 
       var countriesResponse = Countries.fromJson(response.body);
       return countriesResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<UpdatePaymentInfoResponse> updatePaymentInfo(
+      {String? accountNumber,
+      String? routingNumber,
+      String? accountName,
+      String? accountCurrency,
+      int? userId,
+      String? accountCountry}) async {
+    late Response response;
+    try {
+      var url = Uri.https(baseUrl, 'payments/add-bank-account', {
+        'userId': userId.toString(),
+      });
+      var requestBody = UpdatePaymentInfoRequest(
+        accountNumber: accountNumber,
+        accountName: accountName,
+        accountCountry: accountCountry,
+        accountCurrency: accountCurrency,
+        routingNumber: routingNumber,
+      );
+      response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {'content-type': 'application/json'});
+
+      var paymentInfoResponse =
+          UpdatePaymentInfoResponse.fromJson(response.body);
+
+      if (paymentInfoResponse.status == false) {
+        print('error ${paymentInfoResponse.message}');
+        throw ServerErrorException(
+            errorMessage: paymentInfoResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return paymentInfoResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(
           errorMessage: e.errorMessage, statusCode: response.statusCode);
@@ -262,6 +306,24 @@ class ApiManager {
   //         getAllShipments(accessToken: newAccessToken, page: page);
   //       }
 
+  Future<MyShipmentDealsResponse> getMyShipmentDealsWithCheckAccessToken(
+      {required String accessToken, required int shipmentId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await getMyShipmentDeals(
+            accessToken: accessToken, shipmentId: shipmentId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await getMyShipmentDeals(
+            accessToken: newAccessToken, shipmentId: shipmentId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<MyShipmentDealsResponse> getMyShipmentDeals(
       {required String accessToken, required int shipmentId}) async {
     late Response response;
@@ -274,15 +336,9 @@ class ApiManager {
 
       var getResponse = MyShipmentDealsResponse.fromJson(response.body);
       if (getResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          getMyShipmentDeals(
-              accessToken: newAccessToken, shipmentId: shipmentId);
-        } else {
-          throw ServerErrorException(
-              errorMessage: getResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
       }
       return getResponse;
     } on ServerErrorException catch (e) {
@@ -291,6 +347,25 @@ class ApiManager {
     } on Exception catch (e) {
       throw ServerErrorException(
           errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<GetMyShipmentDealDetailsResponse>
+      getMyShipmentDealDetailsWithCheckAccessToken(
+          {required String accessToken, required String dealId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await getMyShipmentDealDetails(
+            accessToken: accessToken, dealId: dealId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await getMyShipmentDealDetails(
+            accessToken: newAccessToken, dealId: dealId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
     }
   }
 
@@ -307,14 +382,9 @@ class ApiManager {
       var getResponse =
           GetMyShipmentDealDetailsResponse.fromJson(response.body);
       if (getResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          getMyShipmentDealDetails(accessToken: newAccessToken, dealId: dealId);
-        } else {
-          throw ServerErrorException(
-              errorMessage: getResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
       }
       return getResponse;
     } on ServerErrorException catch (e) {
@@ -323,6 +393,27 @@ class ApiManager {
     } on Exception catch (e) {
       throw ServerErrorException(
           errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<AcceptOrRejectShipmentDealResponse>
+      acceptShipmentDealWithCheckAccessToken(
+          {required String accessToken,
+          required String dealId,
+          required String status}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await acceptShipmentDeal(
+            accessToken: accessToken, dealId: dealId, status: status);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await acceptShipmentDeal(
+            accessToken: newAccessToken, dealId: dealId, status: status);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
     }
   }
 
@@ -343,15 +434,9 @@ class ApiManager {
       var getResponse =
           AcceptOrRejectShipmentDealResponse.fromJson(response.body);
       if (getResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          acceptShipmentDeal(
-              accessToken: newAccessToken, dealId: dealId, status: status);
-        } else {
-          throw ServerErrorException(
-              errorMessage: getResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
       }
       return getResponse;
     } on ServerErrorException catch (e) {
@@ -531,6 +616,33 @@ class ApiManager {
     }
   }
 
+  Future<TripDealResponse> sendTripDealWithCheckAccessToken(
+      {int? shipmentId,
+      double? reward,
+      required String accessToken,
+      required int tripId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await sendTripDeal(
+            accessToken: accessToken,
+            shipmentId: shipmentId,
+            reward: reward,
+            tripId: tripId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await sendTripDeal(
+            accessToken: newAccessToken,
+            shipmentId: shipmentId,
+            reward: reward,
+            tripId: tripId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<TripDealResponse> sendTripDeal(
       {int? shipmentId,
       double? reward,
@@ -542,7 +654,11 @@ class ApiManager {
         'tripId': tripId.toString(),
       });
       var requestBody = TripDealRequest(
-          deals: TripDeal.Deals(shipmentId: shipmentId, reward: reward));
+          deals: TripDeal.Deals(
+              shipmentId: shipmentId,
+              reward: reward,
+              hatlyFees: 2.5,
+              paymentFees: 2.3));
       print(url.toString());
       response = await client.post(url, body: requestBody.toJson(), headers: {
         'content-type': 'application/json',
@@ -551,18 +667,9 @@ class ApiManager {
 
       var tripDealResponse = TripDealResponse.fromJson(response.body);
       if (tripDealResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          sendTripDeal(
-              accessToken: newAccessToken,
-              shipmentId: shipmentId,
-              reward: reward,
-              tripId: tripId);
-        } else {
-          throw ServerErrorException(
-              errorMessage: tripDealResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: tripDealResponse.message!,
+            statusCode: response.statusCode);
       }
       return tripDealResponse;
     } on ServerErrorException catch (e) {
@@ -780,6 +887,53 @@ class ApiManager {
     }
   }
 
+  Future<CreateShipmentsResponse> createShipmentWithCheckAccessToken(
+      {String? title,
+      String? note,
+      String? from,
+      String? fromCity,
+      String? toCity,
+      String? to,
+      String? date,
+      double? reward,
+      List<Item>? items,
+      required String accessToken}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await createShipment(
+          accessToken: accessToken,
+          title: title,
+          note: note,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          date: date,
+          reward: reward,
+          items: items,
+        );
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await createShipment(
+          accessToken: newAccessToken,
+          title: title,
+          note: note,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          date: date,
+          reward: reward,
+          items: items,
+        );
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<CreateShipmentsResponse> createShipment(
       {String? title,
       String? note,
@@ -813,25 +967,9 @@ class ApiManager {
       var shipmentResponse = CreateShipmentsResponse.fromJson(response.body);
 
       if (shipmentResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          createShipment(
-            accessToken: newAccessToken,
-            items: items,
-            reward: reward,
-            date: date,
-            to: to,
-            toCity: toCity,
-            fromCity: fromCity,
-            from: from,
-            note: note,
-            title: title,
-          );
-        } else {
-          throw ServerErrorException(
-              errorMessage: shipmentResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: shipmentResponse.message!,
+            statusCode: response.statusCode);
       }
       return shipmentResponse;
     } on ServerErrorException catch (e) {

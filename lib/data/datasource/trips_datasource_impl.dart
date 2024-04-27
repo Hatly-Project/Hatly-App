@@ -64,7 +64,7 @@ class TripsDatasourceImpl implements TripsDatasource {
       double? reward,
       required String token,
       required int tripId}) async {
-    var response = await apiManager.sendTripDeal(
+    var response = await apiManager.sendTripDealWithCheckAccessToken(
         accessToken: token,
         tripId: tripId,
         shipmentId: shipmentId,

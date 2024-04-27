@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -110,6 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
           getRefreshToken().then((refreshToken) {
             UserProvider userProvider =
                 BlocProvider.of<UserProvider>(context, listen: false);
+            print('iddd ${state.loginResponseDto.user}');
             userProvider.login(LoggedInState(
               user: state.loginResponseDto.user!,
               accessToken: state.loginResponseDto.accessToken!,

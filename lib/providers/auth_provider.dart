@@ -22,7 +22,7 @@ class UserProvider extends Cubit<CurrentUserState> {
     sharedPreferences.setString('userLastName', loggedInState.user.lastName!);
 
     sharedPreferences.setString('userEmail', loggedInState.user.email!);
-    sharedPreferences.setString('userPhone', loggedInState.user.phone!);
+    // sharedPreferences.setString('userPhone', loggedInState.user.phone!);
     sharedPreferences.setString(
         'userPhoto', loggedInState.user.profilePhoto ?? '');
     sharedPreferences.setInt('userId', loggedInState.user.id ?? 0);

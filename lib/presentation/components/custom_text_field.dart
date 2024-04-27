@@ -11,10 +11,13 @@ class CustomFormField extends StatelessWidget {
   bool readOnly;
   TextInputType keyboardType;
   Widget? icon;
+  Widget? suffixICon;
+
   MyValidator? validator;
   String? initialValue;
   TextEditingController controller;
   int lines;
+  int? maxLength;
   bool? enabled;
   OnTap? onTap;
   OnChange? onChange;
@@ -24,6 +27,8 @@ class CustomFormField extends StatelessWidget {
       this.validator,
       required this.controller,
       required this.hint,
+      this.maxLength,
+      this.suffixICon,
       this.enabled = true,
       this.readOnly = false,
       this.icon,
@@ -52,6 +57,7 @@ class CustomFormField extends StatelessWidget {
             initialValue: initialValue,
             minLines: lines,
             controller: controller,
+            maxLength: maxLength,
             validator: validator,
             keyboardType: keyboardType,
             obscureText: isPassword,
@@ -64,6 +70,7 @@ class CustomFormField extends StatelessWidget {
               fillColor: Colors.grey[300],
               filled: true,
               icon: icon,
+              suffixIcon: suffixICon,
               hintText: hint,
               hintStyle: TextStyle(color: Colors.black),
               focusedBorder: OutlineInputBorder(
