@@ -146,23 +146,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 25),
-                        child: CustomFormField(
-                          controller: mobileController,
-                          label: 'Mobile Number',
-                          hint: 'Enter Your Mobile Number',
-                          keyboardType: TextInputType.phone,
-                          validator: (text) {
-                            if (text == null || text.trim().isEmpty) {
-                              return 'please enter mobile number';
-                            }
-                            if (!ValidationUtils.isValidMobile(text)) {
-                              return 'please enter a valid mobile number';
-                            }
-                          },
-                        ),
-                      ),
+                      // Container(
+                      //   margin: const EdgeInsets.only(bottom: 25),
+                      //   child: CustomFormField(
+                      //     controller: mobileController,
+                      //     label: 'Mobile Number',
+                      //     hint: 'Enter Your Mobile Number',
+                      //     keyboardType: TextInputType.phone,
+                      //     validator: (text) {
+                      //       if (text == null || text.trim().isEmpty) {
+                      //         return 'please enter mobile number';
+                      //       }
+                      //       if (!ValidationUtils.isValidMobile(text)) {
+                      //         return 'please enter a valid mobile number';
+                      //       }
+                      //     },
+                      //   ),
+                      // ),
                       Container(
                         margin: const EdgeInsets.only(bottom: 25),
                         child: CustomFormField(

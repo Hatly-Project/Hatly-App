@@ -943,7 +943,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
                       // return Container();
                     }
-                    return Container();
                   },
                 ),
               )

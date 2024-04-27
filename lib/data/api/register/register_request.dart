@@ -5,13 +5,6 @@ class RegisterRequest {
   String? password;
   String? firstName;
   String? lastName;
-  String? dob;
-  String? address;
-  String? city;
-  String? country;
-  String? phone;
-  String? postalCode;
-  String? ip;
   String? fcmToken;
 
   RegisterRequest({
@@ -19,13 +12,6 @@ class RegisterRequest {
     this.password,
     this.firstName,
     this.lastName,
-    this.dob,
-    this.address,
-    this.city,
-    this.country,
-    this.phone,
-    this.postalCode,
-    this.ip,
     this.fcmToken,
   });
 
@@ -35,13 +21,6 @@ class RegisterRequest {
       password: data['password'] as String?,
       firstName: data['firstName'] as String?,
       lastName: data['lastName'] as String?,
-      dob: data['dob'] as String?,
-      address: data['address'] as String?,
-      city: data['city'] as String?,
-      country: data['country'] as String?,
-      phone: data['phone'] as String?,
-      postalCode: data['postalCode'] as String?,
-      ip: data['ip'] as String?,
       fcmToken: data['fcmToken'] as String?,
     );
   }
@@ -51,13 +30,6 @@ class RegisterRequest {
         'password': password,
         'firstName': firstName,
         'lastName': lastName,
-        'dob': dob,
-        'address': address,
-        'city': city,
-        'country': country,
-        'phone': phone,
-        'postalCode': postalCode,
-        'ip': ip,
         'fcmToken': fcmToken,
       };
 

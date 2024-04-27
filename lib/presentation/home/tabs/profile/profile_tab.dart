@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/presentation/home/tabs/profile/payment_information_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = 'Profile';
@@ -224,7 +225,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, PaymentInformationScreen.routeName);
+            },
             child: Container(
               color: Colors.white,
               margin: const EdgeInsets.only(top: 2),

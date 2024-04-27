@@ -17,7 +17,7 @@ class Deals {
         'shipmentId': shipmentId,
         'reward': reward,
         'fees': hatlyFees,
-        'paymentFess': paymentFees,
+        'paymentFees': paymentFees,
       };
 
   /// `dart:convert`

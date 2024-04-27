@@ -29,7 +29,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       List<ItemDto>? items,
       required String token}) async {
     print('item data: $note');
-    var response = await apiManager.createShipment(
+    var response = await apiManager.createShipmentWithCheckAccessToken(
         accessToken: token,
         title: title,
         note: note,
@@ -64,7 +64,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   @override
   Future<MyShipmentDealsResponseDto> getMyShipmentDeals(
       {required String token, required int shipmentId}) async {
-    var response = await apiManager.getMyShipmentDeals(
+    var response = await apiManager.getMyShipmentDealsWithCheckAccessToken(
         accessToken: token, shipmentId: shipmentId);
 
     return response.toMyShipmentDealsResponseDto();
@@ -88,9 +88,9 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   @override
   Future<GetMyShipmentDealDetailsResponseDto> getMyShipmentDealDetails(
       {required String token, required String dealId}) async {
-    var response = await apiManager.getMyShipmentDealDetails(
-        accessToken: token, dealId: dealId);
-
+    var response =
+        await apiManager.getMyShipmentDealDetailsWithCheckAccessToken(
+            accessToken: token, dealId: dealId);
     return response.toResponseDto();
   }
 
@@ -99,7 +99,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       {required String token,
       required String dealId,
       required String status}) async {
-    var response = await apiManager.acceptShipmentDeal(
+    var response = await apiManager.acceptShipmentDealWithCheckAccessToken(
         accessToken: token, dealId: dealId, status: status);
 
     return response.toResponseDto();

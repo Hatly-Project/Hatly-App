@@ -59,6 +59,7 @@ class User {
         firstName: firstName,
         lastName: lastName,
         phone: phone,
+        id: id,
         email: email,
         profilePhoto: profilePhoto,
         averageRating: averageRating);
