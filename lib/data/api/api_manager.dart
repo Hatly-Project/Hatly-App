@@ -173,17 +173,16 @@ class ApiManager {
       response = await client.post(url,
           body: requestBody.toJson(),
           headers: {'content-type': 'application/json'});
-      var responseHeaders = response.headers;
-      var refreshTokenList = responseHeaders['set-cookie']?.split(';');
-
-      var refreshToken = refreshTokenList![0].split('=');
-      print('token ${refreshToken[1]}');
-      await const FlutterSecureStorage()
-          .write(key: 'refreshToken', value: refreshToken[1]);
-
       var loginResponse = LoginResponse.fromJson(response.body);
+      if (loginResponse.status == true) {
+        var responseHeaders = response.headers;
+        var refreshTokenList = responseHeaders['set-cookie']?.split(';');
 
-      if (loginResponse.status == false) {
+        var refreshToken = refreshTokenList![0].split('=');
+        print('token ${refreshToken[1]}');
+        await const FlutterSecureStorage()
+            .write(key: 'refreshToken', value: refreshToken[1]);
+      } else {
         print('error ${loginResponse.message}');
         throw ServerErrorException(
             errorMessage: loginResponse.message!,
@@ -423,7 +422,7 @@ class ApiManager {
       required String status}) async {
     late Response response;
     try {
-      var url = Uri.https(baseUrl, 'deal/${dealId.toString()}/shipment', {
+      var url = Uri.https(baseUrl, 'deals/${dealId.toString()}/shipment', {
         'status': status,
       });
       response = await client.post(url, headers: {
@@ -544,14 +543,9 @@ class ApiManager {
       print('apiii');
 
       if (getResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          getUserShipments(accessToken: newAccessToken);
-        } else {
-          throw ServerErrorException(
-              errorMessage: getResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
       }
 
       return getResponse;
@@ -580,6 +574,27 @@ class ApiManager {
     }
   }
 
+  Future<GetUserTripResponse> getUserTripsWithCheckAccessToken({
+    required String accessToken,
+  }) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await getUserTrips(
+          accessToken: accessToken,
+        );
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await getUserTrips(
+          accessToken: newAccessToken,
+        );
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<GetUserTripResponse> getUserTrips(
       {required String accessToken}) async {
     late Response response;
@@ -596,14 +611,9 @@ class ApiManager {
       var getResponse = GetUserTripResponse.fromJson(response.body);
 
       if (getResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          getUserTrips(accessToken: newAccessToken);
-        } else {
-          throw ServerErrorException(
-              errorMessage: getResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
       }
 
       return getResponse;
@@ -728,6 +738,59 @@ class ApiManager {
     }
   }
 
+  Future<CreateTripResponse> createTripWithCheckAccessToken(
+      {String? origin,
+      String? destination,
+      String? originCity,
+      String? destinationCity,
+      int? available,
+      String? note,
+      String? addressMeeting,
+      String? departDate,
+      BookInfo? bookInfo,
+      String? notNeed,
+      List<ItemsNotAllowed>? itemsNotAllowed,
+      required String accessToken}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await createTrip(
+          accessToken: accessToken,
+          itemsNotAllowed: itemsNotAllowed,
+          notNeed: notNeed,
+          bookInfo: bookInfo,
+          departDate: departDate,
+          addressMeeting: addressMeeting,
+          note: note,
+          available: available,
+          destinationCity: destinationCity,
+          destination: destination,
+          origin: origin,
+          originCity: originCity,
+        );
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await createTrip(
+          accessToken: newAccessToken,
+          itemsNotAllowed: itemsNotAllowed,
+          notNeed: notNeed,
+          bookInfo: bookInfo,
+          departDate: departDate,
+          addressMeeting: addressMeeting,
+          note: note,
+          available: available,
+          destinationCity: destinationCity,
+          destination: destination,
+          origin: origin,
+          originCity: originCity,
+        );
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<CreateTripResponse> createTrip(
       {String? origin,
       String? destination,
@@ -762,27 +825,9 @@ class ApiManager {
 
       var tripResponse = CreateTripResponse.fromJson(response.body);
       if (tripResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          createTrip(
-            accessToken: newAccessToken,
-            itemsNotAllowed: itemsNotAllowed,
-            notNeed: notNeed,
-            bookInfo: bookInfo,
-            departDate: departDate,
-            addressMeeting: addressMeeting,
-            note: note,
-            available: available,
-            destinationCity: destinationCity,
-            destination: destination,
-            origin: origin,
-            originCity: originCity,
-          );
-        } else {
-          throw ServerErrorException(
-              errorMessage: tripResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: tripResponse.message!,
+            statusCode: response.statusCode);
       }
       return tripResponse;
     } on ServerErrorException catch (e) {

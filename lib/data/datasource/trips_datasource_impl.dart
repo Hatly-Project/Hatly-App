@@ -35,7 +35,7 @@ class TripsDatasourceImpl implements TripsDatasource {
       BookInfoDto? bookInfoDto,
       List<ItemsNotAllowedDto>? itemsNotAllowed,
       required String token}) async {
-    var response = await apiManager.createTrip(
+    var response = await apiManager.createTripWithCheckAccessToken(
         accessToken: token,
         origin: origin,
         originCity: originCity,
@@ -53,7 +53,8 @@ class TripsDatasourceImpl implements TripsDatasource {
 
   @override
   Future<GetUserTripResponseDto> getUserTrip({required String token}) async {
-    var response = await apiManager.getUserTrips(accessToken: token);
+    var response =
+        await apiManager.getUserTripsWithCheckAccessToken(accessToken: token);
 
     return response.toUserTripResponseDto();
   }

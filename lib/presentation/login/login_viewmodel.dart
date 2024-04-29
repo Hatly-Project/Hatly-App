@@ -32,6 +32,8 @@ class LoginViewModel extends Cubit<LoginViewState> {
       emit(LoginSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(LoginFailState(e.errorMessage));
+    } on Exception catch (e) {
+      emit(LoginFailState(e.toString()));
     }
   }
 }

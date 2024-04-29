@@ -8,12 +8,14 @@ import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/components/my_shipments_card_deals.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/components/my_shipments_shimmer_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ShipmentsListBottomSheet extends StatefulWidget {
   TripsDto tripsDto;
@@ -28,7 +30,8 @@ class ShipmentsListBottomSheet extends StatefulWidget {
 
 class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
   ScrollController scrollController = ScrollController();
-  MyShipmentsScreenViewModel viewModel = MyShipmentsScreenViewModel();
+  late MyShipmentsScreenViewModel viewModel;
+  late AccessTokenProvider accessTokenProvider;
   List<ShipmentDto> myShipments = [];
   late String token;
   Image? shipImage;
@@ -40,7 +43,9 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
     super.initState();
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
-
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = MyShipmentsScreenViewModel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;

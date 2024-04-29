@@ -45,7 +45,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   List<ShipmentDto> shipments = [];
   List<TripsDto> trips = [];
   FlutterSecureStorage storage = FlutterSecureStorage();
-  String token = '';
+  // String token = '';
   int? totalShipmentsPage,
       currentShipmentsPage = 1,
       totalTripsPage,
@@ -64,23 +64,26 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         Provider.of<AccessTokenProvider>(context, listen: false);
     viewModel = HomeScreenViewModel(accessTokenProvider);
 
-    UserProvider userProvider =
-        BlocProvider.of<UserProvider>(context, listen: false);
+//     UserProvider userProvider =
+//         BlocProvider.of<UserProvider>(context, listen: false);
 
-// Check if the current state is LoggedInState and then access the token
-    if (userProvider.state is LoggedInState) {
-      LoggedInState loggedInState = userProvider.state as LoggedInState;
-      // token = loggedInState.accessToken;
-      // Now you can use the 'token' variable as needed in your code.
-      getAccessToken(accessTokenProvider).then(
-        (accessToken) => viewModel.create(token),
-      );
-    } else {
-      print(
-          'User is not logged in.'); // Handle the scenario where the user is not logged in.
-    }
+// // Check if the current state is LoggedInState and then access the token
+//     if (userProvider.state is LoggedInState) {
+//       LoggedInState loggedInState = userProvider.state as LoggedInState;
+//       // token = loggedInState.accessToken;
+//       // Now you can use the 'token' variable as needed in your code.
+//       // getAccessToken(accessTokenProvider);
+//     } else {
+//       print(
+//           'User is not logged in.'); // Handle the scenario where the user is not logged in.
+//     }
 
     tabController = TabController(length: 2, vsync: this);
+    if (selectedTab == 0) {
+      getShipments();
+    } else {
+      getTrips();
+    }
     tabController.addListener(() {
       setState(() {
         selectedTab = tabController.index;
@@ -111,17 +114,18 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<String> getAccessToken(AccessTokenProvider accessTokenProvider) async {
-    // String? accessToken = await storage.read(key: 'accessToken');
+  // Future<String> getAccessToken(AccessTokenProvider accessTokenProvider) async {
+  //   // String? accessToken = await storage.read(key: 'accessToken');
 
-    if (accessTokenProvider.accessToken != null) {
-      token = accessTokenProvider.accessToken!;
-      print('access $token');
-    }
+  //   if (accessTokenProvider.accessToken != null) {
+  //     token = accessTokenProvider.accessToken!;
+  //     // viewModel.create(accessTokenProvider.accessToken!);
+  //     print('access $token');
+  //   }
 
-    setState(() {});
-    return token;
-  }
+  //   setState(() {});
+  //   return token;
+  // }
 
   // a method for caching the shipments list
   Future<void> cacheShipments(List<ShipmentDto> shipments) async {
@@ -561,10 +565,17 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               : RefreshIndicator(
                   onRefresh: () async {
                     if (selectedTab == 0) {
-                      await viewModel.create(token);
+                      if (accessTokenProvider.accessToken != null) {
+                        await viewModel.create(accessTokenProvider.accessToken!,
+                            isRefresh: true);
+                      }
                       // cacheShipments(shipments);
                     } else {
-                      await viewModel.getAlltrips(token);
+                      if (accessTokenProvider.accessToken != null) {
+                        await viewModel.getAlltrips(
+                            accessTokenProvider.accessToken!,
+                            isRefresh: true);
+                      }
                       // cacheTrips(trips);
                       // getChachedtrips().then((cachedTrips) {
                       //   if (cachedTrips.isNotEmpty) {
@@ -813,8 +824,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   }
 
   void getTrips() async {
-    String accessToken = await getAccessToken(accessTokenProvider);
-    viewModel.getAlltrips(accessToken);
+    if (accessTokenProvider.accessToken != null) {
+      await viewModel.getAlltrips(
+        accessTokenProvider.accessToken!,
+      );
+    }
 
     // getChachedtrips().then((cachedTrips) {
     //   if (cachedTrips.isNotEmpty) {
@@ -1038,9 +1052,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   }
 
   void getShipments() async {
-    String accessToken = await getAccessToken(accessTokenProvider);
-
-    viewModel.create(accessToken);
+    if (accessTokenProvider.accessToken != null) {
+      await viewModel.create(
+        accessTokenProvider.accessToken!,
+      );
+    }
 
     // getCachedShipments().then((cachedShipments) {
     //   if (cachedShipments.isNotEmpty) {

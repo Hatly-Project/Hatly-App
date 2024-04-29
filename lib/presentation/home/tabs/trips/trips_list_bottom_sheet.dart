@@ -11,12 +11,14 @@ import 'package:hatly/presentation/components/my_shipments_card_deals.dart';
 import 'package:hatly/presentation/components/my_trip_card.dart';
 import 'package:hatly/presentation/components/my_trip_card_for_deals.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips_viewmodel.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/components/my_shipments_shimmer_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class TripsListBottomSheet extends StatefulWidget {
   Function showSuccessDialog;
@@ -30,7 +32,8 @@ class TripsListBottomSheet extends StatefulWidget {
 
 class _ShipmentsListBottomSheetState extends State<TripsListBottomSheet> {
   ScrollController scrollController = ScrollController();
-  MyTripsViewmodel viewModel = MyTripsViewmodel();
+  late MyTripsViewmodel viewModel;
+  late AccessTokenProvider accessTokenProvider;
   List<TripsDto> myTrips = [];
   late String token;
   Image? shipImage;
@@ -42,20 +45,28 @@ class _ShipmentsListBottomSheetState extends State<TripsListBottomSheet> {
     super.initState();
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
-
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = MyTripsViewmodel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.accessToken;
-      // Now you can use the 'token' variable as needed in your code.
-      print('User token: $token');
+      // token = loggedInState.accessToken;
+      // // Now you can use the 'token' variable as needed in your code.
+      // print('User token: $token');
       print('user email ${loggedInState.user.email}');
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
 
-    viewModel.getMyTrip(token: token);
+    if (accessTokenProvider.accessToken != null) {
+      // token = accessTokenProvider.accessToken!;
+      viewModel.getMyTrip(token: accessTokenProvider.accessToken!);
+      // cacheMytrips(myTrips);
+
+      print('no Exist'); // Fetch from API if cache is empty
+    }
   }
 
   @override
@@ -126,7 +137,15 @@ class _ShipmentsListBottomSheetState extends State<TripsListBottomSheet> {
                     slivers: [
                       CupertinoSliverRefreshControl(
                         onRefresh: () async {
-                          viewModel.getMyTrip(token: token);
+                          if (accessTokenProvider.accessToken != null) {
+                            // token = accessTokenProvider.accessToken!;
+                            viewModel.getMyTrip(
+                                token: accessTokenProvider.accessToken!);
+                            // cacheMytrips(myTrips);
+
+                            print(
+                                'no Exist'); // Fetch from API if cache is empty
+                          }
                           setState(() {});
                         },
                       ),
@@ -182,7 +201,14 @@ class _ShipmentsListBottomSheetState extends State<TripsListBottomSheet> {
                 )
               : RefreshIndicator(
                   onRefresh: () async {
-                    viewModel.getMyTrip(token: token);
+                    if (accessTokenProvider.accessToken != null) {
+                      // token = accessTokenProvider.accessToken!;
+                      viewModel.getMyTrip(
+                          token: accessTokenProvider.accessToken!);
+                      // cacheMytrips(myTrips);
+
+                      print('no Exist'); // Fetch from API if cache is empty
+                    }
                     setState(() {});
                   },
                   child: Scaffold(
@@ -216,9 +242,9 @@ class _ShipmentsListBottomSheetState extends State<TripsListBottomSheet> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Image.asset('images/no_shipments.png'),
+                                      Image.asset('images/no_trips.png'),
                                       Text(
-                                        "You don't have any shipments, please add a shipment to send your offer",
+                                        "You don't have any trips, please add a trip to send your offer",
                                         textAlign: TextAlign.center,
                                         style: GoogleFonts.poppins(
                                             fontSize: 20,

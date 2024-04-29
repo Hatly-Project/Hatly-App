@@ -40,9 +40,11 @@ class _PaymentInformationScreenState extends State<PaymentInformationScreen> {
     super.initState();
     // accessTokenProvider =
     //     Provider.of<AccessTokenProvider>(context, listen: false);
-    viewModel = PaymentInformationScreenViewModel();
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = PaymentInformationScreenViewModel(accessTokenProvider);
     // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;

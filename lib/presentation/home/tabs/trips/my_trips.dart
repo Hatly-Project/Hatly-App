@@ -22,8 +22,10 @@ import 'package:hatly/presentation/home/tabs/trips/create_trip_arguments.dart';
 import 'package:hatly/presentation/home/tabs/trips/create_trip_screen.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips_viewmodel.dart';
 import 'package:hatly/presentation/login/login_screen.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../domain/models/item_dto.dart';
 import '../../../../providers/auth_provider.dart';
@@ -39,7 +41,8 @@ class MyTripsTab extends StatefulWidget {
 }
 
 class _MyTripsTabState extends State<MyTripsTab> {
-  MyTripsViewmodel viewModel = MyTripsViewmodel();
+  late MyTripsViewmodel viewModel;
+  late AccessTokenProvider accessTokenProvider;
   List<TripsDto> myTrips = [];
   late String token;
   late CountriesDto countriesDto;
@@ -54,13 +57,15 @@ class _MyTripsTabState extends State<MyTripsTab> {
 
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
-
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = MyTripsViewmodel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.accessToken;
+      // token = loggedInState.accessToken;
       // Now you can use the 'token' variable as needed in your code.
-      print('User token: $token');
+      // print('User token: $token');
       print('user email ${loggedInState.user.email}');
     } else {
       print(
@@ -75,8 +80,11 @@ class _MyTripsTabState extends State<MyTripsTab> {
           myTrips = cachedTrips;
         });
       } else {
-        viewModel.getMyTrip(token: token);
-        print('no Exist'); // Fetch from API if cache is empty
+        if (accessTokenProvider.accessToken != null) {
+          // token = accessTokenProvider.accessToken!;
+          viewModel.getMyTrip(token: accessTokenProvider.accessToken!);
+          print('no Exist'); // Fetch from API if cache is empty
+        }
       }
     });
   }
@@ -199,8 +207,14 @@ class _MyTripsTabState extends State<MyTripsTab> {
                   slivers: [
                     CupertinoSliverRefreshControl(
                       onRefresh: () async {
-                        viewModel.getMyTrip(token: token);
-                        cacheMytrips(myTrips);
+                        if (accessTokenProvider.accessToken != null) {
+                          // token = accessTokenProvider.accessToken!;
+                          viewModel.getMyTrip(
+                              token: accessTokenProvider.accessToken!);
+                          cacheMytrips(myTrips);
+
+                          print('no Exist'); // Fetch from API if cache is empty
+                        }
                         setState(() {});
                       },
                     ),
@@ -246,8 +260,14 @@ class _MyTripsTabState extends State<MyTripsTab> {
                 ))
             : RefreshIndicator(
                 onRefresh: () async {
-                  viewModel.getMyTrip(token: token);
-                  cacheMytrips(myTrips);
+                  if (accessTokenProvider.accessToken != null) {
+                    // token = accessTokenProvider.accessToken!;
+                    viewModel.getMyTrip(
+                        token: accessTokenProvider.accessToken!);
+                    cacheMytrips(myTrips);
+
+                    print('no Exist'); // Fetch from API if cache is empty
+                  }
                   setState(() {});
                 },
                 child: Scaffold(

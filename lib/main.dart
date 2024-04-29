@@ -106,12 +106,15 @@ class MyApp extends StatelessWidget {
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
 
-      if (accessTokenProvider.accessToken != null) {
-        if (accessTokenProvider.accessToken != loggedInState.accessToken) {
-          userProvider.refreshAccessToken();
-        }
-        userToken = loggedInState.accessToken;
-      }
+      // if (accessTokenProvider.accessToken != null) {
+      //   print('toool ${accessTokenProvider.accessToken}');
+
+      //   if (accessTokenProvider.accessToken != loggedInState.accessToken) {
+      //     print('toool ${accessTokenProvider.accessToken}');
+      //     userProvider.refreshAccessToken();
+      //   }
+      //   userToken = loggedInState.accessToken;
+      // }
 
       // Now you can use the 'token' variable as needed in your code.
       print('access token from main: ${accessTokenProvider.accessToken}');

@@ -10,7 +10,7 @@ import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
-import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/trips/trips_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 
 class ShipmentCard extends StatelessWidget {
