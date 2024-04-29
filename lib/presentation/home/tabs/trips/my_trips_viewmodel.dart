@@ -15,6 +15,7 @@ import 'package:hatly/domain/repository/trips_repository.dart';
 import 'package:hatly/domain/usecase/create_trip_usecase.dart';
 import 'package:hatly/domain/usecase/get_all_trips_usecase.dart';
 import 'package:hatly/domain/usecase/get_user_trip_usecase.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 
 class MyTripsViewmodel extends Cubit<MyTripsViewState> {
   late ApiManager apiManager;
@@ -22,9 +23,10 @@ class MyTripsViewmodel extends Cubit<MyTripsViewState> {
   late TripsDatasource tripsDatasource;
   late CreateTripUsecase createTripUsecase;
   late GetUserTripUsecase getUserTripUsecase;
+  AccessTokenProvider accessTokenProvider;
 
-  MyTripsViewmodel() : super(MyTripsInitialState()) {
-    apiManager = ApiManager();
+  MyTripsViewmodel(this.accessTokenProvider) : super(MyTripsInitialState()) {
+    apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     tripsDatasource = TripsDatasourceImpl(apiManager);
     repository = TripsRepositoryImpl(tripsDatasource);
     createTripUsecase = CreateTripUsecase(repository);

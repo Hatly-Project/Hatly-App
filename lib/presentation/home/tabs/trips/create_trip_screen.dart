@@ -19,9 +19,11 @@ import 'package:hatly/presentation/home/tabs/trips/create_trip_arguments.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips_viewmodel.dart';
 import 'package:hatly/presentation/home/tabs/trips/states_list_bottom_sheet.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../providers/auth_provider.dart';
 import '../../../../utils/dialog_utils.dart';
@@ -36,7 +38,8 @@ class CreateTripScreen extends StatefulWidget {
 }
 
 class _CreateTripScreenState extends State<CreateTripScreen> {
-  MyTripsViewmodel viewModel = MyTripsViewmodel();
+  late MyTripsViewmodel viewModel;
+  late AccessTokenProvider accessTokenProvider;
   final MultiSelectController _controller = MultiSelectController();
 
   List<TripsDto> myTrips = [];
@@ -85,7 +88,9 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
 
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
-
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = MyTripsViewmodel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;

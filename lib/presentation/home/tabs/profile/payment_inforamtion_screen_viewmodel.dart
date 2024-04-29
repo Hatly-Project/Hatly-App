@@ -33,10 +33,11 @@ class PaymentInformationScreenViewModel extends Cubit<PaymentInfoViewState> {
   late PaymentInfoRepository paymentInfoRepository;
   late PaymentInfoDatasource paymentInfoDatasource;
   late UpdatePaymentInformationUsecase usecase;
-  // AccessTokenProvider accessTokenProvider;
+  AccessTokenProvider accessTokenProvider;
 
-  PaymentInformationScreenViewModel() : super(UpdatePaymentInfoInitialState()) {
-    apiManager = ApiManager();
+  PaymentInformationScreenViewModel(this.accessTokenProvider)
+      : super(UpdatePaymentInfoInitialState()) {
+    apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     paymentInfoDatasource = PaymentInfoDatasourceImpl(apiManager);
     paymentInfoRepository = PaymentInfoRepositoryImpl(paymentInfoDatasource);
     usecase = UpdatePaymentInformationUsecase(paymentInfoRepository);

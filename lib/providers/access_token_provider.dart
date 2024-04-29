@@ -9,10 +9,14 @@ class AccessTokenProvider extends ChangeNotifier {
 
   void getAccessToken() async {
     accessToken = await const FlutterSecureStorage().read(key: 'accessToken');
+    notifyListeners();
   }
 
   void setAccessToken(String initToken) async {
+    print('olddd $accessToken');
     accessToken = initToken;
+    print('new $accessToken');
+
     await const FlutterSecureStorage()
         .write(key: 'accessToken', value: accessToken);
 

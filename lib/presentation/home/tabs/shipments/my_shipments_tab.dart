@@ -15,8 +15,10 @@ import 'package:hatly/presentation/components/my_shipments_shimmer_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipments_screen_viewmodel.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_bottom_sheet.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../domain/models/item_dto.dart';
 import '../../../../providers/auth_provider.dart';
@@ -32,12 +34,13 @@ class MyShipmentsTab extends StatefulWidget {
 }
 
 class _MyShipmentsTabState extends State<MyShipmentsTab> {
-  MyShipmentsScreenViewModel viewModel = MyShipmentsScreenViewModel();
+  late MyShipmentsScreenViewModel viewModel;
   List<ShipmentDto> myShipments = [];
-  late String token;
+  // late String token;
   ScrollController scrollController = ScrollController();
   Image? shipImage;
   late CountriesDto countries;
+  late AccessTokenProvider accessTokenProvider;
 
   bool isMyshipmentEmpty = false, shimmerIsLoading = false;
   late LoggedInState loggedInState;
@@ -48,14 +51,18 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
 
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
-
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = MyShipmentsScreenViewModel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.accessToken;
-      // Now you can use the 'token' variable as needed in your code.
-      print('User token: $token');
+      // token = loggedInState.accessToken;
+      // // Now you can use the 'token' variable as needed in your code.
+      // print('User token: $token');
       print('user email ${loggedInState.user.email}');
+      // getAccessToken(accessTokenProvider)
+      //     .then((accessToken) => token = accessToken);
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
@@ -69,11 +76,27 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
           myShipments = cachedShipments;
         });
       } else {
-        await viewModel.getMyShipments(token: token);
-        print('no Exist'); // Fetch from API if cache is empty
+        if (accessTokenProvider.accessToken != null) {
+          // token = accessTokenProvider.accessToken!;
+          await viewModel.getMyShipments(
+              token: accessTokenProvider.accessToken!);
+          print('no Exist'); // Fetch from API if cache is empty
+        }
       }
     });
   }
+
+  // Future<String> getAccessToken(AccessTokenProvider accessTokenProvider) async {
+  //   // String? accessToken = await storage.read(key: 'accessToken');
+
+  //   if (accessTokenProvider.accessToken != null) {
+  //     token = accessTokenProvider.accessToken!;
+  //     print('access $token');
+  //   }
+
+  //   setState(() {});
+  //   return token;
+  // }
 
   // a method for caching the shipments list
   Future<void> cacheMyShipments(List<ShipmentDto> shipments) async {
@@ -220,7 +243,10 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                   slivers: [
                     CupertinoSliverRefreshControl(
                       onRefresh: () async {
-                        await viewModel.getMyShipments(token: token);
+                        if (accessTokenProvider.accessToken != null) {
+                          await viewModel.getMyShipments(
+                              token: accessTokenProvider.accessToken!);
+                        }
                         cacheMyShipments(myShipments);
                         setState(() {});
                       },
@@ -279,7 +305,10 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
               )
             : RefreshIndicator(
                 onRefresh: () async {
-                  await viewModel.getMyShipments(token: token);
+                  if (accessTokenProvider.accessToken != null) {
+                    await viewModel.getMyShipments(
+                        token: accessTokenProvider.accessToken!);
+                  }
                   cacheMyShipments(myShipments);
                   setState(() {});
                 },
@@ -429,19 +458,22 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
       String name,
       String note,
       String bonus,
-      List<ItemDto> items) {
+      List<ItemDto> items) async {
     print('from $fromCountry');
-    viewModel.create(
-        token: token,
-        from: fromCountry,
-        to: toCountry,
-        fromCity: fromState,
-        toCity: toState,
-        date: date,
-        title: name,
-        note: note,
-        reward: double.tryParse(bonus),
-        items: items);
+    if (accessTokenProvider.accessToken != null) {
+      viewModel.create(
+          token: accessTokenProvider.accessToken!,
+          from: fromCountry,
+          to: toCountry,
+          fromCity: fromState,
+          toCity: toState,
+          date: date,
+          title: name,
+          note: note,
+          reward: double.tryParse(bonus),
+          items: items);
+    }
+
     print('done ship');
     print(
         '$name , $note , $fromCountry , $fromState , $toCountry , $toState , $bonus , $date itemWeighttt ${items.first.weight}');

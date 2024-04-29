@@ -11,7 +11,7 @@ import 'package:hatly/presentation/components/shopping_items_card.dart';
 import 'package:hatly/presentation/home/bottom_nav_icon.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
-import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/trips/trips_list_bottom_sheet.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
 

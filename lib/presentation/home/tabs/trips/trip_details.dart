@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/home/bottom_nav_icon.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
-import 'package:hatly/presentation/home/tabs/trips/shipment_list_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipment_list_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_details_arguments.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';

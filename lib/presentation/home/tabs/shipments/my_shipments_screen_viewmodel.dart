@@ -7,6 +7,7 @@ import 'package:hatly/domain/models/get_user_shipments_response_dto.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 import 'package:hatly/domain/usecase/create_shipment_usecase.dart';
 import 'package:hatly/domain/usecase/get_user_shipments_usecase.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 
 import '../../../../data/api/api_manager.dart';
 import '../../../../domain/customException/custom_exception.dart';
@@ -18,9 +19,14 @@ class MyShipmentsScreenViewModel extends Cubit<ShipmentViewState> {
   late ShipmentDataSource shipmentDataSource;
   late CreateShipmentUsecase createShipmentUsecase;
   late GetUserShipmentUsecase userShipmentUsecase;
+  AccessTokenProvider accessTokenProvider;
 
-  MyShipmentsScreenViewModel() : super(ShipmentInitialState()) {
-    apiManager = ApiManager();
+  // pass the accessTokenProvider object to the constructor
+  MyShipmentsScreenViewModel(this.accessTokenProvider)
+      : super(ShipmentInitialState()) {
+    apiManager = ApiManager(
+        accessTokenProvider:
+            accessTokenProvider); // pass the accessTokenProvider object
     shipmentDataSource = ShipmentDataSourceImpl(apiManager);
     shipmentRepository = ShipmentRepositoryImpl(shipmentDataSource);
     createShipmentUsecase = CreateShipmentUsecase(shipmentRepository);
