@@ -7,15 +7,17 @@ import 'package:hatly/domain/datasource/shipment_datasource.dart';
 import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 import 'package:hatly/domain/usecase/send_shipment_deal_usecase.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 
 class ShipmentDealViewmodel extends Cubit<ShipmentDealViewState> {
   late ApiManager apiManager;
   late ShipmentDataSource shipmentDataSource;
   late ShipmentRepository shipmentRepository;
   late SendShipmentDealUsecase sendShipmentDealUsecase;
-
-  ShipmentDealViewmodel() : super(ShipmentDealInitialState()) {
-    apiManager = ApiManager();
+  AccessTokenProvider accessTokenProvider;
+  ShipmentDealViewmodel(this.accessTokenProvider)
+      : super(ShipmentDealInitialState()) {
+    apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     shipmentDataSource = ShipmentDataSourceImpl(apiManager);
     shipmentRepository = ShipmentRepositoryImpl(shipmentDataSource);
     sendShipmentDealUsecase =

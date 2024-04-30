@@ -1,7 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
+import 'package:hatly/presentation/home/tabs/profile/edit_profile_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/payment_information_screen.dart';
+import 'package:hatly/presentation/home/tabs/profile/profile_screen_arguments.dart';
+import 'package:hatly/providers/access_token_provider.dart';
+import 'package:hatly/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = 'Profile';
@@ -14,7 +21,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool isNightModeOn = false;
-
+  late AccessTokenProvider accessTokenProvider;
+  String? userName, userEmail, userImage;
+  late HomeScreenArguments args;
   void toggleNightMode() {
     setState(() {
       isNightModeOn = !isNightModeOn;
@@ -22,7 +31,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //     Provider.of<AccessTokenProvider>(context, listen: false);
+    UserProvider userProvider =
+        BlocProvider.of<UserProvider>(context, listen: false);
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    // Check if the current state is LoggedInState and then access the token
+    if (userProvider.state is LoggedInState) {
+      LoggedInState loggedInState = userProvider.state as LoggedInState;
+      userName =
+          '${loggedInState.user.firstName} ${loggedInState.user.lastName}';
+      userEmail = loggedInState.user.email;
+      userImage = loggedInState.user.profilePhoto;
+      // userId = loggedInState.user.id;
+      // print('user iDDD $userId');
+      // token = loggedInState.accessToken;
+      // Now you can use the 'token' variable as needed in your code.
+      // getAccessToken(accessTokenProvider).then(
+      //   (accessToken) => viewModel.create(token),
+      // );
+    } else {
+      print(
+          'User is not logged in.'); // Handle the scenario where the user is not logged in.
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    args = ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
@@ -66,18 +106,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Alaa Hosny',
+                              userName!,
                               style: GoogleFonts.poppins(
                                   fontSize: 20,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              'alaa@gmail.com',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 20,
-                                  color: Colors.lightBlue[900],
-                                  fontWeight: FontWeight.bold),
+                            FittedBox(
+                              fit: BoxFit.fitWidth,
+                              child: Container(
+                                width: MediaQuery.sizeOf(context).width * .56,
+                                child: Text(
+                                  userEmail!,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      color: Colors.lightBlue[900],
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -195,7 +241,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, EditProfileScreen.routeName,
+                  arguments: ProfileScreenArguments(args.countriesFlagsDto));
+            },
             child: Container(
               color: Colors.white,
               child: Row(

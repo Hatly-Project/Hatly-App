@@ -33,6 +33,7 @@ import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_respon
 import 'package:hatly/data/api/trips/get_user_trip_response/get_user_trip_response.dart';
 import 'package:hatly/data/api/update_payment_info_request.dart';
 import 'package:hatly/data/api/update_payment_info_response.dart';
+import 'package:hatly/data/api/update_profile_request.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
@@ -142,16 +143,103 @@ class ApiManager {
           body: requestBody.toJson(),
           headers: {'content-type': 'application/json'});
 
-      var paymentInfoResponse =
+      var updateProfileResponse =
           UpdatePaymentInfoResponse.fromJson(response.body);
 
-      if (paymentInfoResponse.status == false) {
-        print('error ${paymentInfoResponse.message}');
+      if (updateProfileResponse.status == false) {
+        print('error ${updateProfileResponse.message}');
         throw ServerErrorException(
-            errorMessage: paymentInfoResponse.message!,
+            errorMessage: updateProfileResponse.message!,
             statusCode: response.statusCode);
       }
-      return paymentInfoResponse;
+      return updateProfileResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<UpdatePaymentInfoResponse> updateProfileWithCheckAccessToken(
+      {String? dob,
+      String? address,
+      String? city,
+      String? country,
+      String? postalCode,
+      String? ip,
+      required String? accessToken,
+      String? phone}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await updateProfile(
+          accessToken: accessToken,
+          dob: dob,
+          address: address,
+          city: city,
+          country: country,
+          postalCode: postalCode,
+          ip: ip,
+          phone: phone,
+        );
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await updateProfile(
+          accessToken: newAccessToken,
+          dob: dob,
+          address: address,
+          city: city,
+          country: country,
+          postalCode: postalCode,
+          ip: ip,
+          phone: phone,
+        );
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: e.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
+  Future<UpdatePaymentInfoResponse> updateProfile(
+      {String? dob,
+      String? address,
+      String? city,
+      String? country,
+      String? postalCode,
+      String? ip,
+      required String? accessToken,
+      String? phone}) async {
+    late Response response;
+    try {
+      var url = Uri.https(baseUrl, 'users');
+      var requestBody = UpdateProfileRequest(
+        dob: dob,
+        address: address,
+        city: city,
+        country: country,
+        postalCode: postalCode,
+        ip: ip,
+        phone: phone,
+      );
+      response = await client.patch(url, body: requestBody.toJson(), headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $accessToken',
+      });
+
+      var updateProfileResponse =
+          UpdatePaymentInfoResponse.fromJson(response.body);
+
+      if (updateProfileResponse.status == false) {
+        print('error ${updateProfileResponse.message}');
+        throw ServerErrorException(
+            errorMessage: updateProfileResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return updateProfileResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(
           errorMessage: e.errorMessage, statusCode: response.statusCode);
@@ -691,6 +779,33 @@ class ApiManager {
     }
   }
 
+  Future<ShipmentDealResponse> sendShipmentDealWithCheckAccessToken(
+      {required int? shipmentId,
+      required double? reward,
+      required String accessToken,
+      required int tripId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await sendShipmentDeal(
+            accessToken: accessToken,
+            shipmentId: shipmentId,
+            reward: reward,
+            tripId: tripId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await sendShipmentDeal(
+            accessToken: newAccessToken,
+            shipmentId: shipmentId,
+            reward: reward,
+            tripId: tripId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<ShipmentDealResponse> sendShipmentDeal(
       {required int? shipmentId,
       required double? reward,
@@ -715,18 +830,9 @@ class ApiManager {
 
       var shipmentDealResponse = ShipmentDealResponse.fromJson(response.body);
       if (shipmentDealResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          sendShipmentDeal(
-              accessToken: newAccessToken,
-              tripId: tripId,
-              shipmentId: shipmentId,
-              reward: reward);
-        } else {
-          throw ServerErrorException(
-              errorMessage: shipmentDealResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: shipmentDealResponse.message!,
+            statusCode: response.statusCode);
       }
       return shipmentDealResponse;
     } on ServerErrorException catch (e) {
@@ -836,6 +942,24 @@ class ApiManager {
     } on Exception catch (e) {
       throw ServerErrorException(
           errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<RefreshTokenResponse> refreshFCMTokenWithCheckAccessToken(
+      {required String accessToken, required String fcmToken}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await refreshFCMToken(
+            accessToken: accessToken, fcmToken: fcmToken);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await refreshFCMToken(
+            accessToken: newAccessToken, fcmToken: fcmToken);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
     }
   }
 

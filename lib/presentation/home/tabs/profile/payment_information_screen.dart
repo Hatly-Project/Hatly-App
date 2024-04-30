@@ -26,7 +26,7 @@ class PaymentInformationScreen extends StatefulWidget {
 class _PaymentInformationScreenState extends State<PaymentInformationScreen> {
   var formKey = GlobalKey<FormState>();
   var accountNumberController = TextEditingController(text: '');
-  var siwftNumberController = TextEditingController(text: '');
+  var siwftNumberController = TextEditingController(text: null);
   var accountNameController = TextEditingController(text: '');
   var accountCurrencyController = TextEditingController(text: '');
   var accountCountryController = TextEditingController(text: '');
@@ -104,6 +104,7 @@ class _PaymentInformationScreenState extends State<PaymentInformationScreen> {
             children: [
               Scaffold(
                 backgroundColor: Colors.white,
+                resizeToAvoidBottomInset: true,
                 appBar: AppBar(
                   centerTitle: true,
                   backgroundColor: Colors.transparent,
@@ -115,134 +116,142 @@ class _PaymentInformationScreenState extends State<PaymentInformationScreen> {
                     ),
                   ),
                 ),
-                body: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Icon(Icons.info),
-                            Text(
-                                'Please make sure to provide accurate information')
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        CustomFormField(
-                          controller: accountNumberController,
-                          hint: 'Enter Your IBAN Or Account Number ',
-                          maxLength: 34,
-                          keyboardType: TextInputType.text,
-                          validator: (text) {
-                            if (text?.trim() == null || text!.trim().isEmpty) {
-                              return 'please enter account number';
-                            }
-                            if (!(text.trim().length >= 5 &&
-                                text.trim().length <= 34)) {
-                              return 'account number not valid';
-                            }
-                          },
-                        ),
-                        CustomFormField(
-                          controller: siwftNumberController,
-                          hint: 'Enter Your SWIFT Code',
-                          keyboardType: TextInputType.text,
-                          maxLength: 11,
-                          suffixICon: InkWell(
-                            onTap: () {
-                              _showRoutingNumberInfoBottomSheet(context);
-                            },
-                            child: Icon(Icons.info),
+                body: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 15,
                           ),
-                          validator: (text) {
-                            if (text?.trim() == null || text!.trim().isEmpty) {
-                              return 'please enter swift code number';
-                            }
-                            if (!(text.trim().length >= 8 &&
-                                text.trim().length <= 11)) {
-                              return 'SWIFT Code not valid';
-                            }
-                          },
-                        ),
-                        CustomFormField(
-                          controller: accountNameController,
-                          hint: 'Enter Your Account Name',
-                          keyboardType: TextInputType.text,
-                          validator: (text) {
-                            if (text?.trim() == null || text!.trim().isEmpty) {
-                              return 'please enter account name';
-                            }
-                          },
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        CustomFormField(
-                          controller: accountCurrencyController,
-                          hint: 'Enter Your Account Currency',
-                          keyboardType: TextInputType.text,
-                          maxLength: 3,
-                          validator: (text) {
-                            if (text?.trim() == null || text!.trim().isEmpty) {
-                              return 'please enter account currency';
-                            }
-                          },
-                        ),
-                        CustomFormField(
-                          controller: accountCountryController,
-                          hint: 'Enter Your Account Country',
-                          keyboardType: TextInputType.text,
-                          maxLength: 2,
-                          validator: (text) {
-                            if (text?.trim() == null || text!.trim().isEmpty) {
-                              return 'please enter account country';
-                            }
-                          },
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 25),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                minimumSize:
-                                    Size(MediaQuery.sizeOf(context).width, 60),
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                side: BorderSide(
-                                    color: Colors.grey[600]!, width: 1),
-                                backgroundColor: Colors.transparent,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12)),
-                            onPressed: () {
-                              if (formKey.currentState?.validate() == false) {
-                                return;
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Icon(Icons.info),
+                              Text(
+                                  'Please make sure to provide accurate information')
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          CustomFormField(
+                            controller: accountNumberController,
+                            hint: 'Enter Your IBAN Or Account Number ',
+                            maxLength: 34,
+                            keyboardType: TextInputType.text,
+                            validator: (text) {
+                              if (text?.trim() == null ||
+                                  text!.trim().isEmpty) {
+                                return 'please enter account number';
                               }
-                              viewModel.updatePaymentInfo(
-                                accountNumber: accountNumberController.text,
-                                accountName: accountNameController.text,
-                                accountCountry: accountCountryController.text,
-                                accountCurrency: accountCurrencyController.text,
-                                routingNumber: siwftNumberController.text,
-                                userid: userId,
-                              );
-                              // login();
+                              if (!(text.trim().length >= 5 &&
+                                  text.trim().length <= 34)) {
+                                return 'account number not valid';
+                              }
                             },
-                            child: Text(
-                              'Confirm',
-                              style:
-                                  TextStyle(fontSize: 24, color: Colors.black),
+                          ),
+                          CustomFormField(
+                            controller: siwftNumberController,
+                            hint: 'Enter Your SWIFT Code',
+                            keyboardType: TextInputType.text,
+                            maxLength: 11,
+                            suffixICon: InkWell(
+                              onTap: () {
+                                _showRoutingNumberInfoBottomSheet(context);
+                              },
+                              child: Icon(Icons.info),
+                            ),
+                            validator: (text) {
+                              if (text?.trim() == null ||
+                                  text!.trim().isEmpty) {
+                                return 'please enter swift code number';
+                              }
+                              if (!(text.trim().length >= 8 &&
+                                  text.trim().length <= 11)) {
+                                return 'SWIFT Code not valid';
+                              }
+                            },
+                          ),
+                          CustomFormField(
+                            controller: accountNameController,
+                            hint: 'Enter Your Account Name',
+                            keyboardType: TextInputType.text,
+                            validator: (text) {
+                              if (text?.trim() == null ||
+                                  text!.trim().isEmpty) {
+                                return 'please enter account name';
+                              }
+                            },
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          CustomFormField(
+                            controller: accountCurrencyController,
+                            hint: 'Enter Your Account Currency',
+                            keyboardType: TextInputType.text,
+                            maxLength: 3,
+                            validator: (text) {
+                              if (text?.trim() == null ||
+                                  text!.trim().isEmpty) {
+                                return 'please enter account currency';
+                              }
+                            },
+                          ),
+                          CustomFormField(
+                            controller: accountCountryController,
+                            hint: 'Enter Your Account Country',
+                            keyboardType: TextInputType.text,
+                            maxLength: 2,
+                            validator: (text) {
+                              if (text?.trim() == null ||
+                                  text!.trim().isEmpty) {
+                                return 'please enter account country';
+                              }
+                            },
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 25),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(
+                                      MediaQuery.sizeOf(context).width, 60),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  side: BorderSide(
+                                      color: Colors.grey[600]!, width: 1),
+                                  backgroundColor: Colors.transparent,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12)),
+                              onPressed: () {
+                                // if (formKey.currentState?.validate() == false) {
+                                //   return;
+                                // }
+                                viewModel.updatePaymentInfo(
+                                  accountNumber: accountNumberController.text,
+                                  accountName: accountNameController.text,
+                                  accountCountry: accountCountryController.text,
+                                  accountCurrency:
+                                      accountCurrencyController.text,
+                                  routingNumber: siwftNumberController.text,
+                                  userid: userId,
+                                );
+                                // login();
+                              },
+                              child: Text(
+                                'Confirm',
+                                style: TextStyle(
+                                    fontSize: 24, color: Colors.black),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

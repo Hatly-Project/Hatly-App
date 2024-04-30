@@ -7,6 +7,11 @@ class UserDto {
   String? lastName;
   String? email;
   String? phone;
+  String? postalCode;
+  String? country;
+  String? address;
+  String? city;
+  String? dob;
   String? profilePhoto;
   int? id;
   double? averageRating;
@@ -18,7 +23,12 @@ class UserDto {
     required this.email,
     required this.profilePhoto,
     this.id,
+    this.address,
     this.averageRating,
+    this.city,
+    this.country,
+    this.dob,
+    this.postalCode,
   });
 
   factory UserDto.fromMap(Map<String, dynamic> data) => UserDto(

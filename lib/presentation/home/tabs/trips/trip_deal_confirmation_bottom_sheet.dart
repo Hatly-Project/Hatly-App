@@ -7,12 +7,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/components/my_shipments_card_deals.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_deal_viewmodel.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class TripDealConfirmationBottomSheet extends StatefulWidget {
   Deal deal;
@@ -27,8 +29,9 @@ class TripDealConfirmationBottomSheet extends StatefulWidget {
 
 class _TripDealConfirmationBottomSheetState
     extends State<TripDealConfirmationBottomSheet> {
-  TripDealViewModel viewModel = TripDealViewModel();
+  late TripDealViewModel viewModel;
   bool isLoading = false;
+  late AccessTokenProvider accessTokenProvider;
   late LoggedInState loggedInState;
   late String token;
 
@@ -38,7 +41,9 @@ class _TripDealConfirmationBottomSheetState
 
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
-
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = TripDealViewModel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
@@ -554,11 +559,13 @@ class _TripDealConfirmationBottomSheetState
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12)),
                               onPressed: () {
-                                viewModel.sendDeal(
-                                    token: token,
-                                    tripId: deal.tripsDto.id!,
-                                    reward: deal.shipmentDto.reward,
-                                    shipmentId: deal.shipmentDto.id);
+                                if (accessTokenProvider.accessToken != null) {
+                                  viewModel.sendDeal(
+                                      token: accessTokenProvider.accessToken!,
+                                      tripId: deal.tripsDto.id!,
+                                      reward: deal.shipmentDto.reward,
+                                      shipmentId: deal.shipmentDto.id);
+                                }
                               },
                               child: Text(
                                 'Confirm Offer',

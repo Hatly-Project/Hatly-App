@@ -6,9 +6,15 @@ import 'package:hatly/presentation/components/country_flag_card.dart';
 
 class CountriesListBottomSheet extends StatefulWidget {
   CountriesDto countries;
+  Function? selectCurrency, selectCountry, selectCode;
   Function? selectFromCountry, selectToCountry;
   CountriesListBottomSheet(
-      {required this.countries, this.selectFromCountry, this.selectToCountry});
+      {required this.countries,
+      this.selectFromCountry,
+      this.selectCode,
+      this.selectCountry,
+      this.selectToCountry,
+      this.selectCurrency});
 
   @override
   State<CountriesListBottomSheet> createState() =>
@@ -27,11 +33,32 @@ class _CountriesListBottomSheetState extends State<CountriesListBottomSheet> {
   void filterList(String query) {
     filteredCountries.clear();
     if (query.isNotEmpty) {
-      widget.countries.countries?.forEach((country) {
-        if (country.name!.toLowerCase().contains(query.toLowerCase())) {
-          filteredCountries.add(country);
-        }
-      });
+      if (widget.selectCurrency != null) {
+        widget.countries.countries?.forEach((country) {
+          if (country.currency!.toLowerCase().contains(query.toLowerCase())) {
+            filteredCountries.add(country);
+          }
+        });
+      } else if (widget.selectFromCountry != null ||
+          widget.selectToCountry != null) {
+        widget.countries.countries?.forEach((country) {
+          if (country.name!.toLowerCase().contains(query.toLowerCase())) {
+            filteredCountries.add(country);
+          }
+        });
+      } else if (widget.selectCountry != null) {
+        widget.countries.countries?.forEach((country) {
+          if (country.iso2!.toLowerCase().contains(query.toLowerCase())) {
+            filteredCountries.add(country);
+          }
+        });
+      } else if (widget.selectCode != null) {
+        widget.countries.countries?.forEach((country) {
+          if (country.name!.toLowerCase().contains(query.toLowerCase())) {
+            filteredCountries.add(country);
+          }
+        });
+      }
     } else {
       filteredCountries.addAll(widget.countries.countries!);
     }
@@ -55,7 +82,6 @@ class _CountriesListBottomSheetState extends State<CountriesListBottomSheet> {
                   borderRadius: BorderRadius.all(Radius.circular(17)),
                 ),
                 labelText: 'Search',
-                hintText: 'Search Countries...',
               ),
             ),
           ),
@@ -64,9 +90,20 @@ class _CountriesListBottomSheetState extends State<CountriesListBottomSheet> {
               controller: scrollController,
               itemCount: filteredCountries.length,
               itemBuilder: (context, index) => CountryFlagCard(
-                countryName: filteredCountries[index].name!,
+                countryName: widget.selectFromCountry != null ||
+                        widget.selectToCountry != null
+                    ? filteredCountries[index].name!
+                    : widget.selectCurrency != null
+                        ? filteredCountries[index].currency!
+                        : widget.selectCode != null
+                            ? filteredCountries[index].name!
+                            : filteredCountries[index].iso2!,
+                countriesStatesDto: filteredCountries[index],
                 imageUrl: filteredCountries[index].flag!,
                 selectFromCountry: widget.selectFromCountry,
+                selectCountry: widget.selectCountry,
+                selectCode: widget.selectCode,
+                selectCurrency: widget.selectCurrency,
                 selectToCountry: widget.selectToCountry,
               ),
             ),

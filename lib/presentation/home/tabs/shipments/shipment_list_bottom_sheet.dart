@@ -49,16 +49,19 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.accessToken;
-      // Now you can use the 'token' variable as needed in your code.
-      print('User token: $token');
+      // token = loggedInState.accessToken;
+      // // Now you can use the 'token' variable as needed in your code.
+      // print('User token: $token');
       print('user email ${loggedInState.user.email}');
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
-
-    viewModel.getMyShipments(token: token);
+    if (accessTokenProvider.accessToken != null) {
+      // token = accessTokenProvider.accessToken!;
+      viewModel.getMyShipments(token: accessTokenProvider.accessToken!);
+      // cacheMytrips(myTrips);
+    }
   }
 
   @override
@@ -131,7 +134,15 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                     slivers: [
                       CupertinoSliverRefreshControl(
                         onRefresh: () async {
-                          await viewModel.getMyShipments(token: token);
+                          if (accessTokenProvider.accessToken != null) {
+                            // token = accessTokenProvider.accessToken!;
+                            await viewModel.getMyShipments(
+                                token: accessTokenProvider.accessToken!);
+                            // cacheMytrips(myTrips);
+
+                            print(
+                                'no Exist'); // Fetch from API if cache is empty
+                          }
                           setState(() {});
                         },
                       ),
@@ -196,7 +207,14 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                 )
               : RefreshIndicator(
                   onRefresh: () async {
-                    await viewModel.getMyShipments(token: token);
+                    if (accessTokenProvider.accessToken != null) {
+                      // token = accessTokenProvider.accessToken!;
+                      await viewModel.getMyShipments(
+                          token: accessTokenProvider.accessToken!);
+                      // cacheMytrips(myTrips);
+
+                      print('no Exist'); // Fetch from API if cache is empty
+                    }
                     setState(() {});
                   },
                   child: Scaffold(

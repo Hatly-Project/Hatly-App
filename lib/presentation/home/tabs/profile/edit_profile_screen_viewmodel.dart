@@ -22,74 +22,78 @@ import 'package:hatly/domain/usecase/create_shipment_usecase.dart';
 import 'package:hatly/domain/usecase/get_all_shipments_usecase.dart';
 import 'package:hatly/domain/usecase/get_all_trips_usecase.dart';
 import 'package:hatly/domain/usecase/update_payment_inforamtion_usecase.dart';
+import 'package:hatly/domain/usecase/update_profile_usecase.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 
 import '../../../../data/api/api_manager.dart';
 import '../../../../domain/customException/custom_exception.dart';
 import '../../../../domain/models/item_dto.dart';
 
-class PaymentInformationScreenViewModel extends Cubit<PaymentInfoViewState> {
+class EditProfileScreenViewModel extends Cubit<UpdateProfileViewState> {
   late ApiManager apiManager;
-  late ProfileRepository paymentInfoRepository;
-  late ProfileDatasource paymentInfoDatasource;
-  late UpdatePaymentInformationUsecase usecase;
+  late ProfileRepository profileRepository;
+  late ProfileDatasource profileDatasource;
+  late UpdateProfileUsecase usecase;
   AccessTokenProvider accessTokenProvider;
 
-  PaymentInformationScreenViewModel(this.accessTokenProvider)
-      : super(UpdatePaymentInfoInitialState()) {
+  EditProfileScreenViewModel(this.accessTokenProvider)
+      : super(UUpdateProfileInitialState()) {
     apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
-    paymentInfoDatasource = PaymentInfoDatasourceImpl(apiManager);
-    paymentInfoRepository = PaymentInfoRepositoryImpl(paymentInfoDatasource);
-    usecase = UpdatePaymentInformationUsecase(paymentInfoRepository);
+    profileDatasource = PaymentInfoDatasourceImpl(apiManager);
+    profileRepository = PaymentInfoRepositoryImpl(profileDatasource);
+    usecase = UpdateProfileUsecase(profileRepository);
   }
 
-  void updatePaymentInfo(
-      {String? accountNumber,
-      String? routingNumber,
-      String? accountName,
-      String? accountCurrency,
-      String? accountCountry,
-      int? userid}) async {
-    emit(UpdatePaymentInfoLoadingState('Loading...'));
+  void updateProfile(
+      {String? dob,
+      String? address,
+      String? city,
+      String? country,
+      String? postalCode,
+      String? ip,
+      required String? accessToken,
+      String? phone}) async {
+    emit(UpdateProfileLoadingState('Loading...'));
     try {
-      var response = await usecase.updatePaymentInfo(
-        accountNumber: accountNumber,
-        accountName: accountName,
-        accountCountry: accountCountry,
-        accountCurrency: accountCurrency,
-        userid: userid,
-        routingNumber: routingNumber,
+      var response = await usecase.updateProfile(
+        dob: dob,
+        address: address,
+        city: city,
+        country: country,
+        postalCode: postalCode,
+        ip: ip,
+        accessToken: accessToken,
+        phone: phone,
       );
-      emit(UpdatePaymentInfoSuccessState(response));
+      emit(UpdateProfileSuccessState(response));
     } on ServerErrorException catch (e) {
-      emit(
-          UpdatePaymentInfoFailState(e.errorMessage, statusCode: e.statusCode));
+      emit(UpdateProfileFailState(e.errorMessage, statusCode: e.statusCode));
     } on Exception catch (e) {
-      emit(UpdatePaymentInfoFailState(e.toString()));
+      emit(UpdateProfileFailState(e.toString()));
     }
   }
 }
 
-abstract class PaymentInfoViewState {}
+abstract class UpdateProfileViewState {}
 
-class UpdatePaymentInfoInitialState extends PaymentInfoViewState {}
+class UUpdateProfileInitialState extends UpdateProfileViewState {}
 
-class UpdatePaymentInfoSuccessState extends PaymentInfoViewState {
+class UpdateProfileSuccessState extends UpdateProfileViewState {
   UpdatePaymentInfoResponseDto responseDto;
 
-  UpdatePaymentInfoSuccessState(
+  UpdateProfileSuccessState(
     this.responseDto,
   );
 }
 
-class UpdatePaymentInfoLoadingState extends PaymentInfoViewState {
+class UpdateProfileLoadingState extends UpdateProfileViewState {
   String loadingMessage;
 
-  UpdatePaymentInfoLoadingState(this.loadingMessage);
+  UpdateProfileLoadingState(this.loadingMessage);
 }
 
-class UpdatePaymentInfoFailState extends PaymentInfoViewState {
+class UpdateProfileFailState extends UpdateProfileViewState {
   String failMessage;
   int? statusCode;
-  UpdatePaymentInfoFailState(this.failMessage, {this.statusCode});
+  UpdateProfileFailState(this.failMessage, {this.statusCode});
 }

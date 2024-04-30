@@ -11,7 +11,7 @@ import 'package:hatly/domain/models/state_dto.dart';
 import 'package:hatly/presentation/components/shipment_item.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_fees_bottom.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_item_bottom.dart';
-import 'package:hatly/presentation/home/tabs/trips/countries_list_bottom_sheet.dart';
+import 'package:hatly/presentation/components/countries_list_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/states_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 import '../../../components/custom_text_field.dart';

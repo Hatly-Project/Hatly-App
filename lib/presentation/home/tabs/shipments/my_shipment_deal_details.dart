@@ -17,9 +17,11 @@ import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_viewmodel.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_accepted_bottom_sheet.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class MyShipmentDealDetails extends StatefulWidget {
   static const routeName = 'MyShipmentDealDetails';
@@ -42,12 +44,14 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   AcceptOrRejectShipmentDealResponseDto? acceptShipmentDealResponseDto;
   bool isAccepted = false, isRejected = false;
 
-  GetMyShipmentDealDetailsViewModel viewModel =
-      GetMyShipmentDealDetailsViewModel();
-
+  late GetMyShipmentDealDetailsViewModel viewModel;
+  late AccessTokenProvider accessTokenProvider;
   Future<void> getMyShipmentDealDetails(
       {required String dealId, required String token}) async {
-    return viewModel.getMyShipmentDealDetails(dealId: dealId, token: token);
+    if (accessTokenProvider.accessToken != null) {
+      return viewModel.getMyShipmentDealDetails(
+          dealId: dealId, token: accessTokenProvider.accessToken!);
+    }
   }
 
   @override
@@ -56,7 +60,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
 
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
-
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = GetMyShipmentDealDetailsViewModel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;

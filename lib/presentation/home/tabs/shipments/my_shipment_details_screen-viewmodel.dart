@@ -7,6 +7,7 @@ import 'package:hatly/domain/datasource/shipment_datasource.dart';
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 import 'package:hatly/domain/usecase/get_my_shipment_deals_usecase.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 
 class MyShipmentDetailsScreenViewModel
     extends Cubit<MyShipmentDetailsViewState> {
@@ -14,9 +15,10 @@ class MyShipmentDetailsScreenViewModel
   late ShipmentRepository shipmentRepository;
   late ShipmentDataSource shipmentDataSource;
   late GetMyShipmentDealsUsecase getMyShipmentDealsUsecase;
-
-  MyShipmentDetailsScreenViewModel() : super(MyshipmentDetailsInitialState()) {
-    apiManager = ApiManager();
+  AccessTokenProvider? accessTokenProvider;
+  MyShipmentDetailsScreenViewModel({this.accessTokenProvider})
+      : super(MyshipmentDetailsInitialState()) {
+    apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     shipmentDataSource = ShipmentDataSourceImpl(apiManager);
     shipmentRepository = ShipmentRepositoryImpl(shipmentDataSource);
     getMyShipmentDealsUsecase = GetMyShipmentDealsUsecase(shipmentRepository);
