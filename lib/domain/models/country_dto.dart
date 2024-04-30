@@ -4,30 +4,45 @@ import 'package:hatly/domain/models/state_dto.dart';
 
 class CountriesStatesDto {
   String? name;
-  String? error, msg;
   String? flag;
   List<StateDto>? states;
+  String? currency;
+  String? dialCode;
+  String? iso2;
+  String? iso3;
 
-  CountriesStatesDto({this.name, this.flag, this.states, this.error, this.msg});
+  CountriesStatesDto({
+    this.name,
+    this.flag,
+    this.states,
+    this.currency,
+    this.dialCode,
+    this.iso2,
+    this.iso3,
+  });
 
   factory CountriesStatesDto.fromMap(Map<String, dynamic> data) {
     return CountriesStatesDto(
       name: data['name'] as String?,
-      error: data['error'] as String?,
-      msg: data['msg'] as String?,
       flag: data['flag'] as String?,
       states: (data['states'] as List<dynamic>?)
           ?.map((e) => StateDto.fromMap(e as Map<String, dynamic>))
           .toList(),
+      currency: data['currency'] as String?,
+      dialCode: data['dialCode'] as String?,
+      iso2: data['iso2'] as String?,
+      iso3: data['iso3'] as String?,
     );
   }
 
   Map<String, dynamic> toMap() => {
         'name': name,
-        'error': error,
-        'msg': msg,
         'flag': flag,
         'states': states?.map((e) => e.toMap()).toList(),
+        'currency': currency,
+        'dialCode': dialCode,
+        'iso2': iso2,
+        'iso3': iso3,
       };
 
   /// `dart:convert`

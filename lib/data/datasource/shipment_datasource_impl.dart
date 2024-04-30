@@ -76,7 +76,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       required int? shipmentId,
       required double? reward,
       required int tripId}) async {
-    var response = await apiManager.sendShipmentDeal(
+    var response = await apiManager.sendShipmentDealWithCheckAccessToken(
         shipmentId: shipmentId,
         reward: reward,
         accessToken: token,

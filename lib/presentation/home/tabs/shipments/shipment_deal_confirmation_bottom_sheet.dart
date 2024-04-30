@@ -9,12 +9,14 @@ import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_viewmodel.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
 import 'package:hatly/presentation/components/my_shipments_card_deals.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_deal_viewmodel.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ShipmentDealConfirmationBottomSheet extends StatefulWidget {
   Deal deal;
@@ -29,7 +31,8 @@ class ShipmentDealConfirmationBottomSheet extends StatefulWidget {
 
 class _ShipmentDealConfirmationBottomSheetState
     extends State<ShipmentDealConfirmationBottomSheet> {
-  ShipmentDealViewmodel viewModel = ShipmentDealViewmodel();
+  late ShipmentDealViewmodel viewModel;
+  late AccessTokenProvider accessTokenProvider;
   bool isLoading = false;
   late LoggedInState loggedInState;
   late String token;
@@ -41,13 +44,15 @@ class _ShipmentDealConfirmationBottomSheetState
     // print('trip name : ${widget.deal.tripsDto.user?.name}');
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
-
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+    viewModel = ShipmentDealViewmodel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.accessToken;
-      // Now you can use the 'token' variable as needed in your code.
-      print('User token: $token');
+      // token = loggedInState.accessToken;
+      // // Now you can use the 'token' variable as needed in your code.
+      // print('User token: $token');
       print('user email ${loggedInState.user.email}');
     } else {
       print(
@@ -560,11 +565,14 @@ class _ShipmentDealConfirmationBottomSheetState
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12)),
                               onPressed: () {
-                                viewModel.sendShipmentDeal(
-                                    token: token,
-                                    tripId: deal.tripsDto.id!,
-                                    reward: deal.shipmentDto.reward,
-                                    shipmentId: deal.shipmentDto.id);
+                                if (accessTokenProvider.accessToken != null) {
+                                  // token = accessTokenProvider.accessToken!;
+                                  viewModel.sendShipmentDeal(
+                                      token: accessTokenProvider.accessToken!,
+                                      tripId: deal.tripsDto.id!,
+                                      reward: deal.shipmentDto.reward,
+                                      shipmentId: deal.shipmentDto.id);
+                                }
                               },
                               child: Text(
                                 'Confirm Offer',

@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/firebase_options.dart';
+import 'package:hatly/presentation/home/tabs/profile/edit_profile_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/payment_information_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
@@ -106,6 +107,13 @@ class MyApp extends StatelessWidget {
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
 
+      if (accessTokenProvider.accessToken != null) {
+        if (fcmProvider.fcmToken != null) {
+          ApiManager().refreshFCMTokenWithCheckAccessToken(
+              accessToken: accessTokenProvider.accessToken!,
+              fcmToken: fcmProvider.fcmToken!);
+        }
+      }
       // if (accessTokenProvider.accessToken != null) {
       //   print('toool ${accessTokenProvider.accessToken}');
 
@@ -128,10 +136,6 @@ class MyApp extends StatelessWidget {
       NotificationService().showNotification(
           title: fcmProvider.notifMessage?.title,
           body: fcmProvider.notifMessage?.body);
-    }
-    if (fcmProvider.fcmToken != null) {
-      ApiManager().refreshFCMToken(
-          accessToken: userToken, fcmToken: fcmProvider.fcmToken!);
     }
     return MaterialApp(
       title: 'Flutter Demo',
@@ -159,6 +163,7 @@ class MyApp extends StatelessWidget {
         TripDetails.routeName: (context) => TripDetails(),
         ProfileScreen.routeName: (context) => ProfileScreen(),
         MyShipmentDetails.routeName: (context) => MyShipmentDetails(),
+        EditProfileScreen.routeName: (context) => EditProfileScreen(),
         PaymentInformationScreen.routeName: (context) =>
             PaymentInformationScreen(),
         MyShipmentDealDetails.routeName: (context) => MyShipmentDealDetails(

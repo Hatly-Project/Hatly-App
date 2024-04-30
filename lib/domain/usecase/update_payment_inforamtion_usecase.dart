@@ -1,8 +1,8 @@
 import 'package:hatly/domain/models/update_payment_info_response_dto.dart';
-import 'package:hatly/domain/repository/payment_info_repository.dart';
+import 'package:hatly/domain/repository/profile_repository.dart';
 
 class UpdatePaymentInformationUsecase {
-  PaymentInfoRepository repository;
+  ProfileRepository repository;
 
   UpdatePaymentInformationUsecase(this.repository);
 

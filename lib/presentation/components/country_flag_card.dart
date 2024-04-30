@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/country_dto.dart';
 
 class CountryFlagCard extends StatelessWidget {
   String imageUrl = '';
-  String countryName = '';
-  Function? selectFromCountry, selectToCountry;
+  String? countryName = '', currencyName = '';
+  CountriesStatesDto? countriesStatesDto;
+  Function? selectFromCountry,
+      selectToCountry,
+      selectCurrency,
+      selectCountry,
+      selectCode;
   CountryFlagCard(
-      {required this.countryName,
+      {this.countryName,
       required this.imageUrl,
+      this.currencyName,
+      this.selectCountry,
+      this.countriesStatesDto,
+      this.selectCode,
       this.selectFromCountry,
+      this.selectCurrency,
       this.selectToCountry});
 
   @override
@@ -17,10 +28,16 @@ class CountryFlagCard extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
-          if (selectFromCountry == null) {
-            selectedToCountry(selectToCountry!);
-          } else {
+          if (selectFromCountry != null) {
             selectedFromCountry(selectFromCountry!);
+          } else if (selectToCountry != null) {
+            selectedToCountry(selectToCountry!);
+          } else if (selectCurrency != null) {
+            selectedCurrency(selectCurrency!);
+          } else if (selectCountry != null) {
+            selectedCountry(selectCountry!);
+          } else if (selectCode != null) {
+            selectedCode(selectCode!);
           }
         },
         child: Card(
@@ -43,7 +60,7 @@ class CountryFlagCard extends StatelessWidget {
               Container(
                 width: MediaQuery.sizeOf(context).width * .50,
                 child: Text(
-                  countryName,
+                  countryName!,
                   overflow: TextOverflow.visible,
                   style: GoogleFonts.poppins(
                       fontSize: 15,
@@ -56,6 +73,18 @@ class CountryFlagCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void selectedCurrency(Function selectCurrency) {
+    selectCurrency(countryName);
+  }
+
+  void selectedCode(Function selectCode) {
+    selectCode(countriesStatesDto);
+  }
+
+  void selectedCountry(Function selectCountry) {
+    selectCountry(countryName);
   }
 
   void selectedFromCountry(Function select) {

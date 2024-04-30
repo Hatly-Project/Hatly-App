@@ -10,9 +10,11 @@ import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/presentation/components/my_shipment_deal_card.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_arguments.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_screen-viewmodel.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 
 class MyShipmentDeals extends StatefulWidget {
   ShipmentDto shipmentDto;
@@ -25,8 +27,7 @@ class MyShipmentDeals extends StatefulWidget {
 class _ShipmentDealsState extends State<MyShipmentDeals> {
   ScrollController scrollController = ScrollController();
   late LoggedInState loggedInState;
-  MyShipmentDetailsScreenViewModel viewModel =
-      MyShipmentDetailsScreenViewModel();
+  late MyShipmentDetailsScreenViewModel viewModel;
 
   List<DealDto> deals = [];
   bool isMyshipmentDealsEmpty = false;
@@ -34,7 +35,7 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
   late int shipmentId;
   late MyShipmentDetailsArguments args;
   bool isLoading = true;
-
+  late AccessTokenProvider accessTokenProvider;
   Future<void> getMyshipmentDeals(
       {required String token, required int shipmentId}) async {
     await viewModel.getMyshipmentDeals(token: token, shipmentId: shipmentId);
@@ -47,6 +48,11 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
 
+    accessTokenProvider =
+        Provider.of<AccessTokenProvider>(context, listen: false);
+
+    viewModel = MyShipmentDetailsScreenViewModel(
+        accessTokenProvider: accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
@@ -59,8 +65,11 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
           'User is not logged in.'); // Handle the   scenario where the user is not logged in.
     }
 
-    viewModel.getMyshipmentDeals(
-        token: token, shipmentId: widget.shipmentDto.id!);
+    if (accessTokenProvider.accessToken != null) {
+      viewModel.getMyshipmentDeals(
+          token: accessTokenProvider.accessToken!,
+          shipmentId: widget.shipmentDto.id!);
+    }
 
     // getCachedMyShipmentsDeals().then((cachedDeals) async {
     //   if (cachedDeals.isNotEmpty) {
@@ -181,8 +190,12 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
                       slivers: [
                         CupertinoSliverRefreshControl(
                           onRefresh: () async {
-                            await viewModel.getMyshipmentDeals(
-                                token: token, shipmentId: shipmentId);
+                            if (accessTokenProvider.accessToken != null) {
+                              await viewModel.getMyshipmentDeals(
+                                  token: accessTokenProvider.accessToken!,
+                                  shipmentId: widget.shipmentDto.id!);
+                            }
+
                             setState(() {});
                           },
                         ),
@@ -277,8 +290,11 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
                 children: [
                   RefreshIndicator(
                     onRefresh: () async {
-                      await viewModel.getMyshipmentDeals(
-                          token: token, shipmentId: shipmentId);
+                      if (accessTokenProvider.accessToken != null) {
+                        await viewModel.getMyshipmentDeals(
+                            token: accessTokenProvider.accessToken!,
+                            shipmentId: widget.shipmentDto.id!);
+                      }
                       // cacheMyShipmentsDeals(deals);
                       setState(() {});
                     },

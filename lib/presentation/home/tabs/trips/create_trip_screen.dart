@@ -14,7 +14,7 @@ import 'package:hatly/domain/models/state_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/components/custom_text_field.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
-import 'package:hatly/presentation/home/tabs/trips/countries_list_bottom_sheet.dart';
+import 'package:hatly/presentation/components/countries_list_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/create_trip_arguments.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips_viewmodel.dart';

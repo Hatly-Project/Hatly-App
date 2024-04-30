@@ -13,6 +13,7 @@ import 'package:hatly/domain/usecase/accept_shipment_deal_usecase.dart';
 import 'package:hatly/domain/usecase/cancel_shipment_deal_usecase.dart';
 import 'package:hatly/domain/usecase/counter_offer_usecase.dart';
 import 'package:hatly/domain/usecase/get_my_shipment_deal_details_usecase.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import '../../../../data/api/api_manager.dart';
 import '../../../../domain/customException/custom_exception.dart';
 
@@ -25,10 +26,10 @@ class GetMyShipmentDealDetailsViewModel
   late AcceptShipmentDealUsecase _acceptShipmentDealUsecase;
   late ShipmentCounterOfferUsecase _shipmentCounterOfferUsecase;
   late CancelShipmentDealUsecae _cancelShipmentDealUsecae;
-
-  GetMyShipmentDealDetailsViewModel()
+  AccessTokenProvider accessTokenProvider;
+  GetMyShipmentDealDetailsViewModel(this.accessTokenProvider)
       : super(MyShipmentDealDetailsInitialState()) {
-    _apiManager = ApiManager();
+    _apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     _shipmentDataSource = ShipmentDataSourceImpl(_apiManager);
     _shipmentRepository = ShipmentRepositoryImpl(_shipmentDataSource);
     _usecase = GetMyShipmentDealDetailsUsecase(repository: _shipmentRepository);
