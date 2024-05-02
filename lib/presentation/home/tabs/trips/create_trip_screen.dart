@@ -945,7 +945,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
     }
 
     viewModel.createTrip(
-      token: token,
+      token: accessTokenProvider.accessToken!,
       origin: origin,
       destination: destination,
       originCity: fromCityValue,

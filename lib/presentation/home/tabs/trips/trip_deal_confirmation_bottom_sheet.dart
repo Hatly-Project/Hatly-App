@@ -280,7 +280,7 @@ class _TripDealConfirmationBottomSheetState
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  .29,
+                                                  .3,
                                               child: FittedBox(
                                                 fit: BoxFit.scaleDown,
                                                 child: Text(
@@ -304,7 +304,7 @@ class _TripDealConfirmationBottomSheetState
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  .29,
+                                                  .3,
                                               child: FittedBox(
                                                 fit: BoxFit.scaleDown,
                                                 child: Text(
@@ -532,9 +532,9 @@ class _TripDealConfirmationBottomSheetState
                                   shipImage: Image.network(
                                     deal.shipmentDto.items!.first.photos!.first
                                         .photo!,
-                                    fit: BoxFit.fitHeight,
-                                    width: 100,
-                                    height: 100,
+                                    fit: BoxFit.contain,
+                                    width: 110,
+                                    height: 110,
                                   ), //
                                 ),
                               ],

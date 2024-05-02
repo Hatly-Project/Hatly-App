@@ -19,6 +19,7 @@ import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_accepted_bottom_sheet.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
+import 'package:hatly/providers/payment_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -36,47 +37,55 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   ScrollController scrollController = ScrollController();
   bool isLoading = true;
   late LoggedInState loggedInState;
-  late String token;
+  // late String token;
   late String dealId;
+  bool isPaid = false;
   String? paymentIntentId, clientSecret;
   DealDto? dealResponseDto;
   late String? dealCreatorEmail;
   AcceptOrRejectShipmentDealResponseDto? acceptShipmentDealResponseDto;
-  bool isAccepted = false, isRejected = false;
+  bool isAccepted = false, isRejected = false, isPaymentSheetOpened = false;
 
   late GetMyShipmentDealDetailsViewModel viewModel;
   late AccessTokenProvider accessTokenProvider;
+  late PaymentProvider paymentProvider;
   Future<void> getMyShipmentDealDetails(
       {required String dealId, required String token}) async {
     if (accessTokenProvider.accessToken != null) {
-      return viewModel.getMyShipmentDealDetails(
-          dealId: dealId, token: accessTokenProvider.accessToken!);
+      return viewModel.getMyShipmentDealDetails(dealId: dealId, token: token);
     }
   }
 
   @override
   void initState() {
     super.initState();
+    print('deal status ${dealResponseDto?.dealStatus}');
 
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
     accessTokenProvider =
         Provider.of<AccessTokenProvider>(context, listen: false);
+    paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
     viewModel = GetMyShipmentDealDetailsViewModel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
-      token = loggedInState.accessToken;
+      // token = loggedInState.accessToken;
       // Now you can use the 'token' variable as needed in your code.
       dealCreatorEmail = loggedInState.user.email;
-      print('User token: $token');
+      // print('User token: $token');
       print('user email ${loggedInState.user.email}');
     } else {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
-    viewModel.getMyShipmentDealDetails(
-        dealId: widget.args.dealDto.id.toString(), token: token);
+    paymentProvider.getPaymentIntentId(widget.args.dealDto!.id.toString());
+
+    if (accessTokenProvider.accessToken != null) {
+      getMyShipmentDealDetails(
+          dealId: widget.args.dealDto!.id.toString(),
+          token: accessTokenProvider.accessToken!);
+    }
   }
 
   void _showShipmentDealAcceptedBottomSheet() {
@@ -106,16 +115,16 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
       print('payment');
 
       isAccepted = false;
-      if (paymentIntentId != null) {
+      if (paymentProvider.paymentIntentId != null) {
         await Stripe.instance.initPaymentSheet(
             paymentSheetParameters: SetupPaymentSheetParameters(
                 paymentIntentClientSecret:
-                    clientSecret, //Gotten from payment intent
+                    paymentProvider.clientSecret, //Gotten from payment intent
                 style: ThemeMode.light,
                 merchantDisplayName: 'Hatly'));
 
         //STEP 3: Display Payment sheet
-        displayPaymentSheet(paymentIntentId!);
+        displayPaymentSheet(paymentProvider.paymentIntentId!);
       }
     } catch (err) {
       throw Exception(err.toString());
@@ -142,7 +151,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                     ],
                   ),
                 ));
-
+        setState(() {
+          isPaid = true;
+        });
         // Future.delayed(Duration(minutes: 1), () {
         //   capturePayments(id);
         // });
@@ -177,8 +188,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
     // final args = ModalRoute.of(context)?.settings.arguments
     //     as MyShipmentDealDetailsArgument;
     var dealDto = widget.args.dealDto;
+    print('status ${dealDto?.dealStatus}');
     var shipmentDto = widget.args.shipmentDto;
-    dealId = dealDto.id.toString();
+    dealId = dealDto!.id.toString();
 
     return BlocConsumer(
         bloc: viewModel,
@@ -258,13 +270,28 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
         builder: (context, state) {
           if (state is GetMyShipmentDealDetailsSuccessState) {
             dealResponseDto = state.responseDto.deal;
+            if (dealResponseDto?.dealStatus?.toLowerCase() == 'accepted') {
+              isAccepted = true;
+            } else {
+              isAccepted = false;
+            }
             print('deall ${dealResponseDto?.creatorEmail}');
+            print('accepted $isAccepted paid $isPaid');
+            if (!isPaymentSheetOpened) {
+              if (isAccepted && isPaid == false) {
+                print('accept build: $isAccepted');
+                isPaymentSheetOpened = true;
+                makePayment();
+              }
+            }
           }
 
           if (state is AcceptShipmentDealSuccessState) {
             acceptShipmentDealResponseDto = state.responseDto;
             paymentIntentId = acceptShipmentDealResponseDto?.paymentIntentId;
             clientSecret = acceptShipmentDealResponseDto?.clientSecret;
+            paymentProvider.setPaymentIntentId(
+                paymentIntentId, clientSecret, dealId);
             if (isAccepted) {
               print('accept build: $isAccepted');
 
@@ -306,8 +333,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                           slivers: [
                             CupertinoSliverRefreshControl(
                               onRefresh: () async {
-                                await viewModel.getMyShipmentDealDetails(
-                                    dealId: dealId, token: token);
+                                await getMyShipmentDealDetails(
+                                    dealId: dealId,
+                                    token: accessTokenProvider.accessToken!);
                                 setState(() {});
                               },
                             ),
@@ -315,7 +343,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                               child: Column(
                                 children: [
                                   MyShipmentCard(
-                                    title: shipmentDto.title!,
+                                    title: shipmentDto!.title!,
                                     from: shipmentDto.from!,
                                     to: shipmentDto.to!,
                                     date: DateFormat('dd MMMM yyyy')
@@ -324,7 +352,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                     shipImage: Image.network(
                                       shipmentDto
                                           .items!.first.photos!.first.photo!,
-                                      fit: BoxFit.fitHeight,
+                                      fit: BoxFit.fitWidth,
                                       width: 100,
                                       height: 100,
                                     ), //
@@ -1092,8 +1120,18 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                             ),
                                                           ),
                                                         )
-                                              : viewModel.acceptShipmentDeal(
-                                                  dealId: dealId, token: token),
+                                              : accessTokenProvider
+                                                          .accessToken !=
+                                                      null
+                                                  ? dealDto.creatorEmail !=
+                                                          dealCreatorEmail
+                                                      ? null
+                                                      : acceptShipmentDeal(
+                                                          dealId: dealId,
+                                                          token:
+                                                              accessTokenProvider
+                                                                  .accessToken)
+                                                  : null,
                                           child: const Text(
                                             'Accept',
                                             style: TextStyle(
@@ -1273,8 +1311,14 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                             ),
                                                           ),
                                                         )
-                                              : viewModel.rejectShipmentDeal(
-                                                  dealId: dealId, token: token),
+                                              : accessTokenProvider
+                                                          .accessToken !=
+                                                      null
+                                                  ? viewModel.rejectShipmentDeal(
+                                                      dealId: dealId,
+                                                      token: accessTokenProvider
+                                                          .accessToken!)
+                                                  : null,
                                           child: const Text(
                                             'Reject',
                                             style: TextStyle(
@@ -1293,8 +1337,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                         )
                       : RefreshIndicator(
                           onRefresh: () async {
-                            await viewModel.getMyShipmentDealDetails(
-                                dealId: dealId, token: token);
+                            await getMyShipmentDealDetails(
+                                dealId: dealId,
+                                token: accessTokenProvider.accessToken!);
                             setState(() {});
                           },
                           child: CustomScrollView(
@@ -1308,7 +1353,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                 child: Column(
                                   children: [
                                     MyShipmentCard(
-                                      title: shipmentDto.title!,
+                                      title: shipmentDto!.title!,
                                       from: shipmentDto.from!,
                                       to: shipmentDto.to!,
                                       date: DateFormat('dd MMMM yyyy')
@@ -2053,9 +2098,15 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       ),
                                                     ),
                                                   )
-                                                : viewModel.acceptShipmentDeal(
-                                                    dealId: dealId,
-                                                    token: token),
+                                                : accessTokenProvider
+                                                            .accessToken !=
+                                                        null
+                                                    ? viewModel.acceptShipmentDeal(
+                                                        dealId: dealId,
+                                                        token:
+                                                            accessTokenProvider
+                                                                .accessToken!)
+                                                    : null,
                                             child: const Text(
                                               'Accept',
                                               style: TextStyle(
@@ -2088,13 +2139,11 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                             onPressed: () => dealResponseDto
                                                             ?.dealStatus ==
                                                         'accepted' ||
-                                                    dealResponseDto
-                                                            ?.dealStatus ==
+                                                    dealResponseDto?.dealStatus ==
                                                         'rejected'
                                                 ? dealResponseDto?.dealStatus ==
                                                         'accepted'
-                                                    ? ScaffoldMessenger.of(
-                                                            context)
+                                                    ? ScaffoldMessenger.of(context)
                                                         .showSnackBar(
                                                         const SnackBar(
                                                           backgroundColor:
@@ -2111,8 +2160,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                           ),
                                                         ),
                                                       )
-                                                    : dealResponseDto
-                                                                ?.dealStatus ==
+                                                    : dealResponseDto?.dealStatus ==
                                                             'rejected'
                                                         ? ScaffoldMessenger.of(
                                                                 context)
@@ -2152,9 +2200,15 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                               ),
                                                             ),
                                                           )
-                                                : viewModel.acceptShipmentDeal(
-                                                    dealId: dealId,
-                                                    token: token),
+                                                : accessTokenProvider
+                                                            .accessToken !=
+                                                        null
+                                                    ? viewModel.acceptShipmentDeal(
+                                                        dealId: dealId,
+                                                        token:
+                                                            accessTokenProvider
+                                                                .accessToken!)
+                                                    : null,
                                             child: const Text(
                                               'Accept',
                                               style: TextStyle(
@@ -2296,9 +2350,15 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       ),
                                                     ),
                                                   )
-                                                : viewModel.rejectShipmentDeal(
-                                                    dealId: dealId,
-                                                    token: token),
+                                                : accessTokenProvider
+                                                            .accessToken !=
+                                                        null
+                                                    ? viewModel.rejectShipmentDeal(
+                                                        dealId: dealId,
+                                                        token:
+                                                            accessTokenProvider
+                                                                .accessToken!)
+                                                    : null,
                                             child: const Text(
                                               'Reject',
                                               style: TextStyle(
@@ -2340,11 +2400,19 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
 
   void sendCounterReward(double reward) {
     viewModel.makeCounterOffer(
-        token: token, dealId: widget.args.dealDto.id!, reward: reward);
+        token: accessTokenProvider.accessToken!,
+        dealId: widget.args.dealDto!.id!,
+        reward: reward);
+  }
+
+  void acceptShipmentDeal({String? dealId, String? token}) {
+    viewModel.acceptShipmentDeal(dealId: dealId!, token: token!);
   }
 
   void cancelDeal() {
-    viewModel.cancelShipmentDeal(dealId: widget.args.dealDto.id!, token: token);
+    viewModel.cancelShipmentDeal(
+        dealId: widget.args.dealDto!.id!,
+        token: accessTokenProvider.accessToken!);
   }
 
   String substractDates(DateTime dateTime) {
