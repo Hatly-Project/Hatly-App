@@ -2,9 +2,8 @@ import 'package:hatly/domain/models/deal_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 
 class MyShipmentDealDetailsArgument {
-  DealDto dealDto;
-  ShipmentDto shipmentDto;
+  DealDto? dealDto;
+  ShipmentDto? shipmentDto;
 
-  MyShipmentDealDetailsArgument(
-      {required this.dealDto, required this.shipmentDto});
+  MyShipmentDealDetailsArgument({this.dealDto, this.shipmentDto});
 }

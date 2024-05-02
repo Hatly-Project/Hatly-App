@@ -614,7 +614,7 @@ class _AddShipmentBottomSheetState extends State<AddShipmentBottomSheet> {
             id: itemID++));
     print('shipment weight $weight');
     totalItems = items.length.toString();
-    bonus = '200';
+    bonus = '100';
     fees = '90';
     for (var item in items) {
       print(item.name);

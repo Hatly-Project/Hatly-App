@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
+import 'package:hatly/presentation/home/tabs/shipments/matching_trips_screen.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deals.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_arguments.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_screen-viewmodel.dart';
@@ -140,7 +141,9 @@ class _MyShipmentDetailsState extends State<MyShipmentDetails> {
             MyShipmentDeals(
               shipmentDto: args.shipmentDto,
             ),
-            Container(),
+            MatchingTripsScreen(
+              shipmentDto: args.shipmentDto,
+            ),
             Container(),
           ],
         ),

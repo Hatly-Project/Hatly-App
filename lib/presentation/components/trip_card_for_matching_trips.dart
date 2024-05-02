@@ -14,17 +14,17 @@ import 'package:hatly/presentation/home/tabs/trips/trip_details.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_details_arguments.dart';
 import 'package:intl/intl.dart';
 
-class TripCard extends StatefulWidget {
+class MatchingTripCard extends StatefulWidget {
   TripsDto tripsDto;
   Deal? deal;
 
-  TripCard({required this.tripsDto, this.deal});
+  MatchingTripCard({required this.tripsDto, this.deal});
 
   @override
-  State<TripCard> createState() => _TripCardState();
+  State<MatchingTripCard> createState() => _TripCardState();
 }
 
-class _TripCardState extends State<TripCard> {
+class _TripCardState extends State<MatchingTripCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -193,8 +193,8 @@ class _TripCardState extends State<TripCard> {
                             Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        _showShipmentsListBottomSheet(
-                            context, widget.tripsDto, showSuccessDialog);
+                        _showTripDealConfirmationBottomSheet(
+                            context, showSuccessDialog);
                       },
                       child: Text(
                         'Send Request',
@@ -262,7 +262,7 @@ class _TripCardState extends State<TripCard> {
 
   void _showTripDealConfirmationBottomSheet(
       BuildContext context, Function showSuccessDialog) {
-    Navigator.pop(context);
+    // Navigator.pop(context);
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[100],

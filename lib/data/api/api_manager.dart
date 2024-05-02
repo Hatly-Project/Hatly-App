@@ -16,6 +16,7 @@ import 'package:hatly/data/api/register/register_response/register_response.dart
 import 'package:hatly/data/api/register/register_request.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_request.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_response.dart';
+import 'package:hatly/data/api/shipment_matching_trips_response/shipment_matching_trips_response.dart';
 import 'package:hatly/data/api/shipments/accept_reject_shipment_deal_response/accept_reject_shipment_deal_response.dart';
 import 'package:hatly/data/api/shipments/create_shipment_request/create_shipment_request.dart';
 import 'package:hatly/data/api/shipments/create_shipments_response/create_shipments_response.dart';
@@ -35,6 +36,7 @@ import 'package:hatly/data/api/update_payment_info_request.dart';
 import 'package:hatly/data/api/update_payment_info_response.dart';
 import 'package:hatly/data/api/update_profile_request.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
+import 'package:hatly/domain/usecase/get_shipment_matching_trips_usecase.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 import 'package:http/http.dart';
@@ -422,6 +424,52 @@ class ApiManager {
       });
 
       var getResponse = MyShipmentDealsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<ShipmentMatchingTripsResponse>
+      getShipmentMatchingTripsWithCheckAccessToken(
+          {required String accessToken, required int shipmentId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await getShipmentMatchingTrips(
+            accessToken: accessToken, shipmentId: shipmentId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await getShipmentMatchingTrips(
+            accessToken: newAccessToken, shipmentId: shipmentId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
+  Future<ShipmentMatchingTripsResponse> getShipmentMatchingTrips(
+      {required String accessToken, required int shipmentId}) async {
+    late Response response;
+    try {
+      var url = Uri.https(
+          baseUrl, 'shipments/${shipmentId.toString()}/matching-trips');
+      response = await client.get(url, headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $accessToken'
+      });
+
+      var getResponse = ShipmentMatchingTripsResponse.fromJson(response.body);
       if (getResponse.status == false) {
         throw ServerErrorException(
             errorMessage: getResponse.message!,

@@ -26,6 +26,7 @@ import 'package:hatly/presentation/register/register_screen.dart';
 import 'package:hatly/presentation/splash/splash_screen.dart';
 import 'package:hatly/presentation/welcome/welcome_screen.dart';
 import 'package:hatly/providers/firebase_messaging_provider.dart';
+import 'package:hatly/providers/payment_provider.dart';
 import 'package:hatly/services/local_notifications_service.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
@@ -76,6 +77,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => AccessTokenProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => PaymentProvider(),
         ),
         // Add more providers as needed
       ],
@@ -148,6 +152,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(
           create: (_) => FCMProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AccessTokenProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => PaymentProvider(),
         ),
         // Add more providers as needed
       ]),
