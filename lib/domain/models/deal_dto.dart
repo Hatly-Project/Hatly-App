@@ -52,6 +52,22 @@ class DealDto {
         'trip': trip?.toMap(),
       };
 
+  factory DealDto.fromFirestore(Map<String, dynamic> data) => DealDto(
+        id: data['id'] as int?,
+        dealStatus: data['dealStatus'] as String?,
+        creatorEmail: data['creatorEmail'] as String?,
+        counterReward: (data['counterReward'] as num?)?.toDouble(),
+        finalReward: (data['finalReward'] as num?)?.toDouble(),
+      );
+
+  Map<String, dynamic> toFireStore() => {
+        'id': id,
+        'dealStatus': dealStatus,
+        'creatorEmail': creatorEmail,
+        'counterReward': counterReward,
+        'finalReward': finalReward,
+      };
+
   /// `dart:convert`
   ///
   /// Parses the string and returns the resulting Json object as [DealDto].
