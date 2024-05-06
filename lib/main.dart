@@ -14,6 +14,7 @@ import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trips_details_screen.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/home/home_screen.dart';
@@ -173,6 +174,7 @@ class MyApp extends StatelessWidget {
         TripDetails.routeName: (context) => TripDetails(),
         ProfileScreen.routeName: (context) => ProfileScreen(),
         MyShipmentDetails.routeName: (context) => MyShipmentDetails(),
+        MyTripDetails.routeName: (context) => MyTripDetails(),
         EditProfileScreen.routeName: (context) => EditProfileScreen(),
         PaymentInformationScreen.routeName: (context) =>
             PaymentInformationScreen(),

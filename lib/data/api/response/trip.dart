@@ -1,42 +1,49 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/book_info.dart';
-import 'package:hatly/data/api/items_not_allowed.dart';
-import 'package:hatly/data/api/shipment.dart';
-import 'package:hatly/data/api/user.dart';
-import 'package:hatly/domain/models/trips_dto.dart';
+import 'book_info.dart';
+import 'count.dart';
+import 'items_not_allowed.dart';
+import 'user.dart';
 
 class Trip {
   int? id;
-  String? origin, originCity;
-  String? destination, destinationCity;
+  String? origin;
+  String? destination;
+  String? originCity;
+  String? destinationCity;
   int? available;
   int? consumed;
-  String? note;
-  String? addressMeeting;
-  DateTime? departDate;
   DateTime? createdAt;
+  DateTime? updatedAt;
+  dynamic note;
+  String? addressMeeting;
+  int? bookInfoId;
+  DateTime? departDate;
+  int? userId;
   BookInfo? bookInfo;
-  User? user;
-  List<Shipment>? shipments;
   List<ItemsNotAllowed>? itemsNotAllowed;
+  User? user;
+  Count? count;
 
   Trip({
     this.id,
     this.origin,
     this.destination,
-    this.available,
     this.originCity,
     this.destinationCity,
+    this.available,
     this.consumed,
+    this.createdAt,
+    this.updatedAt,
     this.note,
     this.addressMeeting,
+    this.bookInfoId,
     this.departDate,
-    this.createdAt,
-    this.user,
-    this.shipments,
+    this.userId,
     this.bookInfo,
     this.itemsNotAllowed,
+    this.user,
+    this.count,
   });
 
   factory Trip.fromMap(Map<String, dynamic> data) => Trip(
@@ -47,26 +54,31 @@ class Trip {
         destinationCity: data['destinationCity'] as String?,
         available: data['available'] as int?,
         consumed: data['consumed'] as int?,
-        user: data['user'] == null
-            ? null
-            : User.fromMap(data['user'] as Map<String, dynamic>),
-        note: data['note'] as String?,
-        addressMeeting: data['addressMeeting'] as String?,
-        departDate: data['departDate'] == null
-            ? null
-            : DateTime.parse(data['departDate'] as String),
         createdAt: data['createdAt'] == null
             ? null
             : DateTime.parse(data['createdAt'] as String),
+        updatedAt: data['updatedAt'] == null
+            ? null
+            : DateTime.parse(data['updatedAt'] as String),
+        note: data['note'] as dynamic,
+        addressMeeting: data['addressMeeting'] as String?,
+        bookInfoId: data['bookInfoId'] as int?,
+        departDate: data['departDate'] == null
+            ? null
+            : DateTime.parse(data['departDate'] as String),
+        userId: data['userId'] as int?,
         bookInfo: data['bookInfo'] == null
             ? null
             : BookInfo.fromMap(data['bookInfo'] as Map<String, dynamic>),
         itemsNotAllowed: (data['itemsNotAllowed'] as List<dynamic>?)
             ?.map((e) => ItemsNotAllowed.fromMap(e as Map<String, dynamic>))
             .toList(),
-        shipments: (data['shipments'] as List<dynamic>?)
-            ?.map((e) => Shipment.fromMap(e as Map<String, dynamic>))
-            .toList(),
+        user: data['user'] == null
+            ? null
+            : User.fromMap(data['user'] as Map<String, dynamic>),
+        count: data['_count'] == null
+            ? null
+            : Count.fromMap(data['_count'] as Map<String, dynamic>),
       );
 
   Map<String, dynamic> toMap() => {
@@ -76,14 +88,18 @@ class Trip {
         'originCity': originCity,
         'destinationCity': destinationCity,
         'available': available,
-        'note': note,
-        'user': user?.toMap(),
-        'shipments': shipments?.map((e) => e.toMap()).toList(),
-        'addressMeeting': addressMeeting,
-        'departDate': departDate?.toIso8601String(),
+        'consumed': consumed,
         'createdAt': createdAt?.toIso8601String(),
+        'updatedAt': updatedAt?.toIso8601String(),
+        'note': note,
+        'addressMeeting': addressMeeting,
+        'bookInfoId': bookInfoId,
+        'departDate': departDate?.toIso8601String(),
+        'userId': userId,
         'bookInfo': bookInfo?.toMap(),
         'itemsNotAllowed': itemsNotAllowed?.map((e) => e.toMap()).toList(),
+        'user': user?.toMap(),
+        '_count': count?.toMap(),
       };
 
   /// `dart:convert`
@@ -97,26 +113,4 @@ class Trip {
   ///
   /// Converts [Trip] to a JSON string.
   String toJson() => json.encode(toMap());
-
-  TripsDto toTripsDto() {
-    return TripsDto(
-        id: id,
-        origin: origin,
-        destination: destination,
-        originCity: originCity,
-        destinationCity: destinationCity,
-        available: available,
-        consumed: consumed,
-        note: note,
-        addressMeeting: addressMeeting,
-        departDate: departDate,
-        createdAt: createdAt,
-        bookInfo: bookInfo?.toBookInfoDto(),
-        user: user?.toUserDto(),
-        shipmentDto:
-            shipments?.map((shipment) => shipment.toShipmentDto()).toList(),
-        itemsNotAllowed: itemsNotAllowed
-            ?.map((item) => item.toItemsNotAllowedDto())
-            .toList());
-  }
 }

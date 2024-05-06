@@ -4,20 +4,47 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/shipment.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/domain/models/trip_deal_dto.dart';
+import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
 import 'package:hatly/presentation/home/tabs/trips/trips_list_bottom_sheet.dart';
+import 'package:hatly/providers/auth_provider.dart';
 import 'package:intl/intl.dart';
 
-class ShipmentCard extends StatelessWidget {
-  ShipmentDto shipmentDto;
-  Function showConfirmedBottomSheet;
-  ShipmentCard(
-      {required this.shipmentDto, required this.showConfirmedBottomSheet});
+class MyTripDealCard extends StatefulWidget {
+  TripsDto tripsDto;
+  TripDealDto dealDto;
+  // Function showConfirmedBottomSheet;
+  MyTripDealCard(
+      {required this.tripsDto,
+      // required this.showConfirmedBottomSheet,
+      required this.dealDto});
+
+  @override
+  State<MyTripDealCard> createState() => _MyTripDealCardState();
+}
+
+class _MyTripDealCardState extends State<MyTripDealCard> {
+  late LoggedInState loggedInState;
+  late String userEmail;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    UserProvider userProvider =
+        BlocProvider.of<UserProvider>(context, listen: false);
+
+    if (userProvider.state is LoggedInState) {
+      loggedInState = userProvider.state as LoggedInState;
+      userEmail = loggedInState.user.email ?? '';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +53,9 @@ class ShipmentCard extends StatelessWidget {
       // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .3),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, ShipmentDetails.routeName,
-              arguments: ShipmentDetailsArguments(shipmentDto: shipmentDto));
+          // Navigator.pushNamed(context, ShipmentDetails.routeName,
+          //     arguments:
+          //         ShipmentDetailsArguments(shipmentDto: widget.shipmentDto));
         },
         child: Card(
             shape: RoundedRectangleBorder(
@@ -41,6 +69,27 @@ class ShipmentCard extends StatelessWidget {
                   BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: Column(
                 children: [
+                  if (widget.dealDto.creatorEmail != userEmail)
+                    Container(
+                      // margin: EdgeInsets.only(top: 5),
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * .045,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20)),
+                          color: Colors.amber),
+                      child: Center(
+                        child: Text(
+                          'An offer from shopper ${widget.dealDto.shopper?.firstName}',
+                          // textAlign: TextAlign.start,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
@@ -50,18 +99,18 @@ class ShipmentCard extends StatelessWidget {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            shipmentDto.items?.first.photos == null
+                            widget.dealDto.shipment?.items?.first.photos == null
                                 ? Container(
                                     width: 100,
                                     height: 100,
                                     color: Colors.grey[300],
                                   )
                                 : Image.network(
-                                    shipmentDto
-                                        .items!.first.photos!.first.photo!,
+                                    widget.dealDto.shipment!.items!.first
+                                        .photos!.first.photo!,
                                     width: 100,
                                     height: 100,
-                                    fit: BoxFit.fitWidth,
+                                    fit: BoxFit.fitHeight,
                                   ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +121,7 @@ class ShipmentCard extends StatelessWidget {
                                   child: FittedBox(
                                     fit: BoxFit.fitWidth,
                                     child: Text(
-                                      shipmentDto.title!,
+                                      widget.dealDto.shipment!.title!,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.poppins(
                                           fontSize: 20,
@@ -92,7 +141,7 @@ class ShipmentCard extends StatelessWidget {
                                         child: Container(
                                           margin: EdgeInsets.only(left: 10),
                                           child: Text(
-                                            shipmentDto.from!,
+                                            widget.dealDto.shipment!.from!,
                                             overflow: TextOverflow.ellipsis,
                                             style: GoogleFonts.poppins(
                                                 fontSize: 15,
@@ -114,7 +163,7 @@ class ShipmentCard extends StatelessWidget {
                                         child: Container(
                                           margin: EdgeInsets.only(left: 10),
                                           child: Text(
-                                            shipmentDto.to!,
+                                            widget.dealDto.shipment!.to!,
                                             overflow: TextOverflow.ellipsis,
                                             style: GoogleFonts.poppins(
                                                 fontSize: 15,
@@ -131,8 +180,8 @@ class ShipmentCard extends StatelessWidget {
                                 Container(
                                   margin: EdgeInsets.only(left: 10),
                                   child: Text(
-                                    DateFormat('dd MMMM yyyy')
-                                        .format(shipmentDto.expectedDate!),
+                                    DateFormat('dd MMMM yyyy').format(
+                                        widget.dealDto.shipment!.expectedDate!),
                                     style: GoogleFonts.poppins(
                                         fontSize: 10, color: Colors.grey[600]),
                                   ),
@@ -158,10 +207,11 @@ class ShipmentCard extends StatelessWidget {
                                     margin: EdgeInsets.only(top: 10),
                                     child: ClipRRect(
                                         borderRadius: BorderRadius.circular(25),
-                                        child: shipmentDto.user!.profilePhoto !=
+                                        child: widget.dealDto.shipment!.user!
+                                                    .profilePhoto !=
                                                 null
-                                            ? base64ToUserImage(
-                                                shipmentDto.user!.profilePhoto!)
+                                            ? base64ToUserImage(widget.dealDto
+                                                .shipment!.user!.profilePhoto!)
                                             : Container(
                                                 width: 50,
                                                 height: 50,
@@ -177,7 +227,8 @@ class ShipmentCard extends StatelessWidget {
                                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Text(
-                                        shipmentDto.user!.firstName!,
+                                        widget
+                                            .dealDto.shipment!.user!.firstName!,
                                         style: GoogleFonts.poppins(
                                             fontSize: 13,
                                             color: Colors.black,
@@ -194,26 +245,31 @@ class ShipmentCard extends StatelessWidget {
                                 ],
                               ),
                               Container(
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    shape: MaterialStatePropertyAll(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                    ),
-                                    backgroundColor: MaterialStatePropertyAll(
-                                        Theme.of(context).primaryColor),
-                                  ),
-                                  onPressed: () {
-                                    _showTripsListBottomSheet(context,
-                                        showConfirmedBottomSheet, shipmentDto);
-                                  },
+                                width: MediaQuery.sizeOf(context).width * .25,
+                                height: MediaQuery.sizeOf(context).height * .04,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: widget.dealDto.dealStatus
+                                                ?.toLowerCase() ==
+                                            'pending'
+                                        ? Colors.amber
+                                        : widget.dealDto.dealStatus
+                                                    ?.toLowerCase() ==
+                                                'accepted'
+                                            ? Colors.green
+                                            : widget.dealDto.dealStatus
+                                                        ?.toLowerCase() ==
+                                                    'rejected'
+                                                ? Colors.red
+                                                : null),
+                                child: Center(
                                   child: Text(
-                                    'Send offer',
+                                    widget.dealDto.dealStatus!.toUpperCase(),
                                     style: GoogleFonts.poppins(
-                                        fontSize: 13,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               )
@@ -234,7 +290,7 @@ class ShipmentCard extends StatelessWidget {
                         color: Theme.of(context).primaryColor),
                     child: Center(
                       child: Text(
-                        'Shipping Bonus ${shipmentDto.reward} \$',
+                        'Shipping Bonus ${widget.dealDto.finalReward} \$',
                         // textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Colors.white,

@@ -89,10 +89,17 @@ class MyShipmentCard extends StatelessWidget {
                               children: [
                                 Container(
                                   margin: EdgeInsets.only(left: 10),
-                                  child: Text(
-                                    from,
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 15, color: Colors.grey[600]),
+                                  width:
+                                      MediaQuery.sizeOf(context).width * .238,
+                                  child: FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text(
+                                      from,
+                                      overflow: TextOverflow.fade,
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 20,
+                                          color: Colors.grey[600]),
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -100,15 +107,22 @@ class MyShipmentCard extends StatelessWidget {
                                   child: Icon(
                                     Icons.flight_land_rounded,
                                     color: Colors.black,
-                                    size: 30,
+                                    size: 20,
                                   ),
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(left: 10),
-                                  child: Text(
-                                    to,
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 15, color: Colors.grey[600]),
+                                  width:
+                                      MediaQuery.sizeOf(context).width * .238,
+                                  child: FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text(
+                                      to,
+                                      overflow: TextOverflow.fade,
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 20,
+                                          color: Colors.grey[600]),
+                                    ),
                                   ),
                                 ),
                               ],

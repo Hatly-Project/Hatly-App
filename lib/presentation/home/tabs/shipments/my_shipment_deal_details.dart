@@ -1123,7 +1123,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                               : accessTokenProvider
                                                           .accessToken !=
                                                       null
-                                                  ? dealDto.creatorEmail !=
+                                                  ? dealDto.creatorEmail ==
                                                           dealCreatorEmail
                                                       ? null
                                                       : acceptShipmentDeal(
@@ -1254,8 +1254,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       'rejected'
                                               ? dealResponseDto?.dealStatus ==
                                                       'accepted'
-                                                  ? ScaffoldMessenger.of(
-                                                          context)
+                                                  ? ScaffoldMessenger.of(context)
                                                       .showSnackBar(
                                                       const SnackBar(
                                                         backgroundColor:
@@ -1314,10 +1313,14 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                               : accessTokenProvider
                                                           .accessToken !=
                                                       null
-                                                  ? viewModel.rejectShipmentDeal(
-                                                      dealId: dealId,
-                                                      token: accessTokenProvider
-                                                          .accessToken!)
+                                                  ? dealDto.creatorEmail ==
+                                                          dealCreatorEmail
+                                                      ? null
+                                                      : viewModel.rejectShipmentDeal(
+                                                          dealId: dealId,
+                                                          token:
+                                                              accessTokenProvider
+                                                                  .accessToken!)
                                                   : null,
                                           child: const Text(
                                             'Reject',

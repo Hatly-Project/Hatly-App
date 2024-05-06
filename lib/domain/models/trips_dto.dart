@@ -78,7 +78,7 @@ class TripsDto {
         'available': available,
         'consumed': consumed,
         'note': note,
-        'user': user,
+        'user': user?.toMap(),
         'addressMeeting': addressMeeting,
         'departDate': departDate?.toIso8601String(),
         'createdAt': createdAt?.toIso8601String(),

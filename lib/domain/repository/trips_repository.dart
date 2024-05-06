@@ -1,10 +1,13 @@
+import 'package:hatly/data/api/trip_matching_shipments_response/trip_matching_shipments_response.dart';
 import 'package:hatly/domain/models/book_info_dto.dart';
 import 'package:hatly/domain/models/create_trip_response_dto.dart';
 import 'package:hatly/domain/models/get_all_trips_response_dto.dart';
 import 'package:hatly/domain/models/get_user_trip_response_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
+import 'package:hatly/domain/models/my_trip_deals_response_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trip_deal_response.dart';
+import 'package:hatly/domain/models/trip_matching_shipments_response_dto.dart';
 
 abstract class TripsRepository {
   Future<GetAllTripsResponseDto> getAllTrips(
@@ -30,4 +33,10 @@ abstract class TripsRepository {
       double? reward,
       required String token,
       required int tripId});
+
+  Future<TripMatchingShipmentsResponseDto> getTripMatchingShipments(
+      {required String token, required int tripId});
+
+  Future<MyTripDealsResponseDto> getMyTripDeals(
+      {required String token, required int tripId});
 }

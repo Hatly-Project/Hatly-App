@@ -293,7 +293,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                                                 .photos!
                                                 .first
                                                 .photo!,
-                                            fit: BoxFit.fitHeight,
+                                            fit: BoxFit.fitWidth,
                                             width: 100,
                                             height: 100,
                                           ), //
@@ -379,7 +379,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
                                       .photos!
                                       .first
                                       .photo!,
-                                  fit: BoxFit.fitHeight,
+                                  fit: BoxFit.fitWidth,
                                   width: 100,
                                   height: 100,
                                 ), //
