@@ -240,26 +240,6 @@ class _TripCardState extends State<MatchingTripCard> {
     );
   }
 
-  void _showShipmentsListBottomSheet(
-      BuildContext context, TripsDto trip, Function showSuccessDialog) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[100],
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => ShipmentsListBottomSheet(
-        tripsDto: trip,
-        showSuccessDialog: showSuccessDialog,
-      ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-    );
-  }
-
   void _showTripDealConfirmationBottomSheet(
       BuildContext context, Function showSuccessDialog) {
     // Navigator.pop(context);

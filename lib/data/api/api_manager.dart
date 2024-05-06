@@ -28,10 +28,12 @@ import 'package:hatly/data/api/trip_deal/deals.dart' as TripDeal;
 import 'package:hatly/data/api/shipment_deal/deals.dart' as ShipmentDeal;
 import 'package:hatly/data/api/trip_deal/trip_deal_request.dart';
 import 'package:hatly/data/api/trip_deal/trip_deal_response.dart';
+import 'package:hatly/data/api/trip_matching_shipments_response/trip_matching_shipments_response.dart';
 import 'package:hatly/data/api/trips/create_trip_request/create_trip_request.dart';
 import 'package:hatly/data/api/trips/create_trip_response/create_trip_response.dart';
 import 'package:hatly/data/api/trips/get_all_trips_response/get_all_trips_response/get_all_trips_response.dart';
 import 'package:hatly/data/api/trips/get_user_trip_response/get_user_trip_response.dart';
+import 'package:hatly/data/api/trips/my_trip_deals_response/my_trip_deals_response.dart';
 import 'package:hatly/data/api/update_payment_info_request.dart';
 import 'package:hatly/data/api/update_payment_info_response.dart';
 import 'package:hatly/data/api/update_profile_request.dart';
@@ -439,6 +441,49 @@ class ApiManager {
     }
   }
 
+  Future<MyTripDealsResponse> getMyTripDeals(
+      {required String accessToken, required int tripId}) async {
+    late Response response;
+    try {
+      var url = Uri.https(baseUrl, 'trips/${tripId.toString()}/deals');
+      response = await client.get(url, headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $accessToken'
+      });
+
+      var getResponse = MyTripDealsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<MyTripDealsResponse> getMyTripDealsWithCheckAccessToken(
+      {required String accessToken, required int tripId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await getMyTripDeals(accessToken: accessToken, tripId: tripId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await getMyTripDeals(
+            accessToken: newAccessToken, tripId: tripId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<ShipmentMatchingTripsResponse>
       getShipmentMatchingTripsWithCheckAccessToken(
           {required String accessToken, required int shipmentId}) async {
@@ -470,6 +515,52 @@ class ApiManager {
       });
 
       var getResponse = ShipmentMatchingTripsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<TripMatchingShipmentsResponse>
+      getTripsMatchingShipmentsWithCheckAccessToken(
+          {required String accessToken, required int tripId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await getTripsMatchingShipments(
+            accessToken: accessToken, tripId: tripId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await getTripsMatchingShipments(
+            accessToken: newAccessToken, tripId: tripId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
+  Future<TripMatchingShipmentsResponse> getTripsMatchingShipments(
+      {required String accessToken, required int tripId}) async {
+    late Response response;
+    try {
+      var url =
+          Uri.https(baseUrl, 'trips/${tripId.toString()}/matching-shipments');
+      response = await client.get(url, headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $accessToken'
+      });
+
+      var getResponse = TripMatchingShipmentsResponse.fromJson(response.body);
       if (getResponse.status == false) {
         throw ServerErrorException(
             errorMessage: getResponse.message!,
@@ -1041,6 +1132,26 @@ class ApiManager {
     }
   }
 
+  Future<CounterOfferResponse> makeCounterOfferWithCheckAccessToken(
+      {required int dealId,
+      required double reward,
+      required String accessToken}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await makeCounterOffer(
+            accessToken: accessToken, reward: reward, dealId: dealId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await makeCounterOffer(
+            accessToken: newAccessToken, reward: reward, dealId: dealId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<CounterOfferResponse> makeCounterOffer(
       {required int dealId,
       required double reward,
@@ -1055,15 +1166,9 @@ class ApiManager {
       });
       var counterOfferResponse = CounterOfferResponse.fromJson(response.body);
       if (counterOfferResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          makeCounterOffer(
-              accessToken: newAccessToken, reward: reward, dealId: dealId);
-        } else {
-          throw ServerErrorException(
-              errorMessage: counterOfferResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: counterOfferResponse.message!,
+            statusCode: response.statusCode);
       }
       return counterOfferResponse;
     } on ServerErrorException catch (e) {
@@ -1072,6 +1177,22 @@ class ApiManager {
     } on Exception catch (e) {
       throw ServerErrorException(
           errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<CancelDealResponse> cancelDealWithCheckAccessToken(
+      {required String accessToken, required int dealId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await cancelDeal(accessToken: accessToken, dealId: dealId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await cancelDeal(accessToken: newAccessToken, dealId: dealId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
     }
   }
 
@@ -1085,14 +1206,9 @@ class ApiManager {
       });
       var cancelDealResponse = CancelDealResponse.fromJson(response.body);
       if (cancelDealResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          cancelDeal(accessToken: newAccessToken, dealId: dealId);
-        } else {
-          throw ServerErrorException(
-              errorMessage: cancelDealResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: cancelDealResponse.message!,
+            statusCode: response.statusCode);
       }
       return cancelDealResponse;
     } on ServerErrorException catch (e) {

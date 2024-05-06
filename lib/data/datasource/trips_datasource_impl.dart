@@ -5,8 +5,10 @@ import 'package:hatly/domain/models/create_trip_response_dto.dart';
 import 'package:hatly/domain/models/get_all_trips_response_dto.dart';
 import 'package:hatly/domain/models/get_user_trip_response_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
+import 'package:hatly/domain/models/my_trip_deals_response_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trip_deal_response.dart';
+import 'package:hatly/domain/models/trip_matching_shipments_response_dto.dart';
 
 class TripsDatasourceImpl implements TripsDatasource {
   ApiManager apiManager;
@@ -72,5 +74,24 @@ class TripsDatasourceImpl implements TripsDatasource {
         reward: reward);
 
     return response.toTripDealResponseDto();
+  }
+
+  @override
+  Future<TripMatchingShipmentsResponseDto> getTripMatchingShipments(
+      {required String token, required int tripId}) async {
+    var response =
+        await apiManager.getTripsMatchingShipmentsWithCheckAccessToken(
+            accessToken: token, tripId: tripId);
+
+    return response.toDto();
+  }
+
+  @override
+  Future<MyTripDealsResponseDto> getMyTripDeals(
+      {required String token, required int tripId}) async {
+    var respone = await apiManager.getMyTripDealsWithCheckAccessToken(
+        accessToken: token, tripId: tripId);
+
+    return respone.toDto();
   }
 }

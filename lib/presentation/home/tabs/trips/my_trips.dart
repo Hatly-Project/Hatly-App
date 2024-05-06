@@ -249,6 +249,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
                                 origin: myTrips[index].origin,
                                 destination: myTrips[index].destination,
                                 availableWeight: myTrips[index].available,
+                                tripsDto: myTrips[index],
                                 date: DateFormat('dd MMMM yyyy')
                                     .format(myTrips[index].departDate!),
                                 consumedWeight: myTrips[index].consumed ?? 0,
@@ -327,6 +328,7 @@ class _MyTripsTabState extends State<MyTripsTab> {
                           itemCount: myTrips.length,
                           itemBuilder: (context, index) => MyTripCard(
                             origin: myTrips[index].origin,
+                            tripsDto: myTrips[index],
                             destination: myTrips[index].destination,
                             availableWeight: myTrips[index].available,
                             date: DateFormat('dd MMMM yyyy')

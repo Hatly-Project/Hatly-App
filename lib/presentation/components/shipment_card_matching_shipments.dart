@@ -6,28 +6,49 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/shipment.dart';
+import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
+import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipment_list_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trips_details_arguments.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trips_details_screen.dart';
+import 'package:hatly/presentation/home/tabs/trips/trip_deal_confirmation_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/trips/trip_details.dart';
+import 'package:hatly/presentation/home/tabs/trips/trip_details_arguments.dart';
 import 'package:hatly/presentation/home/tabs/trips/trips_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 
-class ShipmentCard extends StatelessWidget {
+class MatchingShipmentCard extends StatefulWidget {
   ShipmentDto shipmentDto;
-  Function showConfirmedBottomSheet;
-  ShipmentCard(
-      {required this.shipmentDto, required this.showConfirmedBottomSheet});
+  Deal? deal;
+  MatchingShipmentCard({required this.shipmentDto, required this.deal});
+
+  @override
+  State<MatchingShipmentCard> createState() => _MatchingShipmentCardState();
+}
+
+class _MatchingShipmentCardState extends State<MatchingShipmentCard> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('deal trip ${widget.deal!.tripsDto.destination}');
+  }
 
   @override
   Widget build(BuildContext context) {
+    Deal deal = widget.deal!;
     return Container(
       padding: EdgeInsets.all(6),
       // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .3),
       child: InkWell(
         onTap: () {
           Navigator.pushNamed(context, ShipmentDetails.routeName,
-              arguments: ShipmentDetailsArguments(shipmentDto: shipmentDto));
+              arguments:
+                  ShipmentDetailsArguments(shipmentDto: widget.shipmentDto));
         },
         child: Card(
             shape: RoundedRectangleBorder(
@@ -50,15 +71,15 @@ class ShipmentCard extends StatelessWidget {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            shipmentDto.items?.first.photos == null
+                            widget.shipmentDto.items?.first.photos == null
                                 ? Container(
                                     width: 100,
                                     height: 100,
                                     color: Colors.grey[300],
                                   )
                                 : Image.network(
-                                    shipmentDto
-                                        .items!.first.photos!.first.photo!,
+                                    widget.shipmentDto.items!.first.photos!
+                                        .first.photo!,
                                     width: 100,
                                     height: 100,
                                     fit: BoxFit.fitWidth,
@@ -72,7 +93,7 @@ class ShipmentCard extends StatelessWidget {
                                   child: FittedBox(
                                     fit: BoxFit.fitWidth,
                                     child: Text(
-                                      shipmentDto.title!,
+                                      widget.shipmentDto.title!,
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.poppins(
                                           fontSize: 20,
@@ -84,19 +105,23 @@ class ShipmentCard extends StatelessWidget {
                                   height: 10,
                                 ),
                                 Container(
-                                  width: MediaQuery.sizeOf(context).width * .62,
+                                  width: MediaQuery.sizeOf(context).width * .64,
                                   child: Row(
                                     // mainAxisSize: MainAxisSize.max,
                                     children: [
                                       Expanded(
                                         child: Container(
                                           margin: EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            shipmentDto.from!,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 15,
-                                                color: Colors.grey[600]),
+                                          child: FittedBox(
+                                            fit: BoxFit.fitWidth,
+                                            child: Text(
+                                              widget.shipmentDto.from!,
+                                              overflow: TextOverflow.fade,
+                                              style: GoogleFonts.poppins(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.grey[600]),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -106,18 +131,19 @@ class ShipmentCard extends StatelessWidget {
                                           child: Icon(
                                             Icons.flight_land_rounded,
                                             color: Colors.black,
-                                            size: 30,
+                                            size: 20,
                                           ),
                                         ),
                                       ),
                                       Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.only(left: 10),
+                                        child: FittedBox(
+                                          fit: BoxFit.fitWidth,
                                           child: Text(
-                                            shipmentDto.to!,
-                                            overflow: TextOverflow.ellipsis,
+                                            widget.shipmentDto.to!,
+                                            overflow: TextOverflow.fade,
                                             style: GoogleFonts.poppins(
                                                 fontSize: 15,
+                                                fontWeight: FontWeight.bold,
                                                 color: Colors.grey[600]),
                                           ),
                                         ),
@@ -131,8 +157,8 @@ class ShipmentCard extends StatelessWidget {
                                 Container(
                                   margin: EdgeInsets.only(left: 10),
                                   child: Text(
-                                    DateFormat('dd MMMM yyyy')
-                                        .format(shipmentDto.expectedDate!),
+                                    DateFormat('dd MMMM yyyy').format(
+                                        widget.shipmentDto.expectedDate!),
                                     style: GoogleFonts.poppins(
                                         fontSize: 10, color: Colors.grey[600]),
                                   ),
@@ -158,10 +184,13 @@ class ShipmentCard extends StatelessWidget {
                                     margin: EdgeInsets.only(top: 10),
                                     child: ClipRRect(
                                         borderRadius: BorderRadius.circular(25),
-                                        child: shipmentDto.user!.profilePhoto !=
+                                        child: widget.shipmentDto.user!
+                                                    .profilePhoto !=
                                                 null
-                                            ? base64ToUserImage(
-                                                shipmentDto.user!.profilePhoto!)
+                                            ? base64ToUserImage(widget
+                                                .shipmentDto
+                                                .user!
+                                                .profilePhoto!)
                                             : Container(
                                                 width: 50,
                                                 height: 50,
@@ -177,7 +206,7 @@ class ShipmentCard extends StatelessWidget {
                                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Text(
-                                        shipmentDto.user!.firstName!,
+                                        widget.shipmentDto.user!.firstName!,
                                         style: GoogleFonts.poppins(
                                             fontSize: 13,
                                             color: Colors.black,
@@ -205,8 +234,11 @@ class ShipmentCard extends StatelessWidget {
                                         Theme.of(context).primaryColor),
                                   ),
                                   onPressed: () {
-                                    _showTripsListBottomSheet(context,
-                                        showConfirmedBottomSheet, shipmentDto);
+                                    print('tripp ${deal.tripsDto.destination}');
+                                    _showTripDealConfirmationBottomSheet(
+                                      showSuccessDialog,
+                                      deal,
+                                    );
                                   },
                                   child: Text(
                                     'Send offer',
@@ -234,7 +266,7 @@ class ShipmentCard extends StatelessWidget {
                         color: Theme.of(context).primaryColor),
                     child: Center(
                       child: Text(
-                        'Shipping Bonus ${shipmentDto.reward} \$',
+                        'Shipping Bonus ${widget.shipmentDto.reward} \$',
                         // textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Colors.white,
@@ -250,16 +282,42 @@ class ShipmentCard extends StatelessWidget {
     );
   }
 
-  void _showTripsListBottomSheet(BuildContext context,
-      Function showSuccessDialog, ShipmentDto shipmentDto) {
+  void showSuccessDialog(String successMsg) {
+    _showShipmentDealConfirmedBottomSheet(context);
+    // if (Platform.isIOS) {
+    //   DialogUtils.showDialogIos(
+    //       alertMsg: 'Success', alertContent: successMsg, context: context);
+    // } else {
+    //   DialogUtils.showDialogAndroid(
+    //       alertMsg: 'Success', alertContent: successMsg, context: context);
+    // }
+  }
+
+  void _showShipmentDealConfirmedBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      builder: (context) => DealConfirmedBottomSheet(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
+
+  void _showTripDealConfirmationBottomSheet(
+      Function showSuccessDialog, Deal deal) {
+    // Navigator.pop(context);
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[100],
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => TripsListBottomSheet(
+      builder: (context) => TripDealConfirmationBottomSheet(
+        deal: deal,
         showSuccessDialog: showSuccessDialog,
-        shipmentDto: shipmentDto,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(

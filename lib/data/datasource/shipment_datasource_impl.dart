@@ -122,7 +122,7 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
       {required String token,
       required int dealId,
       required double reward}) async {
-    var response = await apiManager.makeCounterOffer(
+    var response = await apiManager.makeCounterOfferWithCheckAccessToken(
         dealId: dealId, reward: reward, accessToken: token);
 
     return response.toResponseDto();
@@ -130,9 +130,11 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
 
   @override
   Future<CancelDealResponseDto> cancelDeal(
-      {required String token, required int dealId}) {
-    // TODO: implement cancelDeal
-    throw UnimplementedError();
+      {required String token, required int dealId}) async {
+    var response =
+        await apiManager.cancelDeal(dealId: dealId, accessToken: token);
+
+    return response.toResponseDto();
   }
 
   @override
