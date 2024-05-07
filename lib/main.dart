@@ -8,6 +8,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/firebase_options.dart';
+import 'package:hatly/presentation/home/tabs/chat/chat_screen.dart';
+import 'package:hatly/presentation/home/tabs/chat/chat_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/profile/edit_profile_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/payment_information_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
@@ -175,6 +177,10 @@ class MyApp extends StatelessWidget {
         TripDetails.routeName: (context) => TripDetails(),
         ProfileScreen.routeName: (context) => ProfileScreen(),
         MyShipmentDetails.routeName: (context) => MyShipmentDetails(),
+        ChatScreen.routeName: (context) => ChatScreen(
+              chatScreenArguments: ModalRoute.of(context)?.settings.arguments
+                  as ChatScreenArguments,
+            ),
         MyTripDetails.routeName: (context) => MyTripDetails(),
         ShipmentDealTrackingScreen.routeName: (context) =>
             ShipmentDealTrackingScreen(),

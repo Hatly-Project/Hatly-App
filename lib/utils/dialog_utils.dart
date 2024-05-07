@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 
 class DialogUtils {
   static void showDialogAndroid(
-      {String? alertMsg, String? alertContent, required BuildContext context}) {
+      {String? alertMsg,
+      String? alertContent,
+      required BuildContext context,
+      void Function()? onAction,
+      int? statusCode}) {
     showDialog(
         context: context,
         barrierDismissible: true,
@@ -13,10 +17,12 @@ class DialogUtils {
             content: Text(alertContent!),
             actions: [
               TextButton(
-                  onPressed: () {
-                    hideDialog(context);
-                  },
-                  child: Text('Ok'))
+                onPressed: statusCode == 401
+                    ? onAction
+                    : () => Navigator.of(context).pop(),
+                child:
+                    statusCode == 401 ? const Text('Login') : const Text('Ok'),
+              )
             ],
           );
         });

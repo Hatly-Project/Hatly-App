@@ -691,7 +691,6 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                           margin: EdgeInsets.only(top: 10),
                           child: Center(
                             child: MultiSelectDropDown(
-                              showClearIcon: true,
                               controller: _controller,
                               onOptionSelected: (items) {
                                 itemsNotAllowed = items
@@ -704,15 +703,25 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                                 }
                               },
                               options: const <ValueItem>[
-                                ValueItem(label: 'Mobiles & Tablets'),
-                                ValueItem(label: 'Laptops'),
-                                ValueItem(label: 'Cosmetics'),
-                                ValueItem(label: 'Clothing'),
-                                ValueItem(label: 'Shoes & Bags'),
-                                ValueItem(label: 'Watches & Sunglasses'),
-                                ValueItem(label: 'Supplements'),
-                                ValueItem(label: 'Food & Beverages'),
-                                ValueItem(label: 'Books'),
+                                ValueItem(
+                                    label: 'Mobiles & Tablets',
+                                    value: 'Mobiles & Tablets'),
+                                ValueItem(label: 'Laptops', value: 'Laptops'),
+                                ValueItem(
+                                    label: 'Cosmetics', value: 'Cosmetics'),
+                                ValueItem(label: 'Clothing', value: 'Clothing'),
+                                ValueItem(
+                                    label: 'Shoes & Bags',
+                                    value: 'Shoes & Bags'),
+                                ValueItem(
+                                    label: 'Watches & Sunglasses',
+                                    value: 'Watches & Sunglasses'),
+                                ValueItem(
+                                    label: 'Supplements', value: 'Supplements'),
+                                ValueItem(
+                                    label: 'Food & Beverages',
+                                    value: 'Food & Beverages'),
+                                ValueItem(label: 'Books', value: 'Books'),
                               ],
                               selectionType: SelectionType.multi,
                               chipConfig:
