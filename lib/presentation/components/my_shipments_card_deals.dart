@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_deal_confirmation_bottom_sheet.dart';
@@ -31,11 +33,11 @@ class MyShipmentCardForDeals extends StatelessWidget {
         ),
         color: Colors.white,
         child: Container(
-          width: MediaQuery.of(context).size.width * .95,
+          // width: 500,
           // height: MediaQuery.of(context).size.height * .29,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(2.0),
             child: Row(
               children: [
                 shipImage ?? Container(),
@@ -62,19 +64,23 @@ class MyShipmentCardForDeals extends StatelessWidget {
                       ),
                       Container(
                         // margin: EdgeInsets.only(left: 5),
-                        width: MediaQuery.sizeOf(context).width * .41,
+                        width: MediaQuery.sizeOf(context).width * .4,
                         child: Row(
                           // crossAxisAlignment: CrossAxisAlignment.center,
                           // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Expanded(
-                              child: Container(
-                                width: MediaQuery.sizeOf(context).width * .2,
+                            Container(
+                              width: MediaQuery.sizeOf(context).width * .16,
+                              // color: Colors.red,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
                                 child: Text(
                                   from,
-                                  overflow: TextOverflow.clip,
+                                  overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.poppins(
-                                      fontSize: 12, color: Colors.grey[600]),
+                                      fontSize: 30,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -83,18 +89,22 @@ class MyShipmentCardForDeals extends StatelessWidget {
                                 child: Icon(
                                   Icons.flight_land_rounded,
                                   color: Colors.black,
-                                  size: 20,
+                                  size: 18,
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: Container(
-                                width: MediaQuery.sizeOf(context).width * .2,
+                            Container(
+                              width: MediaQuery.sizeOf(context).width * .177,
+                              // color: Colors.red,
+                              child: FittedBox(
+                                // fit: BoxFit.scaleDown,
                                 child: Text(
                                   to,
-                                  overflow: TextOverflow.clip,
+                                  overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.poppins(
-                                      fontSize: 12, color: Colors.grey[600]),
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),

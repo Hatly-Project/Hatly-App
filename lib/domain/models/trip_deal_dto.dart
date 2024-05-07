@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:hatly/data/api/trips/my_trip_deals_response/shopper.dart';
 import 'package:hatly/data/api/shipment.dart';
@@ -17,8 +18,8 @@ class TripDealDto {
   int? travelerUserId;
   String? creatorEmail;
   String? type;
-  int? fees;
-  int? paymentFees;
+  double? fees;
+  double? paymentFees;
   String? dealStatus;
   ShopperDto? shopper;
   ShipmentDto? shipment;
@@ -58,8 +59,8 @@ class TripDealDto {
         travelerUserId: data['travelerUserId'] as int?,
         creatorEmail: data['creatorEmail'] as String?,
         type: data['type'] as String?,
-        fees: data['fees'] as int?,
-        paymentFees: data['paymentFees'] as int?,
+        fees: (data['fees'] as num?)?.toDouble(),
+        paymentFees: (data['paymentFees'] as num?)?.toDouble(),
         dealStatus: data['dealStatus'] as String?,
         shopper: data['shopper'] == null
             ? null

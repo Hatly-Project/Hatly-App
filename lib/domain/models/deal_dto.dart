@@ -6,6 +6,7 @@ import 'package:hatly/domain/models/traveler_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 
 class DealDto {
+  static const collectionName = 'Deals';
   int? id;
   String? dealStatus;
   String? creatorEmail;
@@ -52,13 +53,13 @@ class DealDto {
         'trip': trip?.toMap(),
       };
 
-  factory DealDto.fromFirestore(Map<String, dynamic> data) => DealDto(
-        id: data['id'] as int?,
-        dealStatus: data['dealStatus'] as String?,
-        creatorEmail: data['creatorEmail'] as String?,
-        counterReward: (data['counterReward'] as num?)?.toDouble(),
-        finalReward: (data['finalReward'] as num?)?.toDouble(),
-      );
+  DealDto.fromFirestore(Map<String, dynamic> data) {
+    id = data['id'];
+    dealStatus = data['dealStatus'];
+    creatorEmail = data['creatorEmail'];
+    counterReward = (data['counterReward'] as num?)?.toDouble();
+    finalReward = (data['finalReward'] as num?)?.toDouble();
+  }
 
   Map<String, dynamic> toFireStore() => {
         'id': id,

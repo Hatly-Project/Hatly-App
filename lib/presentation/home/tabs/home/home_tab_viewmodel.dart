@@ -170,9 +170,10 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           totalPages: totalTripsPages!,
           currentPage: tripsPage));
     } on ServerErrorException catch (e) {
-      emit(GetAllTripsFailState(e.errorMessage));
+      emit(GetAllTripsFailState(
+          failMessage: e.errorMessage, statusCode: e.statusCode));
     } on Exception catch (e) {
-      emit(GetAllTripsFailState(e.toString()));
+      emit(GetAllTripsFailState(failMessage: e.toString()));
     }
   }
 }
@@ -237,8 +238,9 @@ class GetAllTripsPaginationLoadingState extends HomeViewState {
 
 class GetAllTripsFailState extends HomeViewState {
   String failMessage;
+  int? statusCode;
 
-  GetAllTripsFailState(this.failMessage);
+  GetAllTripsFailState({required this.failMessage, this.statusCode});
 }
 
 class RefreshTokenSuccessState extends HomeViewState {

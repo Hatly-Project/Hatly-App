@@ -207,11 +207,11 @@ class _MyTripDealCardState extends State<MyTripDealCard> {
                                     margin: EdgeInsets.only(top: 10),
                                     child: ClipRRect(
                                         borderRadius: BorderRadius.circular(25),
-                                        child: widget.dealDto.shipment!.user!
+                                        child: widget.dealDto.shopper!
                                                     .profilePhoto !=
                                                 null
-                                            ? base64ToUserImage(widget.dealDto
-                                                .shipment!.user!.profilePhoto!)
+                                            ? base64ToUserImage(widget
+                                                .dealDto.shopper!.profilePhoto!)
                                             : Container(
                                                 width: 50,
                                                 height: 50,
@@ -227,8 +227,7 @@ class _MyTripDealCardState extends State<MyTripDealCard> {
                                     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Text(
-                                        widget
-                                            .dealDto.shipment!.user!.firstName!,
+                                        widget.dealDto.shopper!.firstName!,
                                         style: GoogleFonts.poppins(
                                             fontSize: 13,
                                             color: Colors.black,

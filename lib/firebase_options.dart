@@ -63,6 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '445303705925',
     projectId: 'hatly-100dc',
     storageBucket: 'hatly-100dc.appspot.com',
+    androidClientId: '445303705925-mlnjpvric7d0bia56e5i92biiaghnotu.apps.googleusercontent.com',
+    iosClientId: '445303705925-6sh98frk7v49858seg60bn7u9t25srbl.apps.googleusercontent.com',
     iosBundleId: 'com.hatly.hatly-user',
   );
 }

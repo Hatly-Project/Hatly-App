@@ -820,7 +820,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                       shipImage: Image.network(
                                         shipmentDto
                                             .items!.first.photos!.first.photo!,
-                                        fit: BoxFit.fitHeight,
+                                        fit: BoxFit.fitWidth,
                                         width: 100,
                                         height: 100,
                                       ), //
@@ -1537,66 +1537,6 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                             onPressed: () => dealResponseDto
                                                             ?.dealStatus ==
                                                         'accepted' ||
-                                                    dealResponseDto
-                                                            ?.dealStatus ==
-                                                        'rejected'
-                                                ? ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                    const SnackBar(
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      content: Text(
-                                                        'The deal is already accepted',
-                                                        style: TextStyle(
-                                                            fontSize: 17,
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                  )
-                                                : accessTokenProvider
-                                                            .accessToken !=
-                                                        null
-                                                    ? viewModel.acceptShipmentDeal(
-                                                        dealId: dealId,
-                                                        token:
-                                                            accessTokenProvider
-                                                                .accessToken!)
-                                                    : null,
-                                            child: const Text(
-                                              'Accept',
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                                fixedSize: Size(
-                                                    MediaQuery.sizeOf(context)
-                                                            .width *
-                                                        .3,
-                                                    MediaQuery.sizeOf(context)
-                                                            .height *
-                                                        .07),
-                                                elevation: 0,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15)),
-                                                side: const BorderSide(
-                                                    color: Colors.amber,
-                                                    width: 1),
-                                                backgroundColor: Colors.amber,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 12)),
-                                            onPressed: () => dealResponseDto
-                                                            ?.dealStatus ==
-                                                        'accepted' ||
                                                     dealResponseDto?.dealStatus ==
                                                         'rejected'
                                                 ? dealResponseDto?.dealStatus ==
@@ -1618,10 +1558,10 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                           ),
                                                         ),
                                                       )
-                                                    : dealResponseDto?.dealStatus ==
+                                                    : dealResponseDto
+                                                                ?.dealStatus ==
                                                             'rejected'
-                                                        ? ScaffoldMessenger.of(
-                                                                context)
+                                                        ? ScaffoldMessenger.of(context)
                                                             .showSnackBar(
                                                             const SnackBar(
                                                               backgroundColor:
@@ -1661,11 +1601,14 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                 : accessTokenProvider
                                                             .accessToken !=
                                                         null
-                                                    ? viewModel.acceptShipmentDeal(
-                                                        dealId: dealId,
-                                                        token:
-                                                            accessTokenProvider
-                                                                .accessToken!)
+                                                    ? dealDto.creatorEmail ==
+                                                            dealCreatorEmail
+                                                        ? null
+                                                        : acceptShipmentDeal(
+                                                            dealId: dealId,
+                                                            token:
+                                                                accessTokenProvider
+                                                                    .accessToken)
                                                     : null,
                                             child: const Text(
                                               'Accept',
@@ -1789,32 +1732,76 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                             onPressed: () => dealResponseDto
                                                             ?.dealStatus ==
                                                         'accepted' ||
-                                                    dealResponseDto
-                                                            ?.dealStatus ==
+                                                    dealResponseDto?.dealStatus ==
                                                         'rejected'
-                                                ? ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                    const SnackBar(
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      content: Text(
-                                                        'You cannot reject an accepted deal',
-                                                        style: TextStyle(
-                                                            fontSize: 17,
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                  )
+                                                ? dealResponseDto?.dealStatus ==
+                                                        'accepted'
+                                                    ? ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                        const SnackBar(
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          content: Text(
+                                                            'You cannot reject an accepted deal',
+                                                            style: TextStyle(
+                                                                fontSize: 17,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : dealResponseDto
+                                                                ?.dealStatus ==
+                                                            'rejected'
+                                                        ? ScaffoldMessenger.of(context)
+                                                            .showSnackBar(
+                                                            const SnackBar(
+                                                              backgroundColor:
+                                                                  Colors.red,
+                                                              content: Text(
+                                                                'You cannot reject the deal twice',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        17,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                            SnackBar(
+                                                              backgroundColor:
+                                                                  Colors.red,
+                                                              content: Text(
+                                                                'You cannot reject an ${dealResponseDto?.dealStatus} deal',
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        17,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                          )
                                                 : accessTokenProvider
                                                             .accessToken !=
                                                         null
-                                                    ? viewModel.rejectShipmentDeal(
-                                                        dealId: dealId,
-                                                        token:
-                                                            accessTokenProvider
+                                                    ? dealDto.creatorEmail ==
+                                                            dealCreatorEmail
+                                                        ? null
+                                                        : viewModel.rejectShipmentDeal(
+                                                            dealId: dealId,
+                                                            token: accessTokenProvider
                                                                 .accessToken!)
                                                     : null,
                                             child: const Text(

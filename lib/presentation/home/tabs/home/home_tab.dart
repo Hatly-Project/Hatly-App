@@ -218,6 +218,13 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               DialogUtils.showDialogAndroid(
                   alertMsg: 'Fail',
                   alertContent: state.failMessage,
+                  onAction: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, 'Login',
+                        arguments:
+                            LoginScreenArguments(args!.countriesFlagsDto));
+                  },
+                  statusCode: state.statusCode,
                   context: context);
             }
           }
@@ -244,11 +251,13 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               DialogUtils.showDialogIos(
                   alertMsg: 'Fail',
                   alertContent: state.failMessage,
+                  statusCode: state.statusCode,
                   context: context);
             } else {
               DialogUtils.showDialogAndroid(
                   alertMsg: 'Fail',
                   alertContent: state.failMessage,
+                  statusCode: state.statusCode,
                   context: context);
             }
           }
@@ -774,10 +783,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                         ),
                                       ))
                                     : !isShipmentPaginationLoading
-                                        ? buildShipmentsList(
-                                            state as GetAllShipsSuccessState)
-                                        : buildShipmentsList(state
-                                            as GetAllShipsPaginationLoadingState)
+                                        ? buildShipmentsList(state)
+                                        : buildShipmentsList(state)
                             : shimmerIsLoading
                                 ? SliverList(
                                     delegate: SliverChildBuilderDelegate(
@@ -814,8 +821,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ))
-                                    : buildTripsList(
-                                        state as GetAllTripsSuccessState)
+                                    : !isTripPaginationLoading
+                                        ? buildTripsList(
+                                            state as GetAllTripsSuccessState)
+                                        : buildTripsList(state
+                                            as GetAllTripsPaginationLoadingState)
                       ],
                     ),
                   ),

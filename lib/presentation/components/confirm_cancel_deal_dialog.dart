@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class ConfirmCancelDealDialog extends StatelessWidget {
   Function confirmCancellation;
@@ -9,7 +10,7 @@ class ConfirmCancelDealDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: Container(
-        width: MediaQuery.sizeOf(context).width,
+        // width: MediaQuery.sizeOf(context).width,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -29,45 +30,51 @@ class ConfirmCancelDealDialog extends StatelessWidget {
               height: 15,
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(140, 60),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        side: const BorderSide(color: Colors.white, width: 2),
-                        backgroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(vertical: 12)),
-                    onPressed: () {
-                      confirmCancellation();
-                    },
-                    child: const Text(
-                      'Canel',
-                      style: TextStyle(fontSize: 24, color: Colors.white),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(140, 60),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          side: const BorderSide(color: Colors.white, width: 2),
+                          backgroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(vertical: 12)),
+                      onPressed: () {
+                        confirmCancellation();
+                      },
+                      child: const Text(
+                        'Canel',
+                        style: TextStyle(fontSize: 24, color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(top: 10, left: 5),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(140, 60),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        side: const BorderSide(color: Colors.white, width: 2),
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(vertical: 12)),
-                    onPressed: () {
-                      confirmCancellation();
-                    },
-                    child: const Text(
-                      'No',
-                      style: TextStyle(fontSize: 24, color: Colors.white),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                      top: 10,
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(140, 60),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          side: const BorderSide(color: Colors.white, width: 2),
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(vertical: 12)),
+                      onPressed: () {
+                        confirmCancellation();
+                      },
+                      child: const Text(
+                        'No',
+                        style: TextStyle(fontSize: 24, color: Colors.white),
+                      ),
                     ),
                   ),
                 ),

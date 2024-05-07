@@ -60,7 +60,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
       // token = loggedInState.accessToken;
       // // Now you can use the 'token' variable as needed in your code.
       // print('User token: $token');
-      print('user email ${loggedInState.user.email}');
+      print('user id ${loggedInState.user.id}');
       // getAccessToken(accessTokenProvider)
       //     .then((accessToken) => token = accessToken);
     } else {

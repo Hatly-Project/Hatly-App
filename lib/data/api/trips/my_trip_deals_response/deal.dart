@@ -16,8 +16,8 @@ class Deal {
   int? travelerUserId;
   String? creatorEmail;
   String? type;
-  int? fees;
-  int? paymentFees;
+  double? fees;
+  double? paymentFees;
   String? dealStatus;
   Shopper? shopper;
   Shipment? shipment;
@@ -57,8 +57,8 @@ class Deal {
         travelerUserId: data['travelerUserId'] as int?,
         creatorEmail: data['creatorEmail'] as String?,
         type: data['type'] as String?,
-        fees: data['fees'] as int?,
-        paymentFees: data['paymentFees'] as int?,
+        fees: (data['fees'] as num?)?.toDouble(),
+        paymentFees: (data['paymentFees'] as num?)?.toDouble(),
         dealStatus: data['dealStatus'] as String?,
         shopper: data['shopper'] == null
             ? null
