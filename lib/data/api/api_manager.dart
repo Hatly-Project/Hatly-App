@@ -5,6 +5,7 @@ import 'package:hatly/data/api/check_access_token_response.dart';
 import 'package:hatly/data/api/check_acess_token.dart';
 import 'package:hatly/data/api/counter_offer.dart';
 import 'package:hatly/data/api/countries_states/countries.dart';
+import 'package:hatly/data/api/get_trip_deal_details/get_trip_deal_details.dart';
 import 'package:hatly/data/api/item.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
 import 'package:hatly/data/api/login/login_request.dart';
@@ -39,6 +40,7 @@ import 'package:hatly/data/api/update_payment_info_response.dart';
 import 'package:hatly/data/api/update_profile_request.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/usecase/get_shipment_matching_trips_usecase.dart';
+import 'package:hatly/domain/usecase/reject_shipment_deal_usecase.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 import 'package:http/http.dart';
@@ -219,6 +221,8 @@ class ApiManager {
       String? phone}) async {
     late Response response;
     try {
+      print(
+          'dob $dob , address $address , city $city , country $country , postal $postalCode , ip $ip , phone $phone');
       var url = Uri.https(baseUrl, 'users');
       var requestBody = UpdateProfileRequest(
         dob: dob,
@@ -229,6 +233,7 @@ class ApiManager {
         ip: ip,
         phone: phone,
       );
+      print('request body : ${requestBody.toJson()}');
       response = await client.patch(url, body: requestBody.toJson(), headers: {
         'content-type': 'application/json',
         'authorization': 'Bearer $accessToken',
@@ -622,19 +627,70 @@ class ApiManager {
     }
   }
 
+  Future<GetTripDealDetailsResponse> getMyTripDealDetailsWithCheckAccessToken(
+      {required String accessToken, required String dealId}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await getMyTripDealDetails(
+            accessToken: accessToken, dealId: dealId);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await getMyTripDealDetails(
+            accessToken: newAccessToken, dealId: dealId);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
+  Future<GetTripDealDetailsResponse> getMyTripDealDetails(
+      {required String accessToken, required String dealId}) async {
+    late Response response;
+    try {
+      var url = Uri.https(baseUrl, 'deals/${dealId.toString()}');
+      response = await client.get(url, headers: {
+        'content-type': 'application/json',
+        'authorization': 'Bearer $accessToken'
+      });
+
+      var getResponse = GetTripDealDetailsResponse.fromJson(response.body);
+      if (getResponse.status == false) {
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return getResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
   Future<AcceptOrRejectShipmentDealResponse>
       acceptShipmentDealWithCheckAccessToken(
           {required String accessToken,
           required String dealId,
+          required String dealType,
           required String status}) async {
     try {
       if (await chechAccessTokenExpired()) {
         return await acceptShipmentDeal(
-            accessToken: accessToken, dealId: dealId, status: status);
+            accessToken: accessToken,
+            dealId: dealId,
+            status: status,
+            dealType: dealType);
       } else {
         var newAccessToken = await refreshAccessToken();
         return await acceptShipmentDeal(
-            accessToken: newAccessToken, dealId: dealId, status: status);
+            accessToken: newAccessToken,
+            dealId: dealId,
+            status: status,
+            dealType: dealType);
       }
     } on ServerErrorException catch (e) {
       throw ServerErrorException(errorMessage: e.errorMessage);
@@ -646,10 +702,11 @@ class ApiManager {
   Future<AcceptOrRejectShipmentDealResponse> acceptShipmentDeal(
       {required String accessToken,
       required String dealId,
+      required String dealType,
       required String status}) async {
     late Response response;
     try {
-      var url = Uri.https(baseUrl, 'deals/${dealId.toString()}/shipment', {
+      var url = Uri.https(baseUrl, 'deals/${dealId.toString()}/$dealType', {
         'status': status,
       });
       response = await client.post(url, headers: {
@@ -674,13 +731,41 @@ class ApiManager {
     }
   }
 
+  Future<AcceptOrRejectShipmentDealResponse> rejectDealWithCheckAccessToken(
+      {required String accessToken,
+      required String dealId,
+      required String dealType,
+      required String status}) async {
+    try {
+      if (await chechAccessTokenExpired()) {
+        return await rejectShipmentDeal(
+            accessToken: accessToken,
+            dealId: dealId,
+            status: status,
+            dealType: dealType);
+      } else {
+        var newAccessToken = await refreshAccessToken();
+        return await rejectShipmentDeal(
+            accessToken: newAccessToken,
+            dealId: dealId,
+            status: status,
+            dealType: dealType);
+      }
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(errorMessage: e.errorMessage);
+    } on Exception catch (e) {
+      throw ServerErrorException(errorMessage: e.toString());
+    }
+  }
+
   Future<AcceptOrRejectShipmentDealResponse> rejectShipmentDeal(
       {required String accessToken,
       required String dealId,
+      required String dealType,
       required String status}) async {
     late Response response;
     try {
-      var url = Uri.https(baseUrl, 'deal/${dealId.toString()}/shipment', {
+      var url = Uri.https(baseUrl, 'deal/${dealId.toString()}/$dealType', {
         'status': status,
       });
       response = await client.post(url, headers: {
@@ -691,15 +776,9 @@ class ApiManager {
       var getResponse =
           AcceptOrRejectShipmentDealResponse.fromJson(response.body);
       if (getResponse.status == false) {
-        if (response.statusCode == 401) {
-          String newAccessToken = await refreshAccessToken();
-          rejectShipmentDeal(
-              accessToken: newAccessToken, dealId: dealId, status: status);
-        } else {
-          throw ServerErrorException(
-              errorMessage: getResponse.message!,
-              statusCode: response.statusCode);
-        }
+        throw ServerErrorException(
+            errorMessage: getResponse.message!,
+            statusCode: response.statusCode);
       }
       return getResponse;
     } on ServerErrorException catch (e) {
@@ -1086,6 +1165,7 @@ class ApiManager {
 
   Future<RefreshTokenResponse> refreshFCMTokenWithCheckAccessToken(
       {required String accessToken, required String fcmToken}) async {
+    print('refresh tokeeennn $fcmToken');
     try {
       if (await chechAccessTokenExpired()) {
         return await refreshFCMToken(

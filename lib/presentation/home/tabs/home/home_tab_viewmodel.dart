@@ -57,7 +57,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
 
     try {
       if (isPagination) {
-        emit(GetAllShipsPaginationLoadingState('Loading...'));
+        // emit(GetAllShipsPaginationLoadingState('Loading...'));
 
         var response = await getAllShipmentsUsecase.invoke(
             token: token, page: shipmentsPage);
@@ -133,7 +133,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
     try {
       if (isPagination) {
         print('page pagination $tripsPage');
-        emit(GetAllTripsPaginationLoadingState('Loading...'));
+        // emit(GetAllTripsPaginationLoadingState('Loading...'));
         var response =
             await getAllTripsUsecase.invoke(token: token, page: tripsPage);
         totalTripsPages = response.totalPages;

@@ -115,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             FittedBox(
                               fit: BoxFit.fitWidth,
                               child: Container(
-                                width: MediaQuery.sizeOf(context).width * .56,
+                                width: MediaQuery.sizeOf(context).width * .5,
                                 child: Text(
                                   userEmail!,
                                   style: GoogleFonts.poppins(

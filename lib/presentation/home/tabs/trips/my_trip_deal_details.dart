@@ -10,53 +10,61 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
-import 'package:hatly/domain/models/ship_deal_details_dto.dart';
+import 'package:hatly/domain/models/trip_deal_dto.dart';
 import 'package:hatly/presentation/components/animated_alert_dialog.dart';
 import 'package:hatly/presentation/components/confirm_cancel_deal_dialog.dart';
 import 'package:hatly/presentation/components/counter_offer_dialog.dart';
 import 'package:hatly/presentation/components/my_shipment_card.dart';
+import 'package:hatly/presentation/components/my_trip_card.dart';
+import 'package:hatly/presentation/components/my_trip_deal_card.dart';
+import 'package:hatly/presentation/components/shimmer_card.dart';
+import 'package:hatly/presentation/components/shipment_card_for_trip_deal_details.dart';
 import 'package:hatly/presentation/components/trip_card_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_viewmodel.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_accepted_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_tracking_screen.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_trcking_screen_arguments.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trip_deal_details_argument.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trip_deal_details_viewmodel.dart';
+import 'package:hatly/presentation/home/tabs/trips/trip_deal_accepted_bottom_sheet.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/providers/payment_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
-class MyShipmentDealDetails extends StatefulWidget {
-  static const routeName = 'MyShipmentDealDetails';
-  MyShipmentDealDetailsArgument args;
-  MyShipmentDealDetails({required this.args});
+class MyTripDealDetails extends StatefulWidget {
+  static const routeName = 'MyTripDealDetails';
+  MyTripDealDetailsArgument args;
+  MyTripDealDetails({required this.args});
 
   @override
-  State<MyShipmentDealDetails> createState() => _MyShipmentDealDetailsState();
+  State<MyTripDealDetails> createState() => _MyTripDealDetailsState();
 }
 
-class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
+class _MyTripDealDetailsState extends State<MyTripDealDetails> {
   ScrollController scrollController = ScrollController();
   bool isLoading = true;
   late LoggedInState loggedInState;
   // late String token;
-  late String dealId;
+  late int dealId;
   bool isPaid = false;
   String? paymentIntentId, clientSecret;
-  ShipmentDealDetailsDto? dealResponseDto;
+  TripDealDto? dealResponseDto;
   late String? dealCreatorEmail;
   AcceptOrRejectShipmentDealResponseDto? acceptShipmentDealResponseDto;
   bool isAccepted = false, isRejected = false, isPaymentSheetOpened = false;
 
-  late GetMyShipmentDealDetailsViewModel viewModel;
+  late GetMyTripDealDetailsViewModel viewModel;
   late AccessTokenProvider accessTokenProvider;
   late PaymentProvider paymentProvider;
-  Future<void> getMyShipmentDealDetails(
-      {required String dealId, required String token}) async {
+  Future<void> getMyTripDealDetails(
+      {required int dealId, required String token}) async {
     if (accessTokenProvider.accessToken != null) {
-      return viewModel.getMyShipmentDealDetails(dealId: dealId, token: token);
+      return viewModel.getMyTripDealDetails(dealId: dealId, token: token);
     }
   }
 
@@ -70,7 +78,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
     accessTokenProvider =
         Provider.of<AccessTokenProvider>(context, listen: false);
     paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
-    viewModel = GetMyShipmentDealDetailsViewModel(accessTokenProvider);
+    viewModel = GetMyTripDealDetailsViewModel(accessTokenProvider);
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
@@ -83,11 +91,11 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
       print(
           'User is not logged in.'); // Handle the scenario where the user is not logged in.
     }
-    paymentProvider.getPaymentIntentId(widget.args.dealDto!.id.toString());
+    paymentProvider.getPaymentIntentId(widget.args.deal!.id.toString());
 
     if (accessTokenProvider.accessToken != null) {
-      getMyShipmentDealDetails(
-          dealId: widget.args.dealDto!.id.toString(),
+      getMyTripDealDetails(
+          dealId: widget.args.deal!.id!,
           token: accessTokenProvider.accessToken!);
     }
   }
@@ -191,17 +199,17 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   Widget build(BuildContext context) {
     // final args = ModalRoute.of(context)?.settings.arguments
     //     as MyShipmentDealDetailsArgument;
-    var dealDto = widget.args.dealDto;
+    var dealDto = widget.args.deal;
     print('status ${dealDto?.dealStatus}');
-    var shipmentDto = widget.args.shipmentDto;
-    dealId = dealDto!.id.toString();
+    var tripdto = widget.args.tripsDto;
+    dealId = dealDto!.id!;
 
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {
-          if (state is GetMyShipmentDealDetailsLoadingState) {
+          if (state is GetMyTripDealDetailsLoadingState) {
             isLoading = true;
-          } else if (state is GetMyShipmentDealDetailsFailState) {
+          } else if (state is GetMyTripDealDetailsFailState) {
             if (Platform.isIOS) {
               DialogUtils.showDialogIos(
                   context: context,
@@ -214,9 +222,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                   context: context);
             }
           }
-          if (state is AcceptShipmentDealLoadingState) {
+          if (state is AcceptTripDealLoadingState) {
             isLoading = true;
-          } else if (state is AcceptShipmentDealFailState) {
+          } else if (state is AcceptTripDealFailState) {
             if (Platform.isIOS) {
               DialogUtils.showDialogIos(
                   context: context,
@@ -229,9 +237,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                   context: context);
             }
           }
-          if (state is RejectShipmentDealLoadingState) {
+          if (state is RejectTripDealLoadingState) {
             isLoading = true;
-          } else if (state is RejectShipmentDealFailState) {
+          } else if (state is RejectTripDealFailState) {
             if (Platform.isIOS) {
               DialogUtils.showDialogIos(
                   context: context,
@@ -246,104 +254,59 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
           }
         },
         listenWhen: (previous, current) {
-          if (previous is GetMyShipmentDealDetailsLoadingState) {
+          if (previous is GetMyTripDealDetailsLoadingState) {
             isLoading = false;
           }
-          if (previous is AcceptShipmentDealLoadingState ||
-              previous is RejectShipmentDealLoadingState) {
+          if (previous is AcceptTripDealLoadingState ||
+              previous is RejectTripDealLoadingState) {
             isLoading = false;
           }
-          if (current is AcceptShipmentDealSuccessState) {
+          if (current is AcceptTripDealSuccessState) {
             isAccepted = true;
             print('trueeee');
           }
-          if (current is RejectShipmentDealSuccessState) {
+          if (current is RejectTripDealSuccessState) {
             isRejected = true;
             print('rejected');
           }
-          if (current is GetMyShipmentDealDetailsLoadingState ||
-              current is GetMyShipmentDealDetailsFailState ||
-              current is AcceptShipmentDealLoadingState ||
-              current is AcceptShipmentDealFailState ||
-              current is RejectShipmentDealLoadingState ||
-              current is RejectShipmentDealFailState) {
+          if (current is GetMyTripDealDetailsLoadingState ||
+              current is GetMyTripDealDetailsFailState ||
+              current is AcceptTripDealLoadingState ||
+              current is AcceptTripDealFailState ||
+              current is RejectTripDealLoadingState ||
+              current is RejectTripDealFailState) {
             return true;
           }
           return false;
         },
         builder: (context, state) {
-          if (state is GetMyShipmentDealDetailsSuccessState) {
+          if (state is GetMyTripDealDetailsSuccessState) {
             dealResponseDto = state.responseDto.deal;
-
-            if (dealResponseDto!.payments != null) {
-              print('sssss');
-              isPaid = dealResponseDto!.payments!.isPaid!;
-              print('is paidd $isPaid');
-
-              if (dealResponseDto!.payments!.paymentIntentId != null &&
-                  dealResponseDto!.payments!.clientSecret != null) {
-                paymentIntentId = dealResponseDto!.payments!.paymentIntentId!;
-                clientSecret = dealResponseDto!.payments!.clientSecret!;
-
-                paymentProvider.setPaymentIntentId(
-                    paymentIntentId, clientSecret, dealId.toString());
-                isAccepted = true;
-              } else {
-                isAccepted = false;
-              }
-              // print('travellerrr ${dealResponseDto!.traveler!.firstName}');
-              if (dealResponseDto?.dealStatus?.toLowerCase() == 'accepted') {
-                isAccepted = true;
-              } else {
-                isAccepted = false;
-              }
-              print('deall ${dealResponseDto?.creatorEmail}');
-              print('accepted $isAccepted paid $isPaid');
-              if (!isPaymentSheetOpened) {
-                print('opened');
-                if (isAccepted && isPaid == false) {
-                  print('accept build: $isAccepted');
-                  isPaymentSheetOpened = true;
-                  makePayment();
-                }
+            print('statusssss ${dealResponseDto!.dealStatus}');
+            if (dealResponseDto?.dealStatus?.toLowerCase() == 'accepted') {
+              isAccepted = true;
+            } else {
+              isAccepted = false;
+            }
+            print('deall ${dealResponseDto?.creatorEmail}');
+            print('accepted $isAccepted paid $isPaid');
+            if (!isPaymentSheetOpened) {
+              if (isAccepted && isPaid == false) {
+                print('accept build: $isAccepted');
                 isPaymentSheetOpened = true;
+                makePayment();
               }
             }
-            // isPaid = dealResponseDto!.payments!.isPaid!;
-            // if (dealResponseDto!.payments!.paymentIntentId != null &&
-            //     dealResponseDto!.payments!.clientSecret != null) {
-            //   isAccepted = true;
-            // } else {
-            //   isAccepted = false;
-            // }
-            // // print('travellerrr ${dealResponseDto!.traveler!.firstName}');
-            // if (dealResponseDto?.dealStatus?.toLowerCase() == 'accepted') {
-            //   isAccepted = true;
-            // } else {
-            //   isAccepted = false;
-            // }
-            // print('deall ${dealResponseDto?.creatorEmail}');
-            // print('accepted $isAccepted paid $isPaid');
-            // if (!isPaymentSheetOpened) {
-            //   if (isAccepted && isPaid == false) {
-            //     print('accept build: $isAccepted');
-            //     isPaymentSheetOpened = true;
-            //     makePayment();
-            //   }
-            // }
           }
 
-          if (state is AcceptShipmentDealSuccessState) {
-            acceptShipmentDealResponseDto = state.responseDto;
-            paymentIntentId = acceptShipmentDealResponseDto?.paymentIntentId;
-            clientSecret = acceptShipmentDealResponseDto?.clientSecret;
-            paymentProvider.setPaymentIntentId(
-                paymentIntentId, clientSecret, dealId);
-            if (isAccepted) {
-              print('accept build: $isAccepted');
-
-              makePayment();
-            }
+          if (state is AcceptTripDealSuccessState) {
+            // paymentProvider.setPaymentIntentId(
+            //     paymentIntentId, clientSecret, dealId.toString());
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (isAccepted) {
+                _showTripDealAcceptedBottomSheet(context);
+              }
+            });
             print('accept: $isAccepted');
           }
           return Stack(
@@ -365,10 +328,10 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(
-                              context, ShipmentDealTrackingScreen.routeName,
-                              arguments: ShipmentDealTrackingScreenArguments(
-                                  dealdto: widget.args.dealDto));
+                          // Navigator.pushNamed(
+                          //     context, ShipmentDealTrackingScreen.routeName,
+                          //     arguments: ShipmentDealTrackingScreenArguments(
+                          //         dealdto: widget.args.tripsDto));
                         },
                         child: Text(
                           'Tracking',
@@ -387,7 +350,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                           slivers: [
                             CupertinoSliverRefreshControl(
                               onRefresh: () async {
-                                await getMyShipmentDealDetails(
+                                await getMyTripDealDetails(
                                     dealId: dealId,
                                     token: accessTokenProvider.accessToken!);
                                 setState(() {});
@@ -396,25 +359,22 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                             SliverToBoxAdapter(
                               child: Column(
                                 children: [
-                                  MyShipmentCard(
-                                    title: shipmentDto!.title!,
-                                    from: shipmentDto.from!,
-                                    to: shipmentDto.to!,
+                                  MyTripCard(
+                                    origin: tripdto!.origin,
+                                    destination: tripdto.destination,
+                                    tripsDto: tripdto,
+                                    availableWeight: tripdto.available,
+                                    consumedWeight: tripdto.consumed,
                                     date: DateFormat('dd MMMM yyyy')
-                                        .format(shipmentDto.expectedDate!),
-                                    shipmentDto: shipmentDto,
-                                    shipImage: Image.network(
-                                      shipmentDto
-                                          .items!.first.photos!.first.photo!,
-                                      fit: BoxFit.fitWidth,
-                                      width: 100,
-                                      height: 100,
-                                    ), //
+                                        .format(tripdto.departDate!),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: TripCardDetails(dealDto: dealDto),
-                                  ),
+                                  isLoading
+                                      ? ShimmerCard()
+                                      : MyTripDealCard(
+                                          tripsDto: tripdto,
+                                          dealDto: dealResponseDto!,
+                                          isFromTripDealDetails: true,
+                                        ),
                                   Padding(
                                     padding: const EdgeInsets.all(15.0),
                                     child: Container(
@@ -445,7 +405,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       color: Colors.white),
                                                 ),
                                                 Text(
-                                                  '${dealResponseDto?.finalReward} \$',
+                                                  '${dealResponseDto?.counterReward} \$',
                                                   overflow: TextOverflow.fade,
                                                   style: GoogleFonts.poppins(
                                                       fontSize: 16,
@@ -562,8 +522,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                       'rejected'
                                               ? dealResponseDto?.dealStatus ==
                                                       'accepted'
-                                                  ? ScaffoldMessenger.of(
-                                                          context)
+                                                  ? ScaffoldMessenger.of(context)
                                                       .showSnackBar(
                                                       const SnackBar(
                                                         backgroundColor:
@@ -580,8 +539,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                         ),
                                                       ),
                                                     )
-                                                  : dealResponseDto
-                                                              ?.dealStatus ==
+                                                  : dealResponseDto?.dealStatus ==
                                                           'rejected'
                                                       ? ScaffoldMessenger.of(
                                                               context)
@@ -625,8 +583,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                   ? dealDto.creatorEmail ==
                                                           dealCreatorEmail
                                                       ? null
-                                                      : acceptShipmentDeal(
-                                                          dealId: dealId,
+                                                      : acceptTripDeal(
+                                                          dealId:
+                                                              dealId.toString(),
                                                           token:
                                                               accessTokenProvider
                                                                   .accessToken)
@@ -770,8 +729,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                         ),
                                                       ),
                                                     )
-                                                  : dealResponseDto
-                                                              ?.dealStatus ==
+                                                  : dealResponseDto?.dealStatus ==
                                                           'rejected'
                                                       ? ScaffoldMessenger.of(
                                                               context)
@@ -809,14 +767,14 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                             ),
                                                           ),
                                                         )
-                                              : accessTokenProvider
-                                                          .accessToken !=
+                                              : accessTokenProvider.accessToken !=
                                                       null
                                                   ? dealDto.creatorEmail ==
                                                           dealCreatorEmail
                                                       ? null
-                                                      : viewModel.rejectShipmentDeal(
-                                                          dealId: dealId,
+                                                      : viewModel.rejectTripDeal(
+                                                          dealId:
+                                                              dealId.toString(),
                                                           token:
                                                               accessTokenProvider
                                                                   .accessToken!)
@@ -839,7 +797,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                         )
                       : RefreshIndicator(
                           onRefresh: () async {
-                            await getMyShipmentDealDetails(
+                            await getMyTripDealDetails(
                                 dealId: dealId,
                                 token: accessTokenProvider.accessToken!);
                             setState(() {});
@@ -849,35 +807,27 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                             controller: scrollController,
                             slivers: [
                               CupertinoSliverRefreshControl(
-                                onRefresh: () async {
-                                  await getMyShipmentDealDetails(
-                                      dealId: dealId,
-                                      token: accessTokenProvider.accessToken!);
-                                  setState(() {});
-                                },
+                                onRefresh: () async {},
                               ),
                               SliverToBoxAdapter(
                                 child: Column(
                                   children: [
-                                    MyShipmentCard(
-                                      title: shipmentDto!.title!,
-                                      from: shipmentDto.from!,
-                                      to: shipmentDto.to!,
+                                    MyTripCard(
+                                      origin: tripdto!.origin,
+                                      destination: tripdto.destination,
+                                      tripsDto: tripdto,
+                                      availableWeight: tripdto.available,
+                                      consumedWeight: tripdto.consumed,
                                       date: DateFormat('dd MMMM yyyy')
-                                          .format(shipmentDto.expectedDate!),
-                                      shipmentDto: shipmentDto,
-                                      shipImage: Image.network(
-                                        shipmentDto
-                                            .items!.first.photos!.first.photo!,
-                                        fit: BoxFit.fitWidth,
-                                        width: 100,
-                                        height: 100,
-                                      ), //
+                                          .format(tripdto.departDate!),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: TripCardDetails(dealDto: dealDto),
-                                    ),
+                                    isLoading
+                                        ? ShimmerCard()
+                                        : MyTripDealCard(
+                                            tripsDto: tripdto,
+                                            dealDto: dealResponseDto!,
+                                            isFromTripDealDetails: true,
+                                          ),
                                     Padding(
                                       padding: const EdgeInsets.all(15.0),
                                       child: Container(
@@ -885,8 +835,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                         decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(12),
-                                            color:
-                                                Color.fromRGBO(47, 40, 77, 30)),
+                                            color: const Color.fromRGBO(
+                                                47, 40, 77, 30)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(13.0),
                                           child: Column(
@@ -919,8 +869,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                 ],
                                               ),
                                               Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 10),
+                                                margin: const EdgeInsets.only(
+                                                    top: 10),
                                                 child: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -956,8 +906,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                 ),
                                               ),
                                               Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 10),
+                                                margin: const EdgeInsets.only(
+                                                    top: 10),
                                                 child: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -1080,8 +1030,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                               ),
                                                             ),
                                                           )
-                                                        : ScaffoldMessenger.of(
-                                                                context)
+                                                        : ScaffoldMessenger.of(context)
                                                             .showSnackBar(
                                                             SnackBar(
                                                               backgroundColor:
@@ -1105,8 +1054,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     ? dealDto.creatorEmail ==
                                                             dealCreatorEmail
                                                         ? null
-                                                        : acceptShipmentDeal(
-                                                            dealId: dealId,
+                                                        : acceptTripDeal(
+                                                            dealId: dealId
+                                                                .toString(),
                                                             token:
                                                                 accessTokenProvider
                                                                     .accessToken)
@@ -1275,8 +1225,7 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                               ),
                                                             ),
                                                           )
-                                                        : ScaffoldMessenger.of(
-                                                                context)
+                                                        : ScaffoldMessenger.of(context)
                                                             .showSnackBar(
                                                             SnackBar(
                                                               backgroundColor:
@@ -1300,8 +1249,9 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                                     ? dealDto.creatorEmail ==
                                                             dealCreatorEmail
                                                         ? null
-                                                        : viewModel.rejectShipmentDeal(
-                                                            dealId: dealId,
+                                                        : viewModel.rejectTripDeal(
+                                                            dealId: dealId
+                                                                .toString(),
                                                             token: accessTokenProvider
                                                                 .accessToken!)
                                                     : null,
@@ -1320,7 +1270,8 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
                                 ),
                               )
                             ],
-                          ))),
+                          ),
+                        )),
               if (isLoading)
                 Container(
                   color: Colors.black.withOpacity(0.1),
@@ -1346,18 +1297,34 @@ class _MyShipmentDealDetailsState extends State<MyShipmentDealDetails> {
   void sendCounterReward(double reward) {
     viewModel.makeCounterOffer(
         token: accessTokenProvider.accessToken!,
-        dealId: widget.args.dealDto!.id!,
+        dealId: widget.args.deal!.id!,
         reward: reward);
   }
 
-  void acceptShipmentDeal({String? dealId, String? token}) {
-    viewModel.acceptShipmentDeal(dealId: dealId!, token: token!);
+  void acceptTripDeal({String? dealId, String? token}) {
+    viewModel.acceptTripDeal(dealId: dealId!, token: token!);
   }
 
   void cancelDeal() {
-    viewModel.cancelShipmentDeal(
-        dealId: widget.args.dealDto!.id!,
-        token: accessTokenProvider.accessToken!);
+    // viewModel.ca(
+    //     dealId: widget.args.dealDto!.id!,
+    //     token: accessTokenProvider.accessToken!);
+  }
+
+  void _showTripDealAcceptedBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[100],
+      useSafeArea: true,
+      builder: (context) => TripDealAcceptedBottomSheet(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+    isAccepted = false;
   }
 
   String substractDates(DateTime dateTime) {

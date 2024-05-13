@@ -870,181 +870,154 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         Provider.of<AccessTokenProvider>(context);
     // String? accessToken = await storage.read(key: 'accessToken');
 
-    return state is GetAllShipsSuccessState
-        ? SliverList(
-            delegate: SliverChildBuilderDelegate(
-              childCount:
-                  state.hasReachedMax ? shipments.length : shipments.length + 1,
-              (context, index) {
-                if (index < shipments.length) {
-                  return ShipmentCard(
-                    shipmentDto: shipments[index],
-                    showConfirmedBottomSheet: showSuccessDialog,
-                  );
-                } else {
-                  if (totalShipmentsPage! >= currentShipmentsPage!) {
-                    if (accessTokenProvider.accessToken != null) {
-                      viewModel.create(accessTokenProvider.accessToken!,
-                          isPagination: true);
-                    }
-                    // return Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     Platform.isIOS
-                    //         ? const CupertinoActivityIndicator(
-                    //             radius: 11,
-                    //             color: Colors.black,
-                    //           )
-                    //         : const CircularProgressIndicator(),
-                    //     const SizedBox(
-                    //       width: 15,
-                    //     ),
-                    //     Text(
-                    //       "Loading",
-                    //       textAlign: TextAlign.center,
-                    //       style: GoogleFonts.poppins(
-                    //           fontSize: 15,
-                    //           fontWeight: FontWeight.bold,
-                    //           color: Colors.grey[400]),
-                    //     ),
-                    //     const SizedBox(
-                    //       height: 10,
-                    //     ),
-                    //   ],
-                    // );
-                  }
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        childCount: shipments.length + 1,
+        (context, index) {
+          if (index < shipments.length) {
+            return ShipmentCard(
+              shipmentDto: shipments[index],
+              showConfirmedBottomSheet: showSuccessDialog,
+            );
+          } else {
+            if (totalShipmentsPage! >= currentShipmentsPage!) {
+              if (accessTokenProvider.accessToken != null) {
+                viewModel.create(accessTokenProvider.accessToken!,
+                    isPagination: true);
+              }
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Platform.isIOS
+                      ? const CupertinoActivityIndicator(
+                          radius: 11,
+                          color: Colors.black,
+                        )
+                      : const CircularProgressIndicator(),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  Text(
+                    "Loading",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[400]),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                ],
+              );
+            }
 
-                  // return Container();
-                }
-                return Container();
-              },
-            ),
-          )
-        : state is GetAllShipsPaginationLoadingState
-            ? SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  childCount: shipments.length + 1,
-                  (context, index) {
-                    if (index < shipments.length) {
-                      print('trueeeeee');
-                      return ShipmentCard(
-                        shipmentDto: shipments[index],
-                        showConfirmedBottomSheet: showSuccessDialog,
-                      );
-                    } else {
-                      print('1st else');
-                      print(
-                          'total $totalShipmentsPage current $currentShipmentsPage');
-                      if (totalShipmentsPage! >= currentShipmentsPage!) {
-                        print('elseeeee');
+            // return Container();
+          }
+          return Container();
+        },
+      ),
+    );
+    // : state is GetAllShipsPaginationLoadingState
+    //     ? SliverList(
+    //         delegate: SliverChildBuilderDelegate(
+    //           childCount: shipments.length + 1,
+    //           (context, index) {
+    //             if (index < shipments.length) {
+    //               print('trueeeeee');
+    //               return ShipmentCard(
+    //                 shipmentDto: shipments[index],
+    //                 showConfirmedBottomSheet: showSuccessDialog,
+    //               );
+    //             } else {
+    //               print('1st else');
+    //               print(
+    //                   'total $totalShipmentsPage current $currentShipmentsPage');
+    //               if (totalShipmentsPage! >= currentShipmentsPage!) {
+    //                 print('elseeeee');
 
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Platform.isIOS
-                                ? const CupertinoActivityIndicator(
-                                    radius: 11,
-                                    color: Colors.black,
-                                  )
-                                : const CircularProgressIndicator(),
-                            const SizedBox(
-                              width: 15,
-                            ),
-                            Text(
-                              "Loading",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[400]),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        );
-                      }
+    //                 return Row(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   children: [
+    //                     Platform.isIOS
+    //                         ? const CupertinoActivityIndicator(
+    //                             radius: 11,
+    //                             color: Colors.black,
+    //                           )
+    //                         : const CircularProgressIndicator(),
+    //                     const SizedBox(
+    //                       width: 15,
+    //                     ),
+    //                     Text(
+    //                       "Loading",
+    //                       textAlign: TextAlign.center,
+    //                       style: GoogleFonts.poppins(
+    //                           fontSize: 15,
+    //                           fontWeight: FontWeight.bold,
+    //                           color: Colors.grey[400]),
+    //                     ),
+    //                     const SizedBox(
+    //                       height: 10,
+    //                     ),
+    //                   ],
+    //                 );
+    //               }
 
-                      // return Container();
-                    }
-                  },
-                ),
-              )
-            : SliverToBoxAdapter(child: Container());
+    //               // return Container();
+    //             }
+    //           },
+    //         ),
+    //       )
+    //     : SliverToBoxAdapter(child: Container());
   }
 
   Widget buildTripsList(Object? state) {
-    return state is GetAllTripsSuccessState
-        ? SliverList(
-            delegate: SliverChildBuilderDelegate(
-              childCount: state.hasReachedMax ? trips.length : trips.length + 1,
-              (context, index) {
-                if (index < trips.length) {
-                  return TripCard(
-                    tripsDto: trips[index],
-                    // showConfirmedBottomSheet: showSuccessDialog,
-                  );
-                } else {
-                  if (totalTripsPage! >= currentTripsPage!) {
-                    if (accessTokenProvider.accessToken != null) {
-                      viewModel.getAlltrips(accessTokenProvider.accessToken!,
-                          isPagination: true);
-                    }
-                  }
-                }
-                return Container();
-              },
-            ),
-          )
-        : SliverList(
-            delegate: SliverChildBuilderDelegate(
-              childCount: trips.length + 1,
-              (context, index) {
-                if (index < trips.length) {
-                  print('trueeeeee');
-                  return TripCard(
-                    tripsDto: trips[index],
-                    // showConfirmedBottomSheet: showSuccessDialog,
-                  );
-                } else {
-                  print('1st else');
-                  print('total $totalTripsPage current $currentTripsPage');
-                  if (totalTripsPage! >= currentTripsPage!) {
-                    print('elseeeee');
-
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Platform.isIOS
-                            ? const CupertinoActivityIndicator(
-                                radius: 11,
-                                color: Colors.black,
-                              )
-                            : const CircularProgressIndicator(),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Text(
-                          "Loading",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[400]),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                      ],
-                    );
-                  }
-
-                  // return Container();
-                }
-                return Container();
-              },
-            ),
-          );
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        childCount: trips.length + 1,
+        (context, index) {
+          if (index < trips.length) {
+            return TripCard(
+              tripsDto: trips[index],
+              // showConfirmedBottomSheet: showSuccessDialog,
+            );
+          } else {
+            if (totalTripsPage! >= currentTripsPage!) {
+              if (accessTokenProvider.accessToken != null) {
+                viewModel.getAlltrips(accessTokenProvider.accessToken!,
+                    isPagination: true);
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Platform.isIOS
+                        ? const CupertinoActivityIndicator(
+                            radius: 11,
+                            color: Colors.black,
+                          )
+                        : const CircularProgressIndicator(),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Text(
+                      "Loading",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[400]),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                );
+              }
+            }
+          }
+          return Container();
+        },
+      ),
+    );
   }
 
   void _showShipmentDealConfirmedBottomSheet(BuildContext context) {

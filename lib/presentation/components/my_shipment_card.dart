@@ -1,11 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details_arguments.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmation_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_deal_confirmation_bottom_sheet.dart';
 
 class MyShipmentCard extends StatelessWidget {
@@ -37,7 +40,7 @@ class MyShipmentCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           if (isDealTap) {
-            _showTripDealConfirmationBottomSheet(
+            _showShipmentDealConfirmationBottomSheet(
                 context, deal!, showSuccessDialog!);
           } else {
             Navigator.pushNamed(context, MyShipmentDetails.routeName,
@@ -86,13 +89,14 @@ class MyShipmentCard extends StatelessWidget {
                               height: 10,
                             ),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Container(
                                   margin: EdgeInsets.only(left: 10),
                                   width:
                                       MediaQuery.sizeOf(context).width * .238,
                                   child: FittedBox(
-                                    fit: BoxFit.fitWidth,
+                                    fit: BoxFit.scaleDown,
                                     child: Text(
                                       from,
                                       overflow: TextOverflow.fade,
@@ -111,11 +115,11 @@ class MyShipmentCard extends StatelessWidget {
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(left: 10),
                                   width:
-                                      MediaQuery.sizeOf(context).width * .238,
+                                      MediaQuery.sizeOf(context).width * .245,
+                                  margin: EdgeInsets.only(left: 10),
                                   child: FittedBox(
-                                    fit: BoxFit.fitWidth,
+                                    fit: BoxFit.scaleDown,
                                     child: Text(
                                       to,
                                       overflow: TextOverflow.fade,
@@ -228,7 +232,7 @@ class MyShipmentCard extends StatelessWidget {
     );
   }
 
-  void _showTripDealConfirmationBottomSheet(
+  void _showShipmentDealConfirmationBottomSheet(
       BuildContext context, Deal deal, Function showSuccessDialog) {
     Navigator.pop(context);
     showModalBottomSheet(
@@ -236,7 +240,7 @@ class MyShipmentCard extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => TripDealConfirmationBottomSheet(
+      builder: (context) => ShipmentDealConfirmationBottomSheet(
         deal: deal,
         showSuccessDialog: showSuccessDialog,
       ),

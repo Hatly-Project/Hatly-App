@@ -8,6 +8,7 @@ import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
 import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/shipment_matching_trips_response_dto.dart';
+import 'package:hatly/domain/models/trip_deal_response.dart';
 
 import '../models/get_all_shipments_dto.dart';
 
@@ -32,7 +33,7 @@ abstract class ShipmentDataSource {
   Future<MyShipmentDealsResponseDto> getMyShipmentDeals(
       {required String token, required int shipmentId});
 
-  Future<ShipmentDealResponseDto> sendDeal(
+  Future<TripDealResponseDto> sendDeal(
       {required String token,
       required int? shipmentId,
       required double? reward,
@@ -42,10 +43,16 @@ abstract class ShipmentDataSource {
       {required String token, required String dealId});
 
   Future<AcceptOrRejectShipmentDealResponseDto> acceptShipmentDeal(
-      {required String token, required String dealId, required String status});
+      {required String token,
+      required String dealId,
+      required String status,
+      required String dealType});
 
   Future<AcceptOrRejectShipmentDealResponseDto> rejectShipmentDeal(
-      {required String token, required String dealId, required String status});
+      {required String token,
+      required String dealId,
+      required String status,
+      required String dealType});
 
   Future<CounterOfferResponseDto> makeCounterOffer(
       {required String token, required int dealId, required double reward});

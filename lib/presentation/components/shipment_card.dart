@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -10,7 +11,7 @@ import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
-import 'package:hatly/presentation/home/tabs/trips/trips_list_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 
 class ShipmentCard extends StatelessWidget {
@@ -21,6 +22,7 @@ class ShipmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print('imgg ${shipmentDto.items!.first.photos!.first.photo}');
     return Container(
       padding: EdgeInsets.all(6),
       // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .3),
@@ -50,7 +52,8 @@ class ShipmentCard extends StatelessWidget {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            shipmentDto.items?.first.photos == null
+                            shipmentDto.items!.first.photos!.isEmpty ||
+                                    shipmentDto.items?.first.photos == null
                                 ? Container(
                                     width: 100,
                                     height: 100,
@@ -88,37 +91,44 @@ class ShipmentCard extends StatelessWidget {
                                   child: Row(
                                     // mainAxisSize: MainAxisSize.max,
                                     children: [
-                                      Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.only(left: 10),
+                                      Container(
+                                        margin: EdgeInsets.only(left: 10),
+                                        // height: 45,
+                                        width:
+                                            MediaQuery.sizeOf(context).width *
+                                                .26,
+                                        child: FittedBox(
                                           child: Text(
                                             shipmentDto.from!,
                                             overflow: TextOverflow.ellipsis,
                                             style: GoogleFonts.poppins(
-                                                fontSize: 15,
+                                                fontSize: 20,
                                                 color: Colors.grey[600]),
                                           ),
                                         ),
                                       ),
-                                      Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.only(left: 10),
-                                          child: Icon(
-                                            Icons.flight_land_rounded,
-                                            color: Colors.black,
-                                            size: 30,
-                                          ),
+                                      Container(
+                                        margin: EdgeInsets.only(
+                                            left: 10, right: 10),
+                                        child: Icon(
+                                          Icons.flight_land_rounded,
+                                          color: Colors.black,
+                                          size: 25,
                                         ),
                                       ),
-                                      Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            shipmentDto.to!,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 15,
-                                                color: Colors.grey[600]),
+                                      Container(
+                                        // margin: EdgeInsets.only(left: 10),
+                                        // width: 100,
+                                        child: Expanded(
+                                          child: FittedBox(
+                                            // fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              shipmentDto.to!,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.poppins(
+                                                  fontSize: 20,
+                                                  color: Colors.grey[600]),
+                                            ),
                                           ),
                                         ),
                                       ),

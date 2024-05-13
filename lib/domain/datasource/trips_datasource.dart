@@ -1,9 +1,13 @@
+import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/book_info_dto.dart';
+import 'package:hatly/domain/models/counter_offer_response_dto.dart';
 import 'package:hatly/domain/models/create_trip_response_dto.dart';
 import 'package:hatly/domain/models/get_all_trips_response_dto.dart';
+import 'package:hatly/domain/models/get_trip_deal_details_response_dto.dart';
 import 'package:hatly/domain/models/get_user_trip_response_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
 import 'package:hatly/domain/models/my_trip_deals_response_dto.dart';
+import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/trip_deal_response.dart';
 import 'package:hatly/domain/models/trip_matching_shipments_response_dto.dart';
 
@@ -25,7 +29,7 @@ abstract class TripsDatasource {
 
   Future<GetUserTripResponseDto> getUserTrip({required String token});
 
-  Future<TripDealResponseDto> sendDeal(
+  Future<ShipmentDealResponseDto> sendDeal(
       {int? shipmentId,
       double? reward,
       required String token,
@@ -36,4 +40,22 @@ abstract class TripsDatasource {
 
   Future<MyTripDealsResponseDto> getMyTripDeals(
       {required String token, required int tripId});
+
+  Future<GetTripDealDetailsResponseDto> getMytripDealDetails(
+      {required String token, required int dealId});
+
+  Future<AcceptOrRejectShipmentDealResponseDto> acceptTripDeal(
+      {required String token,
+      required String dealId,
+      required String status,
+      required String dealType});
+
+  Future<AcceptOrRejectShipmentDealResponseDto> rejectTripDeal(
+      {required String token,
+      required String dealId,
+      required String status,
+      required String dealType});
+
+  Future<CounterOfferResponseDto> makeCounterOffer(
+      {required String token, required int dealId, required double reward});
 }

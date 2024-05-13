@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:hatly/data/api/shipmentDeal.dart';
+import 'package:hatly/data/api/shipments/get_shipment_deal_details/deal.dart';
 import 'package:hatly/domain/models/get_shipment_deal_details_response_dto.dart';
 
 class GetMyShipmentDealDetailsResponse {
@@ -43,7 +43,7 @@ class GetMyShipmentDealDetailsResponse {
     return GetMyShipmentDealDetailsResponseDto(
       status: status,
       message: message,
-      deal: deal?.toDealDto(),
+      deal: deal?.toDto(),
     );
   }
 }

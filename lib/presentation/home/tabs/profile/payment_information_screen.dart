@@ -164,16 +164,6 @@ class _PaymentInformationScreenState extends State<PaymentInformationScreen> {
                               },
                               child: Icon(Icons.info),
                             ),
-                            validator: (text) {
-                              if (text?.trim() == null ||
-                                  text!.trim().isEmpty) {
-                                return 'please enter swift code number';
-                              }
-                              if (!(text.trim().length >= 8 &&
-                                  text.trim().length <= 11)) {
-                                return 'SWIFT Code not valid';
-                              }
-                            },
                           ),
                           CustomFormField(
                             controller: accountNameController,
@@ -229,9 +219,9 @@ class _PaymentInformationScreenState extends State<PaymentInformationScreen> {
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12)),
                               onPressed: () {
-                                // if (formKey.currentState?.validate() == false) {
-                                //   return;
-                                // }
+                                if (formKey.currentState?.validate() == false) {
+                                  return;
+                                }
                                 viewModel.updatePaymentInfo(
                                   accountNumber: accountNumberController.text,
                                   accountName: accountNameController.text,

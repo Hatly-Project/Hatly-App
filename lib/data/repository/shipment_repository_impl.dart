@@ -10,6 +10,7 @@ import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
 import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/shipment_matching_trips_response_dto.dart';
+import 'package:hatly/domain/models/trip_deal_response.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 
 class ShipmentRepositoryImpl implements ShipmentRepository {
@@ -61,7 +62,7 @@ class ShipmentRepositoryImpl implements ShipmentRepository {
   }
 
   @override
-  Future<ShipmentDealResponseDto> sendDeal(
+  Future<TripDealResponseDto> sendDeal(
       {required String token,
       required int? shipmentId,
       required double? reward,
@@ -78,17 +79,24 @@ class ShipmentRepositoryImpl implements ShipmentRepository {
   }
 
   @override
-  Future<AcceptOrRejectShipmentDealResponseDto> acceptShipmentDeal(
-      {required String token, required String dealId, required String status}) {
+  Future<AcceptOrRejectShipmentDealResponseDto> acceptShipmentDeal({
+    required String token,
+    required String dealId,
+    required String status,
+    required String dealType,
+  }) {
     return shipmentDataSource.acceptShipmentDeal(
-        token: token, dealId: dealId, status: status);
+        token: token, dealId: dealId, status: status, dealType: dealType);
   }
 
   @override
   Future<AcceptOrRejectShipmentDealResponseDto> rejectShipmentDeal(
-      {required String token, required String dealId, required String status}) {
+      {required String token,
+      required String dealId,
+      required String status,
+      required String dealType}) {
     return shipmentDataSource.rejectShipmentDeal(
-        token: token, dealId: dealId, status: status);
+        token: token, dealId: dealId, status: status, dealType: dealType);
   }
 
   @override

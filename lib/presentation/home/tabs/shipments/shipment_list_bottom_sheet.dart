@@ -195,7 +195,7 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                                                   .photos!
                                                   .first
                                                   .photo!,
-                                              fit: BoxFit.fitHeight,
+                                              fit: BoxFit.fitWidth,
                                               width: 100,
                                               height: 100,
                                             ), //
@@ -280,7 +280,7 @@ class _ShipmentsListBottomSheetState extends State<ShipmentsListBottomSheet> {
                                         .photos!
                                         .first
                                         .photo!,
-                                    fit: BoxFit.fitHeight,
+                                    fit: BoxFit.fitWidth,
                                     width: 100,
                                     height: 100,
                                   ), //

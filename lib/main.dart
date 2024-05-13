@@ -17,6 +17,8 @@ import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_tracking_screen.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trip_deal_details.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trip_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips_details_screen.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
@@ -115,12 +117,13 @@ class MyApp extends StatelessWidget {
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
 
-      if (accessTokenProvider.accessToken != null) {
-        if (fcmProvider.fcmToken != null) {
-          ApiManager().refreshFCMTokenWithCheckAccessToken(
-              accessToken: accessTokenProvider.accessToken!,
-              fcmToken: fcmProvider.fcmToken!);
-        }
+      if (fcmProvider.isRefreshed == true) {
+        print('fcmmmm refreshed true ${fcmProvider.fcmToken}');
+        // fcmProvider.isRefreshed = false;
+        ApiManager().refreshFCMTokenWithCheckAccessToken(
+            accessToken: accessTokenProvider.accessToken!,
+            fcmToken: fcmProvider.fcmToken!);
+        fcmProvider.isRefreshed = false;
       }
       // if (accessTokenProvider.accessToken != null) {
       //   print('toool ${accessTokenProvider.accessToken}');
@@ -144,6 +147,7 @@ class MyApp extends StatelessWidget {
       NotificationService().showNotification(
           title: fcmProvider.notifMessage?.title,
           body: fcmProvider.notifMessage?.body);
+      fcmProvider.notifMessage = null;
     }
     return MaterialApp(
       title: 'Flutter Demo',
@@ -175,6 +179,9 @@ class MyApp extends StatelessWidget {
         CreateTripScreen.routeName: (context) => CreateTripScreen(),
         ShipmentDetails.routeName: (context) => ShipmentDetails(),
         TripDetails.routeName: (context) => TripDetails(),
+        MyTripDealDetails.routeName: (context) => MyTripDealDetails(
+            args: ModalRoute.of(context)?.settings.arguments
+                as MyTripDealDetailsArgument),
         ProfileScreen.routeName: (context) => ProfileScreen(),
         MyShipmentDetails.routeName: (context) => MyShipmentDetails(),
         ChatScreen.routeName: (context) => ChatScreen(

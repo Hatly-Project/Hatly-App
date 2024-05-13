@@ -1,17 +1,18 @@
 import 'package:hatly/domain/models/accept_reject_shipment_deal_response_dto.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
+import 'package:hatly/domain/repository/trips_repository.dart';
 
-class RejectShipmentDealUsecase {
-  ShipmentRepository repository;
+class RejecttripDealUsecase {
+  TripsRepository repository;
 
-  RejectShipmentDealUsecase(this.repository);
+  RejecttripDealUsecase(this.repository);
 
-  Future<AcceptOrRejectShipmentDealResponseDto> rejectShipmentDeal(
+  Future<AcceptOrRejectShipmentDealResponseDto> rejectTripDeal(
       {required String token,
       required String dealId,
       required String status,
       required String dealType}) {
-    return repository.rejectShipmentDeal(
+    return repository.rejectTripDeal(
         token: token, dealId: dealId, status: status, dealType: dealType);
   }
 }

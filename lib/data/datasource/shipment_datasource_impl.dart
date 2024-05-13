@@ -11,6 +11,7 @@ import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
 import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/shipment_matching_trips_response_dto.dart';
+import 'package:hatly/domain/models/trip_deal_response.dart';
 
 class ShipmentDataSourceImpl implements ShipmentDataSource {
   ApiManager apiManager;
@@ -72,18 +73,18 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   }
 
   @override
-  Future<ShipmentDealResponseDto> sendDeal(
+  Future<TripDealResponseDto> sendDeal(
       {required String token,
       required int? shipmentId,
       required double? reward,
       required int tripId}) async {
-    var response = await apiManager.sendShipmentDealWithCheckAccessToken(
+    var response = await apiManager.sendTripDealWithCheckAccessToken(
         shipmentId: shipmentId,
         reward: reward,
         accessToken: token,
         tripId: tripId);
 
-    return response.toShipmentDealResponseDto();
+    return response.toTripDealResponseDto();
   }
 
   @override
@@ -99,9 +100,10 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   Future<AcceptOrRejectShipmentDealResponseDto> acceptShipmentDeal(
       {required String token,
       required String dealId,
+      required String dealType,
       required String status}) async {
     var response = await apiManager.acceptShipmentDealWithCheckAccessToken(
-        accessToken: token, dealId: dealId, status: status);
+        accessToken: token, dealId: dealId, status: status, dealType: dealType);
 
     return response.toResponseDto();
   }
@@ -110,9 +112,10 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   Future<AcceptOrRejectShipmentDealResponseDto> rejectShipmentDeal(
       {required String token,
       required String dealId,
+      required String dealType,
       required String status}) async {
-    var response = await apiManager.rejectShipmentDeal(
-        accessToken: token, dealId: dealId, status: status);
+    var response = await apiManager.rejectDealWithCheckAccessToken(
+        accessToken: token, dealId: dealId, status: status, dealType: dealType);
 
     return response.toResponseDto();
   }

@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/trip_deal/deals.dart';
 import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmation_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/trips/trip_deal_confirmation_bottom_sheet.dart';
 import 'package:hatly/presentation/login/login_screen.dart';
 
 import '../home/tabs/trips/create_trip_screen.dart';
@@ -39,7 +40,7 @@ class MyTripCardForDeals extends StatelessWidget {
         onTap: () {
           print('user trip : ${deal.tripsDto.origin}');
 
-          _showShipmentDealConfirmationBottomSheet(
+          _showTripDealConfirmationBottomSheet(
               context, deal, showSuccessDialog);
         },
         child: Card(
@@ -185,7 +186,7 @@ class MyTripCardForDeals extends StatelessWidget {
     );
   }
 
-  void _showShipmentDealConfirmationBottomSheet(
+  void _showTripDealConfirmationBottomSheet(
       BuildContext context, Deal deal, Function showSuccessDialog) {
     Navigator.pop(context);
     showModalBottomSheet(
@@ -193,7 +194,7 @@ class MyTripCardForDeals extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => ShipmentDealConfirmationBottomSheet(
+      builder: (context) => TripDealConfirmationBottomSheet(
         deal: deal,
         showSuccessDialog: showSuccessDialog,
       ),
