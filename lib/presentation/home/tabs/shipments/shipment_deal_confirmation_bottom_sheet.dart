@@ -40,7 +40,7 @@ class _ShipmentDealConfirmationBottomSheetState
   @override
   void initState() {
     super.initState();
-
+    print('created at from sheet ${widget.deal.shipmentDto.createdAt}');
     // print('trip name : ${widget.deal.tripsDto.user?.name}');
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
@@ -195,14 +195,14 @@ class _ShipmentDealConfirmationBottomSheetState
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white),
                                         ),
-                                        Text(
-                                          '${substractDates(deal.shipmentDto.createdAt!)} days ago',
-                                          overflow: TextOverflow.fade,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white),
-                                        ),
+                                        // Text(
+                                        //   '${substractDates(deal.shipmentDto.createdAt ??)} days ago',
+                                        //   overflow: TextOverflow.fade,
+                                        //   style: GoogleFonts.poppins(
+                                        //       fontSize: 12,
+                                        //       fontWeight: FontWeight.bold,
+                                        //       color: Colors.white),
+                                        // ),
                                       ],
                                     )
                                   ],
@@ -219,7 +219,7 @@ class _ShipmentDealConfirmationBottomSheetState
                                   shipImage: Image.network(
                                     deal.shipmentDto.items!.first.photos!.first
                                         .photo!,
-                                    fit: BoxFit.fitHeight,
+                                    fit: BoxFit.fitWidth,
                                     width: 100,
                                     height: 100,
                                   ), //
@@ -567,7 +567,7 @@ class _ShipmentDealConfirmationBottomSheetState
                               onPressed: () {
                                 if (accessTokenProvider.accessToken != null) {
                                   // token = accessTokenProvider.accessToken!;
-                                  viewModel.sendShipmentDeal(
+                                  viewModel.sendDealOnTrip(
                                       token: accessTokenProvider.accessToken!,
                                       tripId: deal.tripsDto.id!,
                                       reward: deal.shipmentDto.reward,

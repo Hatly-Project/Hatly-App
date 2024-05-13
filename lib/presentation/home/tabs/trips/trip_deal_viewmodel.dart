@@ -11,6 +11,7 @@ import 'package:hatly/domain/models/book_info_dto.dart';
 import 'package:hatly/domain/models/create_trip_response_dto.dart';
 import 'package:hatly/domain/models/get_user_trip_response_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
+import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trip_deal_response.dart';
 import 'package:hatly/domain/repository/trips_repository.dart';
@@ -33,7 +34,7 @@ class TripDealViewModel extends Cubit<TripDealViewState> {
     sendTripDealUsecase = SendTripDealUsecase(repository: repository);
   }
 
-  void sendDeal(
+  void sendDealOnShipment(
       {int? shipmentId,
       double? reward,
       required String token,
@@ -54,7 +55,7 @@ abstract class TripDealViewState {}
 class TripDealInitialState extends TripDealViewState {}
 
 class CreateTripDealSuccessState extends TripDealViewState {
-  TripDealResponseDto responseDto;
+  ShipmentDealResponseDto responseDto;
 
   CreateTripDealSuccessState(this.responseDto);
 }

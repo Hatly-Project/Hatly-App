@@ -269,7 +269,7 @@ class _MyShipmentDealCardState extends State<MyShipmentDealCard> {
                     color: Theme.of(context).primaryColor),
                 child: Center(
                   child: Text(
-                    'Shipping Bonus ${widget.dealDto.counterReward} \$',
+                    'Shipping Bonus ${widget.dealDto.finalReward} \$',
                     // textAlign: TextAlign.start,
                     style: TextStyle(
                         color: Colors.white,

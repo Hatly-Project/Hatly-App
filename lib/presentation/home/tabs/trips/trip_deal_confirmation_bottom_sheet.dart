@@ -560,7 +560,7 @@ class _TripDealConfirmationBottomSheetState
                                       const EdgeInsets.symmetric(vertical: 12)),
                               onPressed: () {
                                 if (accessTokenProvider.accessToken != null) {
-                                  viewModel.sendDeal(
+                                  viewModel.sendDealOnShipment(
                                       token: accessTokenProvider.accessToken!,
                                       tripId: deal.tripsDto.id!,
                                       reward: deal.shipmentDto.reward,
@@ -568,7 +568,7 @@ class _TripDealConfirmationBottomSheetState
                                 }
                               },
                               child: Text(
-                                'Confirm Offer',
+                                'Confirm Offerrrr',
                                 style: TextStyle(
                                     fontSize: 15,
                                     color: Theme.of(context).primaryColor,

@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/domain/models/deal_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmation_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_list_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_deal_confirmation_bottom_sheet.dart';
@@ -193,7 +194,7 @@ class _TripCardState extends State<MatchingTripCard> {
                             Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        _showTripDealConfirmationBottomSheet(
+                        _showShipmentDealConfirmationBottomSheet(
                             context, showSuccessDialog);
                       },
                       child: Text(
@@ -240,7 +241,7 @@ class _TripCardState extends State<MatchingTripCard> {
     );
   }
 
-  void _showTripDealConfirmationBottomSheet(
+  void _showShipmentDealConfirmationBottomSheet(
       BuildContext context, Function showSuccessDialog) {
     // Navigator.pop(context);
     showModalBottomSheet(
@@ -248,10 +249,8 @@ class _TripCardState extends State<MatchingTripCard> {
       backgroundColor: Colors.grey[100],
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => TripDealConfirmationBottomSheet(
-        deal: widget.deal!,
-        showSuccessDialog: showSuccessDialog,
-      ),
+      builder: (context) => ShipmentDealConfirmationBottomSheet(
+          deal: widget.deal!, showSuccessDialog: showSuccessDialog),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),

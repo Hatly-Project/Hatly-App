@@ -7,22 +7,27 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/shipment.dart';
+import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trip_deal_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
-import 'package:hatly/presentation/home/tabs/trips/trips_list_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trip_deal_details.dart';
+import 'package:hatly/presentation/home/tabs/trips/my_trip_deal_details_argument.dart';
+import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:intl/intl.dart';
 
 class MyTripDealCard extends StatefulWidget {
   TripsDto tripsDto;
   TripDealDto dealDto;
+  bool? isFromTripDealDetails;
   // Function showConfirmedBottomSheet;
   MyTripDealCard(
       {required this.tripsDto,
+      this.isFromTripDealDetails = false,
       // required this.showConfirmedBottomSheet,
       required this.dealDto});
 
@@ -53,9 +58,11 @@ class _MyTripDealCardState extends State<MyTripDealCard> {
       // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .3),
       child: InkWell(
         onTap: () {
-          // Navigator.pushNamed(context, ShipmentDetails.routeName,
-          //     arguments:
-          //         ShipmentDetailsArguments(shipmentDto: widget.shipmentDto));
+          widget.isFromTripDealDetails!
+              ? null
+              : Navigator.pushNamed(context, MyTripDealDetails.routeName,
+                  arguments: MyTripDealDetailsArgument(
+                      deal: widget.dealDto, tripsDto: widget.tripsDto));
         },
         child: Card(
             shape: RoundedRectangleBorder(
@@ -110,7 +117,7 @@ class _MyTripDealCardState extends State<MyTripDealCard> {
                                         .photos!.first.photo!,
                                     width: 100,
                                     height: 100,
-                                    fit: BoxFit.fitHeight,
+                                    fit: BoxFit.fitWidth,
                                   ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,10 +146,11 @@ class _MyTripDealCardState extends State<MyTripDealCard> {
                                     children: [
                                       Expanded(
                                         child: Container(
+                                          height: 45,
                                           margin: EdgeInsets.only(left: 10),
                                           child: Text(
                                             widget.dealDto.shipment!.from!,
-                                            overflow: TextOverflow.ellipsis,
+                                            overflow: TextOverflow.clip,
                                             style: GoogleFonts.poppins(
                                                 fontSize: 15,
                                                 color: Colors.grey[600]),
@@ -161,10 +169,11 @@ class _MyTripDealCardState extends State<MyTripDealCard> {
                                       ),
                                       Expanded(
                                         child: Container(
+                                          height: 40,
                                           margin: EdgeInsets.only(left: 10),
                                           child: Text(
                                             widget.dealDto.shipment!.to!,
-                                            overflow: TextOverflow.ellipsis,
+                                            overflow: TextOverflow.clip,
                                             style: GoogleFonts.poppins(
                                                 fontSize: 15,
                                                 color: Colors.grey[600]),

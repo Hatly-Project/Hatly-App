@@ -9,7 +9,7 @@ class SendShipmentDealUsecase {
 
   SendShipmentDealUsecase({required this.repository});
 
-  Future<ShipmentDealResponseDto> sendDeal(
+  Future<TripDealResponseDto> sendDeal(
       {required int? shipmentId,
       required double? reward,
       required String token,

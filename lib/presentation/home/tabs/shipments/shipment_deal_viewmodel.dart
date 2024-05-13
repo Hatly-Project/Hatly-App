@@ -5,6 +5,7 @@ import 'package:hatly/data/repository/shipment_repository_impl.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/datasource/shipment_datasource.dart';
 import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
+import 'package:hatly/domain/models/trip_deal_response.dart';
 import 'package:hatly/domain/repository/shipment_repository.dart';
 import 'package:hatly/domain/usecase/send_shipment_deal_usecase.dart';
 import 'package:hatly/providers/access_token_provider.dart';
@@ -24,7 +25,7 @@ class ShipmentDealViewmodel extends Cubit<ShipmentDealViewState> {
         SendShipmentDealUsecase(repository: shipmentRepository);
   }
 
-  void sendShipmentDeal(
+  void sendDealOnTrip(
       {required int? shipmentId,
       required double? reward,
       required String token,
@@ -57,6 +58,6 @@ class ShipmentDealFailState extends ShipmentDealViewState {
 }
 
 class ShipmentDealSuccessState extends ShipmentDealViewState {
-  ShipmentDealResponseDto responseDto;
+  TripDealResponseDto responseDto;
   ShipmentDealSuccessState(this.responseDto);
 }

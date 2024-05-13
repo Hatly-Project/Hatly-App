@@ -37,12 +37,12 @@ class MyShipmentCardForDeals extends StatelessWidget {
           // height: MediaQuery.of(context).size.height * .29,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
           child: Padding(
-            padding: const EdgeInsets.all(2.0),
+            padding: const EdgeInsets.all(5.0),
             child: Row(
               children: [
                 shipImage ?? Container(),
                 Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(5.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -64,16 +64,16 @@ class MyShipmentCardForDeals extends StatelessWidget {
                       ),
                       Container(
                         // margin: EdgeInsets.only(left: 5),
-                        width: MediaQuery.sizeOf(context).width * .4,
+                        width: MediaQuery.sizeOf(context).width * .44,
                         child: Row(
                           // crossAxisAlignment: CrossAxisAlignment.center,
                           // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
-                              width: MediaQuery.sizeOf(context).width * .16,
+                              width: MediaQuery.sizeOf(context).width * .23,
                               // color: Colors.red,
                               child: FittedBox(
-                                fit: BoxFit.scaleDown,
+                                // fit: BoxFit.scaleDown,
                                 child: Text(
                                   from,
                                   overflow: TextOverflow.ellipsis,
@@ -89,12 +89,12 @@ class MyShipmentCardForDeals extends StatelessWidget {
                                 child: Icon(
                                   Icons.flight_land_rounded,
                                   color: Colors.black,
-                                  size: 18,
+                                  size: 20,
                                 ),
                               ),
                             ),
                             Container(
-                              width: MediaQuery.sizeOf(context).width * .177,
+                              width: MediaQuery.sizeOf(context).width * .16,
                               // color: Colors.red,
                               child: FittedBox(
                                 // fit: BoxFit.scaleDown,

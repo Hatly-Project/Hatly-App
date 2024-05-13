@@ -312,7 +312,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           ),
                                           Icon(
                                             Icons.arrow_drop_down_rounded,
-                                            size: 33,
+                                            size: 30,
                                           )
                                         ],
                                       ),

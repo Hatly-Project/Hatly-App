@@ -61,7 +61,10 @@ class GetMyShipmentDealDetailsViewModel
 
     try {
       var response = await _acceptShipmentDealUsecase.acceptShipmentDeal(
-          token: token, dealId: dealId, status: 'accepted');
+          token: token,
+          dealId: dealId,
+          status: 'accepted',
+          dealType: 'shipment');
       // createUserInDb(user);
       emit(AcceptShipmentDealSuccessState(response));
     } on ServerErrorException catch (e) {
@@ -77,7 +80,10 @@ class GetMyShipmentDealDetailsViewModel
 
     try {
       var response = await _acceptShipmentDealUsecase.acceptShipmentDeal(
-          token: token, dealId: dealId, status: 'rejected');
+          token: token,
+          dealId: dealId,
+          status: 'rejected',
+          dealType: 'shipment');
       // createUserInDb(user);
       emit(RejectShipmentDealSuccessState(response));
     } on ServerErrorException catch (e) {

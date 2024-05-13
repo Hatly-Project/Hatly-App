@@ -51,7 +51,7 @@ class _MatchingTripsState extends State<MatchingTripsScreen> {
   @override
   void initState() {
     super.initState();
-
+    print('created at ${widget.shipmentDto.createdAt}');
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: false);
 

@@ -18,7 +18,7 @@ import 'package:hatly/presentation/home/tabs/trips/my_trips_details_screen.dart'
 import 'package:hatly/presentation/home/tabs/trips/trip_deal_confirmation_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_details.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_details_arguments.dart';
-import 'package:hatly/presentation/home/tabs/trips/trips_list_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 
 class MatchingShipmentCard extends StatefulWidget {
@@ -105,7 +105,7 @@ class _MatchingShipmentCardState extends State<MatchingShipmentCard> {
                                   height: 10,
                                 ),
                                 Container(
-                                  width: MediaQuery.sizeOf(context).width * .64,
+                                  width: MediaQuery.sizeOf(context).width * .6,
                                   child: Row(
                                     // mainAxisSize: MainAxisSize.max,
                                     children: [
@@ -118,7 +118,7 @@ class _MatchingShipmentCardState extends State<MatchingShipmentCard> {
                                               widget.shipmentDto.from!,
                                               overflow: TextOverflow.fade,
                                               style: GoogleFonts.poppins(
-                                                  fontSize: 15,
+                                                  fontSize: 20,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.grey[600]),
                                             ),
