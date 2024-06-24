@@ -10,7 +10,7 @@ class DialogUtils {
       int? statusCode}) {
     showDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
             title: Text(alertMsg!),
