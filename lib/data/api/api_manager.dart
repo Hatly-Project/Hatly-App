@@ -4,7 +4,7 @@ import 'package:hatly/data/api/cancel_deal_response.dart';
 import 'package:hatly/data/api/check_access_token_response.dart';
 import 'package:hatly/data/api/check_acess_token.dart';
 import 'package:hatly/data/api/counter_offer.dart';
-import 'package:hatly/data/api/countries_states/countries.dart';
+import 'package:hatly/data/api/countries_states/countries_states.dart';
 import 'package:hatly/data/api/get_trip_deal_details/get_trip_deal_details.dart';
 import 'package:hatly/data/api/item.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
@@ -49,7 +49,9 @@ import 'package:provider/provider.dart';
 import 'interceptor/LoggingInterceptor.dart';
 
 class ApiManager {
-  static const String baseUrl = 'hatlyapi.onrender.com';
+  static const String baseUrl = 'hatly-api-v2.onrender.com';
+  static const String apiVersion = '/api/v2';
+
   final AccessTokenProvider? accessTokenProvider;
   Client client = InterceptedClient.build(
     interceptors: [
@@ -109,20 +111,23 @@ class ApiManager {
     }
   }
 
-  Future<Countries> getCountriesFlags() async {
-    late Response response;
+  Future<CountriesStates> getCountriesFlags() async {
+    Response? response;
     try {
-      var url = Uri.https(baseUrl, 'assets');
+      var url = Uri.https(baseUrl, '$apiVersion/assets', {
+        'withStates': 'true',
+      });
       response = await client.get(url);
 
-      var countriesResponse = Countries.fromJson(response.body);
+      var countriesResponse = CountriesStates.fromJson(response.body);
       return countriesResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(
-          errorMessage: e.errorMessage, statusCode: response.statusCode);
+          errorMessage: e.errorMessage,
+          statusCode: response?.statusCode ?? 500);
     } on Exception catch (e) {
       throw ServerErrorException(
-          errorMessage: e.toString(), statusCode: response.statusCode);
+          errorMessage: e.toString(), statusCode: response?.statusCode ?? 500);
     }
   }
 

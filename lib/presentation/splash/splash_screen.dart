@@ -18,20 +18,46 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
   @override
   void initState() {
     super.initState();
-    UserProvider userProvider =
-        BlocProvider.of<UserProvider>(context, listen: false);
 
-    getCountriesFlags().then((countries) => userProvider.state is LoggedInState
-        ? countries != null
-            ? Navigator.pushReplacementNamed(context, HomeScreen.routeName,
-                arguments: HomeScreenArguments(countries))
-            : null
-        : Navigator.pushReplacementNamed(context, WelcomeScreen.routeName,
-            arguments: WelcomeScreenArguments(countries!)));
+    // Initialize animation controller
+    _controller = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    );
+
+    // Define the animation
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.bounceIn,
+    );
+
+    // Add listener to animation status
+    _animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        UserProvider userProvider =
+            BlocProvider.of<UserProvider>(context, listen: false);
+
+        getCountriesFlags().then((countries) => userProvider.state
+                is LoggedInState
+            ? countries != null
+                ? Navigator.pushReplacementNamed(context, HomeScreen.routeName,
+                    arguments: HomeScreenArguments(countries))
+                : null
+            : Navigator.pushReplacementNamed(context, WelcomeScreen.routeName,
+                arguments: WelcomeScreenArguments(countries!)));
+      }
+    });
+
+    // Start the animation
+    _controller.forward();
   }
 
   ApiManager apiManager = ApiManager();
@@ -41,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<CountriesDto?> getCountriesFlags() async {
     try {
       var response = await apiManager.getCountriesFlags();
-      var countries = response.toCountriesDto();
+      var countries = response.toDto();
       countriesList = countries;
     } on ServerErrorException catch (e) {
       DialogUtils.showDialogIos(
@@ -54,13 +80,26 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void dispose() {
+    // Dispose the animation controller to free up resources
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Image.asset(
-        'images/splash.png',
-        width: double.infinity,
-        height: double.infinity,
-        fit: BoxFit.cover,
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Center(
+        child: FadeTransition(
+          opacity: _animation,
+          child: Image.asset(
+            "images/splash_logo.png",
+            fit: BoxFit.cover,
+            width: 435,
+            height: 436,
+          ),
+        ),
       ),
     );
   }
