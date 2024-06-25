@@ -5,8 +5,8 @@ import 'package:hatly/domain/models/country_dto.dart';
 
 class CountriesDto {
   List<CountriesStatesDto>? countries;
-
-  CountriesDto({this.countries});
+  bool? status;
+  CountriesDto({this.countries, this.status});
 
   factory CountriesDto.fromMap(List<dynamic> data) => CountriesDto(
       countries: data

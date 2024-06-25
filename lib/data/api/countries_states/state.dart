@@ -27,7 +27,7 @@ class State {
   /// Converts [State] to a JSON string.
   String toJson() => json.encode(toMap());
 
-  StateDto toStatesDto() {
+  StateDto toDto() {
     return StateDto(name: name);
   }
 }
