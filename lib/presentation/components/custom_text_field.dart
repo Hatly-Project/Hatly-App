@@ -67,22 +67,25 @@ class CustomFormField extends StatelessWidget {
             onChanged: onChange,
             cursorColor: Theme.of(context).primaryColor,
             decoration: InputDecoration(
-              fillColor: Colors.grey[300],
+              fillColor: Colors.transparent,
               filled: true,
               icon: icon,
               suffixIcon: suffixICon,
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.black),
+              hintStyle: Theme.of(context)
+                  .textTheme
+                  .displayMedium
+                  ?.copyWith(fontWeight: FontWeight.w300),
               focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.white, width: 1)),
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Color(0xFFD6D6D6), width: 1)),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.white, width: 1),
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide(color: Color(0xFFD6D6D6), width: 1),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.white, width: 1),
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide(color: Color(0xFFD6D6D6), width: 1),
               ),
             ),
           ),
