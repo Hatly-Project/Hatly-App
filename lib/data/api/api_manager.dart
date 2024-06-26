@@ -76,7 +76,7 @@ class ApiManager {
       required String? fcmToken}) async {
     late Response response;
     try {
-      var url = Uri.https(baseUrl, 'auth/register');
+      var url = Uri.https(baseUrl, '$apiVersion/auth/register');
       var requestBody = RegisterRequest(
         firstName: firstName,
         lastName: lastName,
