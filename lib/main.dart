@@ -153,8 +153,21 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          primaryColor: MyTheme.primaryColor,
-          scaffoldBackgroundColor: MyTheme.backgroundColor),
+        primaryColor: MyTheme.primaryColor,
+        scaffoldBackgroundColor: MyTheme.backgroundColor,
+        fontFamily: "glancyr",
+        textTheme: TextTheme(
+            displayLarge: TextStyle(
+                fontSize: 30.0,
+                // letterSpacing: 1.1,
+                // fontWeight: FontWeight.bold,
+                color: MyTheme.textColor),
+            displayMedium: TextStyle(
+              fontSize: 15.0,
+              fontWeight: FontWeight.w200,
+              color: MyTheme.smallTextColor,
+            )),
+      ),
       initialRoute: SplashScreen.routeName,
       home: MultiProvider(providers: [
         BlocProvider(create: (_) => UserProvider()),
