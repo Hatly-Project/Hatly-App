@@ -13,7 +13,7 @@ class UserDto {
   String? city;
   String? dob;
   String? profilePhoto;
-  int? id;
+  String? id;
   double? averageRating;
 
   UserDto({
@@ -37,7 +37,7 @@ class UserDto {
       email: data['email'] as String?,
       phone: data['phone'] as String?,
       profilePhoto: data['ProfilePhoto'] as String?,
-      id: data['id'] as int?,
+      id: data['id'] as String?,
       averageRating: (data['averageRating'] as num?)?.toDouble());
 
   Map<String, dynamic> toMap() => {

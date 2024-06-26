@@ -26,6 +26,16 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   String? fcmToken = '';
   String ipAddress = '';
+  bool _isButtonEnabled = false, _obsecurePassword = false;
+  var formKey = GlobalKey<FormState>();
+
+  var fullNameController = TextEditingController(text: '');
+
+  var emailController = TextEditingController(text: '');
+
+  var passwordController = TextEditingController(text: '');
+
+  RegisterViewModel viewModel = RegisterViewModel();
   @override
   void initState() {
     super.initState();
@@ -35,6 +45,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
       fcmToken = value;
     });
     print('fcm token $fcmToken');
+
+    fullNameController.addListener(_checkFormCompletion);
+
+    emailController.addListener(_checkFormCompletion);
+
+    passwordController.addListener(_checkFormCompletion);
+  }
+
+  void _checkFormCompletion() {
+    // Check if both fields are non-empty
+    if (fullNameController.text.trim().isNotEmpty &&
+        emailController.text.trim().isNotEmpty &&
+        passwordController.text.trim().isNotEmpty) {
+      setState(() {
+        _isButtonEnabled = true;
+      });
+    } else {
+      setState(() {
+        _isButtonEnabled = false;
+      });
+    }
   }
 
   Future<String?> getFcmToken() async {
@@ -63,21 +94,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  var formKey = GlobalKey<FormState>();
-
-  var firstNameController = TextEditingController(text: '');
-
-  var lastNameController = TextEditingController(text: '');
-
-  var emailController = TextEditingController(text: '');
-
-  var mobileController = TextEditingController(text: '');
-
-  var passwordController = TextEditingController(text: '');
-
-  var passwordConfirmationController = TextEditingController(text: '');
-
-  RegisterViewModel viewModel = RegisterViewModel();
   @override
   Widget build(BuildContext context) {
     final args =
@@ -103,72 +119,59 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return false;
       },
       builder: (context, State) {
-        return Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('images/firstBack.png'),
-                  fit: BoxFit.cover)),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
+        return Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: Stack(
+                children: [
+                  Image.asset(
+                    'images/top_corner.png',
+                    fit: BoxFit.fitWidth,
+                    width: double.infinity,
+                  ),
+                  Column(
                     children: [
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * .23),
                       Container(
-                        margin: const EdgeInsets.only(bottom: 25),
+                        margin: EdgeInsets.only(
+                            top: MediaQuery.sizeOf(context).width * .44),
+                        child: Text(
+                          'Let’s get started',
+                          style: Theme.of(context).textTheme.displayLarge,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 8),
+                        child: Text(
+                          'Please enter the required data to create \nyour account',
+                          style: Theme.of(context).textTheme.displayMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 15),
+                        padding: EdgeInsets.only(left: 20, right: 30, top: 30),
                         child: CustomFormField(
-                          controller: firstNameController,
-                          label: 'First Name',
-                          hint: 'Enter Your First Name',
+                          controller: fullNameController,
+                          label: null,
+                          hint: 'Full Name',
+                          keyboardType: TextInputType.emailAddress,
                           validator: (text) {
                             if (text == null || text.trim().isEmpty) {
-                              return 'please enter first name';
+                              return 'please enter full name';
+                            }
+                            if (!ValidationUtils.isValidFullName(text)) {
+                              return 'please enter a valid full name';
                             }
                           },
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(bottom: 25),
-                        child: CustomFormField(
-                          controller: lastNameController,
-                          label: 'Last Name',
-                          hint: 'Enter Your Last Name',
-                          validator: (text) {
-                            if (text == null || text.trim().isEmpty) {
-                              return 'please enter last name';
-                            }
-                          },
-                        ),
-                      ),
-                      // Container(
-                      //   margin: const EdgeInsets.only(bottom: 25),
-                      //   child: CustomFormField(
-                      //     controller: mobileController,
-                      //     label: 'Mobile Number',
-                      //     hint: 'Enter Your Mobile Number',
-                      //     keyboardType: TextInputType.phone,
-                      //     validator: (text) {
-                      //       if (text == null || text.trim().isEmpty) {
-                      //         return 'please enter mobile number';
-                      //       }
-                      //       if (!ValidationUtils.isValidMobile(text)) {
-                      //         return 'please enter a valid mobile number';
-                      //       }
-                      //     },
-                      //   ),
-                      // ),
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 25),
+                        // margin: const EdgeInsets.only(top: 15),
+                        padding: EdgeInsets.only(left: 20, right: 30, top: 12),
                         child: CustomFormField(
                           controller: emailController,
-                          label: 'Email Address',
-                          hint: 'Enter Your Email',
+                          label: null,
+                          hint: 'Email',
                           keyboardType: TextInputType.emailAddress,
                           validator: (text) {
                             if (text == null || text.trim().isEmpty) {
@@ -181,94 +184,175 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(bottom: 25),
+                        // margin: const EdgeInsets.only(top: 15),
+                        padding: EdgeInsets.only(left: 20, right: 30, top: 12),
                         child: CustomFormField(
                           controller: passwordController,
-                          label: 'Password',
-                          hint: 'Enter Your Password',
-                          keyboardType: TextInputType.text,
-                          isPassword: true,
+                          label: null,
+                          hint: 'Password',
+                          keyboardType: TextInputType.emailAddress,
+                          isPassword: _obsecurePassword,
+                          suffixICon: IconButton(
+                            icon: _obsecurePassword
+                                ? const Icon(
+                                    Icons.visibility_off_outlined,
+                                  )
+                                : const Icon(
+                                    Icons.visibility_outlined,
+                                  ),
+                            onPressed: () {
+                              setState(() {
+                                _obsecurePassword = !_obsecurePassword;
+                              });
+                            },
+                          ),
                           validator: (text) {
                             if (text == null || text.trim().isEmpty) {
                               return 'please enter password';
                             }
-                            if (text.length < 6) {
-                              return 'password should at least 6 chars';
+                            if (!ValidationUtils.isValidPassword(text)) {
+                              return 'please enter a password more than 8 characters';
                             }
                           },
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(bottom: 25),
-                        child: CustomFormField(
-                          controller: passwordConfirmationController,
-                          label: 're password',
-                          hint: 'Enter Your Password',
-                          keyboardType: TextInputType.text,
-                          isPassword: true,
-                          validator: (text) {
-                            if (text == null || text.trim().isEmpty) {
-                              return 'please enter password';
-                            }
-                            if (text.length < 6) {
-                              return 'password should at least 6 chars';
-                            }
-                          },
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 10),
+                        margin: const EdgeInsets.only(top: 20),
+                        padding: EdgeInsets.only(left: 20, right: 20),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               minimumSize: Size(double.infinity, 60),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              side: BorderSide(
-                                  color: Theme.of(context).primaryColor,
-                                  width: 1),
-                              backgroundColor: Colors.white,
+                                  borderRadius: BorderRadius.circular(6)),
+                              backgroundColor: _isButtonEnabled
+                                  ? Theme.of(context).primaryColor
+                                  : const Color(0xFFEEEEEE),
                               padding:
                                   const EdgeInsets.symmetric(vertical: 12)),
-                          onPressed: () {
-                            register();
-                          },
+                          onPressed: _isButtonEnabled
+                              ? () {
+                                  register();
+                                }
+                              : null,
                           child: Text(
-                            'Register',
-                            style: TextStyle(
-                                fontSize: 24,
-                                color: Theme.of(context).primaryColor),
+                            'Create Account',
+                            style: Theme.of(context)
+                                .textTheme
+                                .displayMedium
+                                ?.copyWith(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600),
                           ),
                         ),
                       ),
-                      Center(
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 30),
-                          child: TextButton(
-                            style: const ButtonStyle(
-                                overlayColor:
-                                    MaterialStatePropertyAll(Colors.grey)),
-                            child: const Text(
-                              'Already have an account? Login',
-                              style:
-                                  TextStyle(fontSize: 17, color: Colors.white),
+                      Container(
+                        margin: EdgeInsets.only(
+                            top: MediaQuery.sizeOf(context).width * .1),
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                child: Divider(
+                                  thickness: 1,
+                                  color: Color(0xFFD6D6D6),
+                                ),
+                              ),
                             ),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, LoginScreen.routeName,
-                                  arguments: LoginScreenArguments(
-                                      args.countriesFlagsDto));
-                            },
-                          ),
+                            Text(
+                              ' or Create Account With... ',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayMedium
+                                  ?.copyWith(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 12),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                child: Divider(
+                                  thickness: 1,
+                                  color: Color(0xFFD6D6D6),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      )
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              margin: const EdgeInsets.only(
+                                top: 20,
+                                left: 16,
+                                right: 16,
+                              ),
+                              // padding: EdgeInsets.only(left: 20, right: 20),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(double.infinity, 60),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(6)),
+                                    side: BorderSide(
+                                        color: Color(0xFFD6D6D6), width: 1),
+                                    backgroundColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12)),
+                                onPressed: () {
+                                  // register();
+                                },
+                                child: Image.asset(
+                                  'images/devicon_google.png',
+                                  width: 24,
+                                  height: 24,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 20, right: 16),
+                              // padding: EdgeInsets.only(left: 20, right: 20),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(double.infinity, 60),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(6)),
+                                    side: BorderSide(
+                                        color: Color(0xFFD6D6D6), width: 1),
+                                    backgroundColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12)),
+                                onPressed: () {
+                                  // register();
+                                },
+                                child: Image.asset(
+                                  'images/apple_icon.png',
+                                  width: 24,
+                                  height: 24,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ),
-          ),
-        );
+            ));
       },
       listener: (context, state) {
         if (state is RegisterFailState) {
@@ -327,15 +411,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (formKey.currentState?.validate() == false) {
       return;
     }
-
+    var fullNameSplitted = fullNameController.text.split(' ');
     viewModel.register(
-        firstName: firstNameController.text,
-        lastName: lastNameController.text,
+        firstName: fullNameSplitted.first,
+        lastName: fullNameSplitted.last,
         email: emailController.text,
         ip: ipAddress,
-        phone: mobileController.text,
         password: passwordController.text,
         fcmToken: fcmToken);
-    // loginViewModel.register(emailController.text, passwordController.text);
   }
 }

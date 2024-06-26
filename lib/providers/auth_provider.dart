@@ -25,7 +25,7 @@ class UserProvider extends Cubit<CurrentUserState> {
     // sharedPreferences.setString('userPhone', loggedInState.user.phone!);
     sharedPreferences.setString(
         'userPhoto', loggedInState.user.profilePhoto ?? '');
-    sharedPreferences.setInt('userId', loggedInState.user.id ?? 0);
+    sharedPreferences.setString('userId', loggedInState.user.id ?? '');
     // sharedPreferences.setString('userReview', loggedInState.user.r!);
 
     emit(loggedInState);
@@ -50,7 +50,7 @@ class UserProvider extends Cubit<CurrentUserState> {
     String? email = sharedPreferences.getString('userEmail');
     String? phone = sharedPreferences.getString('userPhone');
     String? profilePhoto = sharedPreferences.getString('userPhoto');
-    int? id = sharedPreferences.getInt('userId');
+    String? id = sharedPreferences.getString('userId');
     bool? isLogin = sharedPreferences.getBool('login') ?? false;
     print(isLogin);
     if (isLogin) {
@@ -80,7 +80,7 @@ class UserProvider extends Cubit<CurrentUserState> {
     String? email = sharedPreferences.getString('userEmail');
     String? phone = sharedPreferences.getString('userPhone');
     String? profilePhoto = sharedPreferences.getString('userPhoto');
-    int? id = sharedPreferences.getInt('userId');
+    String? id = sharedPreferences.getString('userId');
     bool? isLogin = sharedPreferences.getBool('login') ?? false;
 
     emit(LoggedInState(
