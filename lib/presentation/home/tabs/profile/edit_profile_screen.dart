@@ -58,7 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       LoggedInState loggedInState = userProvider.state as LoggedInState;
-      userId = loggedInState.user.id;
+      // userId = loggedInState.user.id;
       print('user iDDD $userId');
       // token = loggedInState.accessToken;
       // Now you can use the 'token' variable as needed in your code.

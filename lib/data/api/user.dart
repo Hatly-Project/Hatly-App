@@ -9,7 +9,7 @@ class User {
   String? email;
   String? phone;
   String? profilePhoto;
-  int? id;
+  String? id;
   double? averageRating;
 
   User({
@@ -28,7 +28,7 @@ class User {
         email: data['email'] as String?,
         phone: data['phone'] as String?,
         profilePhoto: data['ProfilePhoto'] as String?,
-        id: data['id'] as int?,
+        id: data['id'] as String?,
         averageRating: (data['averageRating'] as num?)?.toDouble(),
       );
 

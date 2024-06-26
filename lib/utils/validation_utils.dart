@@ -11,4 +11,18 @@ class ValidationUtils {
 
     return true;
   }
+
+  static bool isValidFullName(String? fullName) {
+    if (fullName!.trim().length < 5) return false;
+    // var regex = RegExp(r"^\d{11}$");
+
+    return true;
+  }
+
+  static bool isValidPassword(String? passwrod) {
+    if (passwrod!.trim().length < 8) return false;
+    // var regex = RegExp(r"^\d{11}$");
+
+    return true;
+  }
 }
