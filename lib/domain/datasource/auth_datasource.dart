@@ -21,4 +21,6 @@ abstract class AuthDataSource {
 
   Future<MyShipmentDealsResponseDto> getMyShipmentDealDetails(
       {required String token, required String dealId});
+
+  Future<LoginResponseDto> loginWithGoogle(String idToken);
 }

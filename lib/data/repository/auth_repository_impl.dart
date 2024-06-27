@@ -38,4 +38,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<LoginResponseDto> login(String email, String password) async {
     return authDataSource.login(email, password);
   }
+
+  @override
+  Future<LoginResponseDto> loginWithGoogle(String idToken) {
+    return authDataSource.loginWithGoogle(idToken);
+  }
 }

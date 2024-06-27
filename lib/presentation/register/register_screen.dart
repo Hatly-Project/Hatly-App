@@ -147,74 +147,81 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 15),
-                        padding: EdgeInsets.only(left: 20, right: 30, top: 30),
-                        child: CustomFormField(
-                          controller: fullNameController,
-                          label: null,
-                          hint: 'Full Name',
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (text) {
-                            if (text == null || text.trim().isEmpty) {
-                              return 'please enter full name';
-                            }
-                            if (!ValidationUtils.isValidFullName(text)) {
-                              return 'please enter a valid full name';
-                            }
-                          },
-                        ),
-                      ),
-                      Container(
-                        // margin: const EdgeInsets.only(top: 15),
-                        padding: EdgeInsets.only(left: 20, right: 30, top: 12),
-                        child: CustomFormField(
-                          controller: emailController,
-                          label: null,
-                          hint: 'Email',
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (text) {
-                            if (text == null || text.trim().isEmpty) {
-                              return 'please enter email';
-                            }
-                            if (!ValidationUtils.isValidEmail(text)) {
-                              return 'please enter a valid email';
-                            }
-                          },
-                        ),
-                      ),
-                      Container(
-                        // margin: const EdgeInsets.only(top: 15),
-                        padding: EdgeInsets.only(left: 20, right: 30, top: 12),
-                        child: CustomFormField(
-                          controller: passwordController,
-                          label: null,
-                          hint: 'Password',
-                          keyboardType: TextInputType.emailAddress,
-                          isPassword: _obsecurePassword,
-                          suffixICon: IconButton(
-                            icon: _obsecurePassword
-                                ? const Icon(
-                                    Icons.visibility_off_outlined,
-                                  )
-                                : const Icon(
-                                    Icons.visibility_outlined,
-                                  ),
-                            onPressed: () {
-                              setState(() {
-                                _obsecurePassword = !_obsecurePassword;
-                              });
-                            },
+                      Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 15),
+                            padding:
+                                EdgeInsets.only(left: 20, right: 30, top: 30),
+                            child: CustomFormField(
+                              controller: fullNameController,
+                              label: null,
+                              hint: 'Full Name',
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter full name';
+                                }
+                                if (!ValidationUtils.isValidFullName(text)) {
+                                  return 'please enter a valid full name';
+                                }
+                              },
+                            ),
                           ),
-                          validator: (text) {
-                            if (text == null || text.trim().isEmpty) {
-                              return 'please enter password';
-                            }
-                            if (!ValidationUtils.isValidPassword(text)) {
-                              return 'please enter a password more than 8 characters';
-                            }
-                          },
-                        ),
+                          Container(
+                            // margin: const EdgeInsets.only(top: 15),
+                            padding:
+                                EdgeInsets.only(left: 20, right: 30, top: 12),
+                            child: CustomFormField(
+                              controller: emailController,
+                              label: null,
+                              hint: 'Email',
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter email';
+                                }
+                                if (!ValidationUtils.isValidEmail(text)) {
+                                  return 'please enter a valid email';
+                                }
+                              },
+                            ),
+                          ),
+                          Container(
+                            // margin: const EdgeInsets.only(top: 15),
+                            padding:
+                                EdgeInsets.only(left: 20, right: 30, top: 12),
+                            child: CustomFormField(
+                              controller: passwordController,
+                              label: null,
+                              hint: 'Password',
+                              keyboardType: TextInputType.emailAddress,
+                              isPassword: _obsecurePassword,
+                              suffixICon: IconButton(
+                                icon: _obsecurePassword
+                                    ? const Icon(
+                                        Icons.visibility_off_outlined,
+                                      )
+                                    : const Icon(
+                                        Icons.visibility_outlined,
+                                      ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obsecurePassword = !_obsecurePassword;
+                                  });
+                                },
+                              ),
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter password';
+                                }
+                                if (!ValidationUtils.isValidPassword(text)) {
+                                  return 'please enter a password more than 8 characters';
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                       Container(
                         margin: const EdgeInsets.only(top: 20),

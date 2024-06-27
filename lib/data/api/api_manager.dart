@@ -11,6 +11,7 @@ import 'package:hatly/data/api/items_not_allowed.dart';
 import 'package:hatly/data/api/login/login_request.dart';
 import 'package:hatly/data/api/login/login_response/login_response.dart';
 import 'package:hatly/data/api/refresh_access_token_response.dart';
+import 'package:hatly/data/api/refresh_auth_request.dart';
 import 'package:hatly/data/api/refresh_token_request.dart';
 import 'package:hatly/data/api/refresh_token_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
@@ -25,6 +26,7 @@ import 'package:hatly/data/api/shipments/get_shipment_deal_details/get_shipment_
 import 'package:hatly/data/api/shipments/get_shipments_response/get_shipments_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_deals_response/my_shipment_deals_response.dart';
 import 'package:hatly/data/api/shipments/my_shipment_response/my_shipment_response.dart';
+import 'package:hatly/data/api/sign_in_google_request.dart';
 import 'package:hatly/data/api/trip_deal/deals.dart' as TripDeal;
 import 'package:hatly/data/api/shipment_deal/deals.dart' as ShipmentDeal;
 import 'package:hatly/data/api/trip_deal/trip_deal_request.dart';
@@ -95,8 +97,15 @@ class ApiManager {
           body: requestBody.toJson(),
           headers: {'content-type': 'application/json'});
       var registerResponse = RegisterResponse.fromJson(response.body);
+      if (registerResponse.status == true) {
+        var responseHeaders = response.headers;
+        var refreshTokenList = responseHeaders['set-cookie']?.split(';');
 
-      if (registerResponse.status == false) {
+        var refreshToken = refreshTokenList![0].split('=');
+        print('token ${refreshToken[1]}');
+        await const FlutterSecureStorage()
+            .write(key: 'refreshToken', value: refreshToken[1]);
+      } else {
         throw ServerErrorException(
             errorMessage: registerResponse.message!,
             statusCode: response.statusCode);
@@ -266,12 +275,46 @@ class ApiManager {
   Future<LoginResponse> loginUser(String email, String password) async {
     late Response response;
     try {
-      var url = Uri.https(baseUrl, 'auth/login');
+      var url = Uri.https(baseUrl, '$apiVersion/auth/login');
       var requestBody = LoginRequest(
         email: email,
         password: password,
       );
-      List<String> splitted = [];
+      response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {'content-type': 'application/json'});
+      var loginResponse = LoginResponse.fromJson(response.body);
+      if (loginResponse.status == true) {
+        var responseHeaders = response.headers;
+        var refreshTokenList = responseHeaders['set-cookie']?.split(';');
+
+        var refreshToken = refreshTokenList![0].split('=');
+        print('token ${refreshToken[1]}');
+        await const FlutterSecureStorage()
+            .write(key: 'refreshToken', value: refreshToken[1]);
+      } else {
+        print('error ${loginResponse.message}');
+        throw ServerErrorException(
+            errorMessage: loginResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return loginResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<LoginResponse> loginWithGoogle(String idToken) async {
+    late Response response;
+    try {
+      var url = Uri.https(baseUrl, '$apiVersion/auth/google');
+      var requestBody = SignInGoogleRequest(
+        idToken: idToken,
+      );
       response = await client.post(url,
           body: requestBody.toJson(),
           headers: {'content-type': 'application/json'});
@@ -303,16 +346,30 @@ class ApiManager {
   Future<String> refreshAccessToken() async {
     String? refreshToken =
         await const FlutterSecureStorage().read(key: 'refreshToken');
+    String? accessToken =
+        await const FlutterSecureStorage().read(key: 'accessToken');
+
     late Response response;
     try {
-      var url = Uri.https(baseUrl, 'auth/refresh-token');
-      response = await client.post(url, headers: {
-        'content-type': 'application/json',
-        'cookie': 'refreshToken=$refreshToken',
-      });
+      var url = Uri.https(baseUrl, '$apiVersion/auth/refresh');
+      var requestBody = RefreshAuthRequest(token: accessToken);
+      response = await client.post(url,
+          headers: {
+            'content-type': 'application/json',
+            'cookie': 'refreshToken=$refreshToken',
+          },
+          body: requestBody.toJson());
       var refreshResponse = RefreshAccessTokenResponse.fromJson(response.body);
+      if (refreshResponse.status == true) {
+        var responseHeaders = response.headers;
+        var refreshTokenList = responseHeaders['set-cookie']?.split(';');
 
-      if (refreshResponse.status == false) {
+        var refreshedRefreshToken = refreshTokenList![0].split('=');
+        print('new refresh token response ${refreshedRefreshToken[1]}');
+        await const FlutterSecureStorage()
+            .write(key: 'refreshToken', value: refreshedRefreshToken[1]);
+        accessTokenProvider?.setRefreshToken(refreshedRefreshToken[1]);
+      } else {
         print('error ${response.statusCode}');
         throw ServerErrorException(
             errorMessage: refreshResponse.message!,
@@ -334,13 +391,16 @@ class ApiManager {
   Future<bool> chechAccessTokenExpired() async {
     String? accessToken =
         await const FlutterSecureStorage().read(key: 'accessToken');
+    String? refreshToken =
+        await const FlutterSecureStorage().read(key: 'refreshToken');
     late Response response;
     try {
-      var url = Uri.https(baseUrl, 'auth/check');
+      var url = Uri.https(baseUrl, '$apiVersion/auth/check');
       var requestBody = CheckAcessTokenRequest(token: accessToken);
       response = await client.post(url,
           headers: {
             'content-type': 'application/json',
+            'cookie': 'refreshToken=$refreshToken',
           },
           body: requestBody.toJson());
       var checkResponse = CheckAccessTokenResponse.fromJson(response.body);
@@ -377,7 +437,7 @@ class ApiManager {
     late Response response;
 
     try {
-      var url = Uri.https(baseUrl, 'shipments',
+      var url = Uri.https(baseUrl, '$apiVersion/shipment',
           {'page': page.toString(), 'take': 4.toString()});
       response = await client.get(url, headers: {
         'content-type': 'application/json',
