@@ -17,7 +17,7 @@ class GetShipmentsResponse {
     return GetShipmentsResponse(
       status: data['status'] as bool?,
       message: data['message'] as String?,
-      totalPages: data['totalPages'] as int?,
+      totalPages: data['totalData'] as int?,
       shipments: (data['shipments'] as List<dynamic>?)
           ?.map((e) => Shipment.fromMap(e as Map<String, dynamic>))
           .toList(),

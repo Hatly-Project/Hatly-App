@@ -50,4 +50,11 @@ class AuthDataSourceImpl implements AuthDataSource {
     // TODO: implement getMyShipmentDealDetails
     throw UnimplementedError();
   }
+
+  @override
+  Future<LoginResponseDto> loginWithGoogle(String idToken) async {
+    var response = await apiManager.loginWithGoogle(idToken);
+
+    return response.toLoginDto();
+  }
 }

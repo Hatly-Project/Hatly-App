@@ -17,4 +17,6 @@ abstract class AuthRepository {
       String? ip,
       required String? fcmToken});
   Future<LoginResponseDto> login(String email, String password);
+
+  Future<LoginResponseDto> loginWithGoogle(String idToken);
 }
