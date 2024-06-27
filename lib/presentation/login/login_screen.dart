@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
@@ -33,6 +35,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   var connectivityResult;
 
+  bool _isButtonEnabled = false, _obscurePassword = false;
+
   var formKey = GlobalKey<FormState>();
 
   var emailController = TextEditingController(text: '');
@@ -52,6 +56,28 @@ class _LoginScreenState extends State<LoginScreen> {
       print('token success');
     }
     return refreshToken;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    emailController.addListener(_checkFormCompletion);
+    passwordController.addListener(_checkFormCompletion);
+  }
+
+  void _checkFormCompletion() {
+    // Check if both fields are non-empty
+    if (emailController.text.trim().isNotEmpty &&
+        passwordController.text.trim().isNotEmpty) {
+      setState(() {
+        _isButtonEnabled = true;
+      });
+    } else {
+      setState(() {
+        _isButtonEnabled = false;
+      });
+    }
   }
 
   @override
@@ -174,41 +200,62 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 15),
-                      padding: EdgeInsets.only(left: 20, right: 30),
-                      child: CustomFormField(
-                        controller: emailController,
-                        label: 'Email Address',
-                        hint: 'Email',
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (text) {
-                          if (text == null || text.trim().isEmpty) {
-                            return 'please enter email';
-                          }
-                          if (!ValidationUtils.isValidEmail(text)) {
-                            return 'please enter a valid email';
-                          }
-                        },
-                      ),
-                    ),
-                    Container(
-                      // margin: const EdgeInsets.only(top: 15),
-                      padding: EdgeInsets.only(left: 20, right: 30),
-                      child: CustomFormField(
-                        controller: emailController,
-                        label: 'Password',
-                        hint: 'Password',
-                        keyboardType: TextInputType.emailAddress,
-                        suffixICon: Icon(Icons.visibility_outlined),
-                        validator: (text) {
-                          if (text == null || text.trim().isEmpty) {
-                            return 'please enter email';
-                          }
-                          if (!ValidationUtils.isValidEmail(text)) {
-                            return 'please enter a valid email';
-                          }
-                        },
+                    Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 15),
+                            padding: EdgeInsets.only(left: 20, right: 30),
+                            child: CustomFormField(
+                              controller: emailController,
+                              label: 'Email Address',
+                              hint: 'Email',
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter email';
+                                }
+                                if (!ValidationUtils.isValidEmail(text)) {
+                                  return 'please enter a valid email';
+                                }
+                              },
+                            ),
+                          ),
+                          Container(
+                            // margin: const EdgeInsets.only(top: 15),
+                            padding: EdgeInsets.only(left: 20, right: 30),
+                            child: CustomFormField(
+                              controller: passwordController,
+                              label: 'Password',
+                              hint: 'Password',
+                              keyboardType: TextInputType.text,
+                              isPassword: _obscurePassword,
+                              suffixICon: IconButton(
+                                icon: _obscurePassword
+                                    ? const Icon(
+                                        Icons.visibility_off_outlined,
+                                      )
+                                    : const Icon(
+                                        Icons.visibility_outlined,
+                                      ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                              validator: (text) {
+                                if (text == null || text.trim().isEmpty) {
+                                  return 'please enter password';
+                                }
+                                if (!ValidationUtils.isValidEmail(text)) {
+                                  return 'Password must be more than 8 characters';
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Container(
@@ -238,14 +285,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(6)),
-                            side: BorderSide(
-                                color: Theme.of(context).primaryColor,
-                                width: 1),
-                            backgroundColor: Theme.of(context).primaryColor,
+                            backgroundColor: _isButtonEnabled
+                                ? Theme.of(context).primaryColor
+                                : const Color(0xFFEEEEEE),
                             padding: const EdgeInsets.symmetric(vertical: 12)),
-                        onPressed: () {
-                          // register();
-                        },
+                        onPressed: _isButtonEnabled
+                            ? () {
+                                login();
+                              }
+                            : null,
                         child: Text(
                           'Log in',
                           style: Theme.of(context)
@@ -314,9 +362,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   side: BorderSide(
                                       color: Color(0xFFD6D6D6), width: 1),
                                   backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12)),
-                              onPressed: () {
+                              onPressed: () async {
+                                await _signInWithGoogle(context);
                                 // register();
                               },
                               child: Image.asset(
@@ -342,6 +392,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   side: BorderSide(
                                       color: Color(0xFFD6D6D6), width: 1),
                                   backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 12)),
                               onPressed: () {
@@ -364,6 +415,28 @@ class _LoginScreenState extends State<LoginScreen> {
             ));
       },
     );
+  }
+
+  Future<void> _signInWithGoogle(BuildContext context) async {
+    GoogleSignIn _googleSignIn = GoogleSignIn(
+      scopes: ['email'],
+    );
+    try {
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        final auth = await googleUser.authentication;
+        String? idToken = auth.idToken;
+        if (idToken != null) {
+          print('id token $idToken');
+          print('user name ${googleUser.displayName}');
+          print('user email ${googleUser.email}');
+          viewModel.loginWithGoogle(idToken);
+          // call the server with ID token
+        }
+      }
+    } catch (error) {
+      print(error);
+    }
   }
 
   Future<bool> checkInternetConnection() async {
