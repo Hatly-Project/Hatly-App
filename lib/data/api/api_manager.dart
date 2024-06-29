@@ -366,6 +366,34 @@ class ApiManager {
     }
   }
 
+  Future<SendResetEmailResponse> resetPassword(
+      {String? otp, String? newPassword}) async {
+    late Response response;
+    try {
+      var url = Uri.https(baseUrl, '$apiVersion/auth/check/otp');
+      var requestBody = VerifyOtpRequest(
+        otp: otp,
+      );
+      response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {'content-type': 'application/json'});
+      var verifyResponse = SendResetEmailResponse.fromJson(response.body);
+      if (verifyResponse.status == false) {
+        print('error ${verifyResponse.message}');
+        throw ServerErrorException(
+            errorMessage: verifyResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return verifyResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
   Future<LoginResponse> loginWithGoogle(String idToken) async {
     late Response response;
     try {

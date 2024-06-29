@@ -7,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/presentation/components/custom_text_field.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/create_password.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/forget_passwrod_screen_viewmodel.dart';
+import 'package:hatly/presentation/home/tabs/forget_password/reset_password_screen_arguments.dart';
 import 'package:hatly/presentation/login/login_screen.dart';
+import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:hatly/utils/validation_utils.dart';
 
@@ -29,7 +31,7 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
   var fourthController = TextEditingController(text: '');
 
   ForgetPasswrodScreenViewmodel viewmodel = ForgetPasswrodScreenViewmodel();
-
+  String otp = '';
   bool _isButtonEnabled = false,
       _isFirstEnabled = false,
       _isSecondEnabled = false,
@@ -74,6 +76,9 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as LoginScreenArguments;
+
     return BlocConsumer(
       bloc: viewmodel,
       listener: (context, state) {
@@ -105,7 +110,9 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
         } else if (state is VerifyCodeSuccessState) {
           print('success');
           Navigator.pushReplacementNamed(
-              context, CreatePasswordScreen.routeName);
+              context, CreatePasswordScreen.routeName,
+              arguments:
+                  ResetPasswordScreenArguments(otp, args.countriesFlagsDto));
         }
       },
       listenWhen: (previous, current) {
@@ -348,6 +355,9 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
         await checkInternetConnection()) {
       return;
     }
+    setState(() {
+      this.otp = otp;
+    });
     viewmodel.verifyOtpCode(otp);
   }
 }
