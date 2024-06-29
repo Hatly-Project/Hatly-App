@@ -1,4 +1,5 @@
 import 'package:hatly/domain/models/login_response_dto.dart';
+import 'package:hatly/domain/models/send_reset_email_response_dto.dart';
 
 import '../models/register_response_dto.dart';
 
@@ -19,4 +20,6 @@ abstract class AuthRepository {
   Future<LoginResponseDto> login(String email, String password);
 
   Future<LoginResponseDto> loginWithGoogle(String idToken);
+
+  Future<SendResetEmailResponseDto> sendResetEmail(String email);
 }

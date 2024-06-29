@@ -1,4 +1,5 @@
 import 'package:hatly/domain/models/login_response_dto.dart';
+import 'package:hatly/domain/models/send_reset_email_response_dto.dart';
 import 'package:hatly/domain/repository/auth_repository.dart';
 
 import '../../domain/datasource/auth_datasource.dart';
@@ -42,5 +43,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<LoginResponseDto> loginWithGoogle(String idToken) {
     return authDataSource.loginWithGoogle(idToken);
+  }
+
+  @override
+  Future<SendResetEmailResponseDto> sendResetEmail(String email) {
+    return authDataSource.sendResetEmail(email);
   }
 }

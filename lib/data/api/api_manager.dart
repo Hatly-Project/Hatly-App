@@ -16,6 +16,8 @@ import 'package:hatly/data/api/refresh_token_request.dart';
 import 'package:hatly/data/api/refresh_token_response.dart';
 import 'package:hatly/data/api/register/register_response/register_response.dart';
 import 'package:hatly/data/api/register/register_request.dart';
+import 'package:hatly/data/api/send_reset_email_request.dart';
+import 'package:hatly/data/api/send_reset_email_response.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_request.dart';
 import 'package:hatly/data/api/shipment_deal/shipment_deal_response.dart';
 import 'package:hatly/data/api/shipment_matching_trips_response/shipment_matching_trips_response.dart';
@@ -40,6 +42,7 @@ import 'package:hatly/data/api/trips/my_trip_deals_response/my_trip_deals_respon
 import 'package:hatly/data/api/update_payment_info_request.dart';
 import 'package:hatly/data/api/update_payment_info_response.dart';
 import 'package:hatly/data/api/update_profile_request.dart';
+import 'package:hatly/data/api/verify_otp_request.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/usecase/get_shipment_matching_trips_usecase.dart';
 import 'package:hatly/domain/usecase/reject_shipment_deal_usecase.dart';
@@ -283,8 +286,8 @@ class ApiManager {
       response = await client.post(url,
           body: requestBody.toJson(),
           headers: {'content-type': 'application/json'});
-      var loginResponse = LoginResponse.fromJson(response.body);
-      if (loginResponse.status == true) {
+      var verifyResponse = LoginResponse.fromJson(response.body);
+      if (verifyResponse.status == true) {
         var responseHeaders = response.headers;
         var refreshTokenList = responseHeaders['set-cookie']?.split(';');
 
@@ -293,12 +296,67 @@ class ApiManager {
         await const FlutterSecureStorage()
             .write(key: 'refreshToken', value: refreshToken[1]);
       } else {
-        print('error ${loginResponse.message}');
+        print('error ${verifyResponse.message}');
         throw ServerErrorException(
-            errorMessage: loginResponse.message!,
+            errorMessage: verifyResponse.message!,
             statusCode: response.statusCode);
       }
-      return loginResponse;
+      return verifyResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<SendResetEmailResponse> sendResetEmail(String email) async {
+    late Response response;
+    try {
+      var url = Uri.https(baseUrl, '$apiVersion/auth/reset/password');
+      var requestBody = SendResetEmailRequest(
+        email: email,
+        ar: false,
+      );
+      response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {'content-type': 'application/json'});
+      var verifyResponse = SendResetEmailResponse.fromJson(response.body);
+      if (verifyResponse.status == false) {
+        print('error ${verifyResponse.message}');
+        throw ServerErrorException(
+            errorMessage: verifyResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return verifyResponse;
+    } on ServerErrorException catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.errorMessage, statusCode: response.statusCode);
+    } on Exception catch (e) {
+      throw ServerErrorException(
+          errorMessage: e.toString(), statusCode: response.statusCode);
+    }
+  }
+
+  Future<SendResetEmailResponse> verifyOtp(String otp) async {
+    late Response response;
+    try {
+      var url = Uri.https(baseUrl, '$apiVersion/auth/check/otp');
+      var requestBody = VerifyOtpRequest(
+        otp: otp,
+      );
+      response = await client.post(url,
+          body: requestBody.toJson(),
+          headers: {'content-type': 'application/json'});
+      var verifyResponse = SendResetEmailResponse.fromJson(response.body);
+      if (verifyResponse.status == false) {
+        print('error ${verifyResponse.message}');
+        throw ServerErrorException(
+            errorMessage: verifyResponse.message!,
+            statusCode: response.statusCode);
+      }
+      return verifyResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(
           errorMessage: e.errorMessage, statusCode: response.statusCode);
@@ -318,8 +376,8 @@ class ApiManager {
       response = await client.post(url,
           body: requestBody.toJson(),
           headers: {'content-type': 'application/json'});
-      var loginResponse = LoginResponse.fromJson(response.body);
-      if (loginResponse.status == true) {
+      var verifyResponse = LoginResponse.fromJson(response.body);
+      if (verifyResponse.status == true) {
         var responseHeaders = response.headers;
         var refreshTokenList = responseHeaders['set-cookie']?.split(';');
 
@@ -328,12 +386,12 @@ class ApiManager {
         await const FlutterSecureStorage()
             .write(key: 'refreshToken', value: refreshToken[1]);
       } else {
-        print('error ${loginResponse.message}');
+        print('error ${verifyResponse.message}');
         throw ServerErrorException(
-            errorMessage: loginResponse.message!,
+            errorMessage: verifyResponse.message!,
             statusCode: response.statusCode);
       }
-      return loginResponse;
+      return verifyResponse;
     } on ServerErrorException catch (e) {
       throw ServerErrorException(
           errorMessage: e.errorMessage, statusCode: response.statusCode);
