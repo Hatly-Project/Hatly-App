@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hatly/data/api/api_manager.dart';
+import 'package:hatly/presentation/home/tabs/forget_password/forget_password_screen.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/home/home_screen.dart';
@@ -206,10 +207,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Container(
                             margin: const EdgeInsets.only(top: 15),
-                            padding: EdgeInsets.only(left: 20, right: 30),
+                            padding: EdgeInsets.only(left: 20, right: 20),
                             child: CustomFormField(
                               controller: emailController,
-                              label: 'Email Address',
+                              label: null,
                               hint: 'Email',
                               keyboardType: TextInputType.emailAddress,
                               validator: (text) {
@@ -224,10 +225,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           Container(
                             // margin: const EdgeInsets.only(top: 15),
-                            padding: EdgeInsets.only(left: 20, right: 30),
+                            padding:
+                                EdgeInsets.only(left: 20, right: 20, top: 15),
                             child: CustomFormField(
                               controller: passwordController,
-                              label: 'Password',
+                              label: null,
                               hint: 'Password',
                               keyboardType: TextInputType.text,
                               isPassword: _obscurePassword,
@@ -263,15 +265,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text(
-                            'Forget Password?',
-                            style: Theme.of(context)
-                                .textTheme
-                                .displayMedium
-                                ?.copyWith(
-                                    color: Color(0xFF5A5A5A),
-                                    fontWeight: FontWeight.w500),
-                            textAlign: TextAlign.center,
+                          TextButton(
+                            child: Text(
+                              'Forget Password?',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayMedium
+                                  ?.copyWith(
+                                      color: Color(0xFF5A5A5A),
+                                      fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            ),
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, ForgetPasswordScreen.routeName);
+                            },
                           ),
                         ],
                       ),
@@ -296,14 +304,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             : null,
                         child: Text(
                           'Log in',
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayMedium
-                              ?.copyWith(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600),
+                          style: _isButtonEnabled
+                              ? Theme.of(context)
+                                  .textTheme
+                                  .displayMedium
+                                  ?.copyWith(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600)
+                              : Theme.of(context).textTheme.displaySmall,
                         ),
                       ),
                     ),

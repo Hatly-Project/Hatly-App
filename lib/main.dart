@@ -10,6 +10,9 @@ import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/firebase_options.dart';
 import 'package:hatly/presentation/home/tabs/chat/chat_screen.dart';
 import 'package:hatly/presentation/home/tabs/chat/chat_screen_arguments.dart';
+import 'package:hatly/presentation/home/tabs/forget_password/create_password.dart';
+import 'package:hatly/presentation/home/tabs/forget_password/forget_password_code_screen.dart';
+import 'package:hatly/presentation/home/tabs/forget_password/forget_password_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/edit_profile_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/payment_information_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
@@ -164,8 +167,13 @@ class MyApp extends StatelessWidget {
                 color: MyTheme.textColor),
             displayMedium: TextStyle(
               fontSize: 15.0,
-              fontWeight: FontWeight.w200,
+              fontWeight: FontWeight.w300,
               color: MyTheme.smallTextColor,
+            ),
+            displaySmall: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: MyTheme.disabledTextButtonColor,
             )),
       ),
       initialRoute: SplashScreen.routeName,
@@ -210,7 +218,11 @@ class MyApp extends StatelessWidget {
         MyShipmentDealDetails.routeName: (context) => MyShipmentDealDetails(
               args: ModalRoute.of(context)?.settings.arguments
                   as MyShipmentDealDetailsArgument,
-            )
+            ),
+        ForgetPasswordScreen.routeName: (context) => ForgetPasswordScreen(),
+        ForgetPasswordOtpScreen.routeName: (context) =>
+            ForgetPasswordOtpScreen(),
+        CreatePasswordScreen.routeName: (context) => CreatePasswordScreen()
       },
     );
   }

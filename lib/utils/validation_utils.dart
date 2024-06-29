@@ -20,7 +20,7 @@ class ValidationUtils {
   }
 
   static bool isValidPassword(String? passwrod) {
-    if (passwrod!.trim().length < 8) return false;
+    if (!(passwrod!.trim().length >= 8)) return false;
     // var regex = RegExp(r"^\d{11}$");
 
     return true;

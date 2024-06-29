@@ -152,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Container(
                             margin: const EdgeInsets.only(top: 15),
                             padding:
-                                EdgeInsets.only(left: 20, right: 30, top: 30),
+                                EdgeInsets.only(left: 20, right: 20, top: 30),
                             child: CustomFormField(
                               controller: fullNameController,
                               label: null,
@@ -171,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Container(
                             // margin: const EdgeInsets.only(top: 15),
                             padding:
-                                EdgeInsets.only(left: 20, right: 30, top: 12),
+                                EdgeInsets.only(left: 20, right: 20, top: 12),
                             child: CustomFormField(
                               controller: emailController,
                               label: null,
@@ -190,7 +190,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Container(
                             // margin: const EdgeInsets.only(top: 15),
                             padding:
-                                EdgeInsets.only(left: 20, right: 30, top: 12),
+                                EdgeInsets.only(left: 20, right: 20, top: 12),
                             child: CustomFormField(
                               controller: passwordController,
                               label: null,
@@ -244,14 +244,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               : null,
                           child: Text(
                             'Create Account',
-                            style: Theme.of(context)
-                                .textTheme
-                                .displayMedium
-                                ?.copyWith(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600),
+                            style: _isButtonEnabled
+                                ? Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600)
+                                : Theme.of(context).textTheme.displaySmall,
                           ),
                         ),
                       ),
