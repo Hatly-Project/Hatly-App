@@ -65,4 +65,11 @@ class AuthDataSourceImpl implements AuthDataSource {
 
     return response.toDto();
   }
+
+  @override
+  Future<SendResetEmailResponseDto> verifyOtp(String otp) async {
+    var response = await apiManager.verifyOtp(otp);
+
+    return response.toDto();
+  }
 }
