@@ -278,7 +278,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             onPressed: () {
                               Navigator.pushNamed(
-                                  context, ForgetPasswordScreen.routeName);
+                                  context, ForgetPasswordScreen.routeName,
+                                  arguments: LoginScreenArguments(
+                                      args.countriesFlagsDto));
                             },
                           ),
                         ],

@@ -6,6 +6,7 @@ import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/datasource/auth_datasource.dart';
 import 'package:hatly/domain/models/send_reset_email_response_dto.dart';
 import 'package:hatly/domain/repository/auth_repository.dart';
+import 'package:hatly/domain/usecase/reset_password_usecase.dart';
 import 'package:hatly/domain/usecase/send_reset_email_usecase.dart';
 import 'package:hatly/domain/usecase/verify_otp_usecase.dart';
 
@@ -15,12 +16,14 @@ class ForgetPasswrodScreenViewmodel extends Cubit<ForgetPasswordViewState> {
   late AuthDataSource _authDataSource;
   late SendResetEmailUsecase _sendResetEmailUsecase;
   late VerifyOtpUsecase _verifyOtpUsecase;
+  late ResetPasswordUsecase _resetPasswordUsecase;
   ForgetPasswrodScreenViewmodel() : super(ForgetPasswordInitialState()) {
     _apiManager = ApiManager();
     _authDataSource = AuthDataSourceImpl(_apiManager);
     _authRepository = AuthRepositoryImpl(_authDataSource);
     _sendResetEmailUsecase = SendResetEmailUsecase(_authRepository);
     _verifyOtpUsecase = VerifyOtpUsecase(_authRepository);
+    _resetPasswordUsecase = ResetPasswordUsecase(_authRepository);
   }
 
   void sendResetEmail(String email) async {
@@ -48,6 +51,21 @@ class ForgetPasswrodScreenViewmodel extends Cubit<ForgetPasswordViewState> {
       emit(VerifyCodeFailState(e.errorMessage));
     } on Exception catch (e) {
       emit(VerifyCodeFailState(e.toString()));
+    }
+  }
+
+  void resetPassword(String otp, String newPassword) async {
+    emit(ResetPasswordLoadingState('Loading...'));
+
+    try {
+      var response = await _resetPasswordUsecase.invoke(
+          otp: otp, newPassword: newPassword);
+      // createUserInDb(user);
+      emit(ResetPasswordSuccessState(response));
+    } on ServerErrorException catch (e) {
+      emit(ResetPasswordFailState(e.errorMessage));
+    } on Exception catch (e) {
+      emit(ResetPasswordFailState(e.toString()));
     }
   }
 }
@@ -90,4 +108,22 @@ class VerifyCodeFailState extends ForgetPasswordViewState {
   String failMessage;
 
   VerifyCodeFailState(this.failMessage);
+}
+
+class ResetPasswordSuccessState extends ForgetPasswordViewState {
+  SendResetEmailResponseDto responseDto;
+
+  ResetPasswordSuccessState(this.responseDto);
+}
+
+class ResetPasswordLoadingState extends ForgetPasswordViewState {
+  String loadingMessage;
+
+  ResetPasswordLoadingState(this.loadingMessage);
+}
+
+class ResetPasswordFailState extends ForgetPasswordViewState {
+  String failMessage;
+
+  ResetPasswordFailState(this.failMessage);
 }
