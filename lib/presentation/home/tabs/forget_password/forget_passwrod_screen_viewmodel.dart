@@ -7,17 +7,20 @@ import 'package:hatly/domain/datasource/auth_datasource.dart';
 import 'package:hatly/domain/models/send_reset_email_response_dto.dart';
 import 'package:hatly/domain/repository/auth_repository.dart';
 import 'package:hatly/domain/usecase/send_reset_email_usecase.dart';
+import 'package:hatly/domain/usecase/verify_otp_usecase.dart';
 
 class ForgetPasswrodScreenViewmodel extends Cubit<ForgetPasswordViewState> {
   late ApiManager _apiManager;
   late AuthRepository _authRepository;
   late AuthDataSource _authDataSource;
   late SendResetEmailUsecase _sendResetEmailUsecase;
+  late VerifyOtpUsecase _verifyOtpUsecase;
   ForgetPasswrodScreenViewmodel() : super(ForgetPasswordInitialState()) {
     _apiManager = ApiManager();
     _authDataSource = AuthDataSourceImpl(_apiManager);
     _authRepository = AuthRepositoryImpl(_authDataSource);
     _sendResetEmailUsecase = SendResetEmailUsecase(_authRepository);
+    _verifyOtpUsecase = VerifyOtpUsecase(_authRepository);
   }
 
   void sendResetEmail(String email) async {
@@ -31,6 +34,20 @@ class ForgetPasswrodScreenViewmodel extends Cubit<ForgetPasswordViewState> {
       emit(ResetEmailFailState(e.errorMessage));
     } on Exception catch (e) {
       emit(ResetEmailFailState(e.toString()));
+    }
+  }
+
+  void verifyOtpCode(String otp) async {
+    emit(VerifyCodeLoadingState('Loading...'));
+
+    try {
+      var response = await _verifyOtpUsecase.invoke(otp);
+      // createUserInDb(user);
+      emit(VerifyCodeSuccessState(response));
+    } on ServerErrorException catch (e) {
+      emit(VerifyCodeFailState(e.errorMessage));
+    } on Exception catch (e) {
+      emit(VerifyCodeFailState(e.toString()));
     }
   }
 }
@@ -55,4 +72,22 @@ class ResetEmailFailState extends ForgetPasswordViewState {
   String failMessage;
 
   ResetEmailFailState(this.failMessage);
+}
+
+class VerifyCodeSuccessState extends ForgetPasswordViewState {
+  SendResetEmailResponseDto responseDto;
+
+  VerifyCodeSuccessState(this.responseDto);
+}
+
+class VerifyCodeLoadingState extends ForgetPasswordViewState {
+  String loadingMessage;
+
+  VerifyCodeLoadingState(this.loadingMessage);
+}
+
+class VerifyCodeFailState extends ForgetPasswordViewState {
+  String failMessage;
+
+  VerifyCodeFailState(this.failMessage);
 }
