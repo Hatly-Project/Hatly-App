@@ -2,6 +2,7 @@ import 'package:hatly/domain/datasource/auth_datasource.dart';
 import 'package:hatly/domain/models/login_response_dto.dart';
 import 'package:hatly/domain/models/my_shipment_deals_response_dto.dart';
 import 'package:hatly/domain/models/register_response_dto.dart';
+import 'package:hatly/domain/models/send_reset_email_response_dto.dart';
 
 import '../api/api_manager.dart';
 
@@ -56,5 +57,12 @@ class AuthDataSourceImpl implements AuthDataSource {
     var response = await apiManager.loginWithGoogle(idToken);
 
     return response.toLoginDto();
+  }
+
+  @override
+  Future<SendResetEmailResponseDto> sendResetEmail(String email) async {
+    var response = await apiManager.sendResetEmail(email);
+
+    return response.toDto();
   }
 }
