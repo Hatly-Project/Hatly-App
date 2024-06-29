@@ -22,4 +22,6 @@ abstract class AuthRepository {
   Future<LoginResponseDto> loginWithGoogle(String idToken);
 
   Future<SendResetEmailResponseDto> sendResetEmail(String email);
+
+  Future<SendResetEmailResponseDto> verifyOtp(String otp);
 }
