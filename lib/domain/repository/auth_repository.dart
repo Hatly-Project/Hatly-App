@@ -24,4 +24,7 @@ abstract class AuthRepository {
   Future<SendResetEmailResponseDto> sendResetEmail(String email);
 
   Future<SendResetEmailResponseDto> verifyOtp(String otp);
+
+  Future<SendResetEmailResponseDto> resetPassword(
+      String otp, String newPassword);
 }

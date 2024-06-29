@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/presentation/components/custom_text_field.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/forget_password_code_screen.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/forget_passwrod_screen_viewmodel.dart';
+import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 import 'package:hatly/utils/validation_utils.dart';
 
@@ -50,6 +51,9 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as LoginScreenArguments;
+
     return BlocConsumer(
       bloc: viewmodel,
       listener: (context, state) {
@@ -81,7 +85,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
         } else if (state is ResetEmailSuccessState) {
           print('success');
           Navigator.pushReplacementNamed(
-              context, ForgetPasswordOtpScreen.routeName);
+              context, ForgetPasswordOtpScreen.routeName,
+              arguments: LoginScreenArguments(args.countriesFlagsDto));
         }
       },
       listenWhen: (previous, current) {

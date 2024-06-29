@@ -54,4 +54,10 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<SendResetEmailResponseDto> verifyOtp(String otp) {
     return authDataSource.verifyOtp(otp);
   }
+
+  @override
+  Future<SendResetEmailResponseDto> resetPassword(
+      String otp, String newPassword) {
+    return authDataSource.resetPassword(otp, newPassword);
+  }
 }
