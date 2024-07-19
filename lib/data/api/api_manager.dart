@@ -479,6 +479,9 @@ class ApiManager {
         await const FlutterSecureStorage().read(key: 'accessToken');
     String? refreshToken =
         await const FlutterSecureStorage().read(key: 'refreshToken');
+    print('refreshhhhhhh $refreshToken');
+    print('accessssssss $accessToken');
+
     late Response response;
     try {
       var url = Uri.https(baseUrl, '$apiVersion/auth/check');

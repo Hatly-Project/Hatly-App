@@ -14,7 +14,7 @@ class AccessTokenProvider extends ChangeNotifier {
   }
 
   void getRefreshToken() async {
-    accessToken = await const FlutterSecureStorage().read(key: 'refreshToken');
+    refreshToken = await const FlutterSecureStorage().read(key: 'refreshToken');
     notifyListeners();
   }
 

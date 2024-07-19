@@ -50,22 +50,22 @@ class CountryFlagCard extends StatelessWidget {
                 child: Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
-                  width: 50,
-                  height: 50,
+                  width: 20,
+                  height: 20,
                 ),
               ),
               SizedBox(
-                width: MediaQuery.sizeOf(context).width * .1,
+                width: MediaQuery.sizeOf(context).width * .04,
               ),
               Container(
                 width: MediaQuery.sizeOf(context).width * .50,
                 child: Text(
                   countryName!,
                   overflow: TextOverflow.visible,
-                  style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor),
+                  style: Theme.of(context)
+                      .textTheme
+                      .displayLarge
+                      ?.copyWith(fontSize: 16, fontWeight: FontWeight.w400),
                 ),
               ),
             ],
