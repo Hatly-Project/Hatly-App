@@ -1,28 +1,31 @@
 import 'dart:convert';
-import 'dart:ffi';
+import 'dart:ffi' as size;
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/api_manager.dart';
+import 'package:hatly/domain/models/countries_dto.dart';
+import 'package:hatly/domain/models/country_dto.dart';
+import 'package:hatly/domain/models/state_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
-import 'package:hatly/presentation/components/shimmer_card.dart';
+import 'package:hatly/presentation/components/countries_list.dart';
+import 'package:hatly/presentation/components/countries_list_bottom_sheet.dart';
+import 'package:hatly/presentation/components/custom_fields_for_search.dart';
+import 'package:hatly/presentation/components/custom_text_field.dart';
 import 'package:hatly/presentation/components/trip_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab_viewmodel.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/providers/access_token_provider.dart';
-import 'package:hatly/providers/firebase_messaging_provider.dart';
-import 'package:hatly/services/local_notifications_service.dart';
 import 'package:hive/hive.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/shipment_dto.dart';
@@ -32,6 +35,8 @@ import '../../../components/shipment_card.dart';
 
 class HomeTab extends StatefulWidget {
   static const routeName = 'Home';
+  bool? isAddSelected;
+  HomeTab({this.isAddSelected});
   @override
   State<HomeTab> createState() => _HomeTabState();
 }
@@ -45,7 +50,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   List<ShipmentDto> shipments = [];
   List<TripsDto> trips = [];
   FlutterSecureStorage storage = FlutterSecureStorage();
+  TextEditingController fromController = TextEditingController(text: '');
   // String token = '';
+  final GlobalKey shipmentFromKey = GlobalKey();
+  final GlobalKey receivingInKey = GlobalKey();
+  bool _isShipmentFromClicked = false, _isReceivingInClicked = false;
   int? totalShipmentsPage,
       currentShipmentsPage = 1,
       totalTripsPage,
@@ -56,6 +65,12 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   bool shimmerIsLoading = true,
       isShipmentPaginationLoading = false,
       isTripPaginationLoading = false;
+  var _isButtonEnabled = false;
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
+  List<CountriesStatesDto> filteredCountries = [];
+  late String fromCountry;
+  late List<StateDto> fromStatesList;
 
   @override
   void initState() {
@@ -77,7 +92,10 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 //       print(
 //           'User is not logged in.'); // Handle the scenario where the user is not logged in.
 //     }
-
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
     tabController = TabController(length: 2, vsync: this);
     if (selectedTab == 0) {
       getShipments();
@@ -89,28 +107,12 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         selectedTab = tabController.index;
       });
     });
-
-    // Check for cached shipments when initializing
-    // Future.delayed(Duration(milliseconds: 400), () {
-    //   viewModel.create(token); // Fetch from API if cache is empty
-
-    //   // getCachedShipments().then((cachedShipments) {
-    //   //   if (cachedShipments.isNotEmpty) {
-    //   //     print('exist');
-    //   //     setState(() {
-    //   //       shipments = cachedShipments;
-    //   //       shimmerIsLoading = false;
-    //   //     });
-    //   //   } else {
-    //   //     viewModel.create(token); // Fetch from API if cache is empty
-    //   //   }
-    //   // });
-    // });
   }
 
   @override
   void dispose() {
     tabController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -173,6 +175,65 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         tripsMaps.map((tripsMaps) => TripsDto.fromJson(tripsMaps)).toList();
 
     return trips;
+  }
+
+  OverlayEntry? _overlayEntry;
+
+  void _hideOverlay() {
+    print('sasas');
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    setState(() {
+      _isShipmentFromClicked = false;
+    });
+  }
+
+  void _showOverlay(BuildContext context, String type, GlobalKey key) {
+    _animation = Tween<Offset>(
+      begin: Offset(0, 1),
+      end: Offset(0, 0),
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+    _controller.forward();
+    _overlayEntry = _createOverlayEntry(context, type, key);
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  OverlayEntry _createOverlayEntry(
+      BuildContext context, String type, GlobalKey key) {
+    RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
+    var size = renderBox.size;
+    var offset = renderBox.localToGlobal(Offset.zero);
+
+    return OverlayEntry(
+        builder: (context) => Positioned(
+              top: offset.dy + size.height,
+              left: offset.dx,
+              width: size.width,
+              child: SlideTransition(
+                  position: _animation,
+                  child: CountriesList(
+                    countries: args!.countriesFlagsDto,
+                    selectFromCountry: selectFromCountry,
+                    hideOverLay: _hideOverlay,
+                  )),
+            ));
+  }
+
+  void selectFromCountry(String selectedCountry) {
+    _hideOverlay();
+    var index = args!.countriesFlagsDto.countries
+        ?.indexWhere((country) => country.name == selectedCountry);
+    var countryStates = args!.countriesFlagsDto.countries![index!].states;
+
+    setState(() {
+      fromCountry = selectedCountry;
+      // fromCityValue = '';
+      fromStatesList = countryStates!;
+    });
+    print('from $fromCountry');
   }
 
   @override
@@ -318,519 +379,1410 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             }
             shimmerIsLoading = false;
           }
-          return Platform.isIOS
-              ? CupertinoPageScaffold(
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  child: CustomScrollView(
-                    controller: scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      SliverAppBar(
-                        expandedHeight:
-                            MediaQuery.of(context).size.height * .244,
-                        floating: false,
-                        pinned: true,
-                        backgroundColor: Theme.of(context).primaryColor,
-                        elevation: 0,
-                        title: Text(
-                          'Hatly',
-                          style: GoogleFonts.poppins(
-                              fontSize: 35,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+          return GestureDetector(
+            onTap: _hideOverlay,
+            child: Scaffold(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              body: SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Image.asset(
+                        'images/pattern.png',
+                        width: 215,
+                        height: 330,
+                        filterQuality: FilterQuality.high,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.sizeOf(context).width * .03),
+                      child: Container(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.sizeOf(context).height * .08,
+                          left: MediaQuery.sizeOf(context).width * .01,
+                          right: MediaQuery.sizeOf(context).width * .01,
                         ),
-                        actions: [
-                          Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            child: Row(
-                              // mainAxisAlignment: MainAxisAlignment.end,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(
-                                    // margin: EdgeInsets.only(right: 20),
+                                Column(
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          child: Image.asset(
+                                            'images/me.jpg',
+                                            fit: BoxFit.cover,
+                                            width: 50,
+                                            height: 50,
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(left: 5),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 1),
+                                                child: Text(
+                                                  'Welcome Back,',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .displayMedium,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 4),
+                                                child: Text(
+                                                  'Alaa Hosni',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .displayLarge
+                                                      ?.copyWith(fontSize: 22),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                const Icon(
-                                  Icons.search,
-                                  color: Colors.white,
-                                  size: 30,
+                                  ],
+                                ),
+                                Image.asset(
+                                  'images/bell.png',
+                                  width: 32,
+                                  height: 32,
+                                  fit: BoxFit.cover,
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                        centerTitle: true,
-                        automaticallyImplyLeading: false,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: Container(
-                            margin: EdgeInsets.only(
-                                top: MediaQuery.of(context).size.height * 0.13),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(40),
-                                bottomRight: Radius.circular(40),
+                            Container(
+                              margin: EdgeInsets.only(
+                                top: MediaQuery.sizeOf(context).height * .015,
+                                left: MediaQuery.sizeOf(context).width * .04,
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Your Location:',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(left: 10),
+                                    child: Image.asset(
+                                      'images/egypt.png',
+                                      fit: BoxFit.cover,
+                                      width: 17,
+                                      height: 17,
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 6),
+                                    child: Text(
+                                      'Egypt',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 16,
+                                              color: const Color(0xFF5A5A5A)),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  Container(
+                                      margin: const EdgeInsets.only(left: 2),
+                                      child: const Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Color(0xFF5A5A5A),
+                                      )),
+                                ],
                               ),
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            Stack(
                               children: [
                                 Container(
-                                  // margin: EdgeInsets.only(top: 30),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.7,
+                                  // height:
+                                  //     MediaQuery.sizeOf(context).height * .385,
+                                  margin: EdgeInsets.only(top: 20),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
-                                    color: Colors.white54,
+                                    borderRadius: BorderRadius.circular(6),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      color: Color(0xFFEEEEEE),
+                                    ),
                                   ),
                                   child: Column(
                                     children: [
-                                      TabBar(
-                                        controller: tabController,
-                                        indicatorColor: Colors.white,
-                                        indicatorWeight: 2,
-                                        unselectedLabelStyle:
-                                            GoogleFonts.poppins(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                        labelStyle: GoogleFonts.poppins(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold),
-                                        labelColor: Colors.black,
-                                        indicatorSize: TabBarIndicatorSize.tab,
-                                        indicator: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 20.0, bottom: 10),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              'Shipments',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .displayLarge
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 20,
+                                                      color: Theme.of(context)
+                                                          .primaryColor),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            Container(
+                                              height: 30,
+                                              width: 1.5,
+                                              color: Color(0xFFD6D6D6),
+                                            ),
+                                            Text(
+                                              'Trips',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .displayLarge
+                                                  ?.copyWith(
+                                                      fontSize: 20,
+                                                      color: Color(0xFF848484)),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
                                         ),
-                                        onTap: (index) async {
-                                          selectedTab = index;
-                                          print('index $index');
-                                          if (selectedTab == 1) {
-                                            getTrips();
-                                            setState(() {
-                                              trips.clear();
-                                            });
-                                          } else {
-                                            getShipments();
-                                            setState(() {
-                                              shipments.clear();
-                                            });
-                                          }
-                                        },
-                                        tabs: const [
-                                          Tab(
-                                            child: Text('Shipments'),
+                                      ),
+                                      Stack(
+                                        children: [
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(20.0),
+                                                child: Container(
+                                                  height: 170,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                    border: Border.all(
+                                                        color:
+                                                            Color(0xFFD6D6D6)),
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      _isShipmentFromClicked
+                                                          ? Expanded(
+                                                              flex: 1,
+                                                              child: Material(
+                                                                key:
+                                                                    shipmentFromKey,
+                                                                elevation:
+                                                                    10.0, // Elevation value
+                                                                color: Colors
+                                                                    .white,
+
+                                                                child: Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(
+                                                                            15.0),
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Row(
+                                                                              children: [
+                                                                                Container(
+                                                                                  margin: EdgeInsets.only(right: 10),
+                                                                                  child: Image.asset(
+                                                                                    'images/takeoff.png',
+                                                                                    width: 17,
+                                                                                    height: 17,
+                                                                                  ),
+                                                                                ),
+                                                                                Text(
+                                                                                  'Shipment From',
+                                                                                  style: Theme.of(context).textTheme.displayMedium,
+                                                                                  textAlign: TextAlign.center,
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                            Container(
+                                                                              margin: EdgeInsets.only(bottom: 10),
+                                                                              child: Text(
+                                                                                'Select a country',
+                                                                                style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w300),
+                                                                                textAlign: TextAlign.center,
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                        const Icon(
+                                                                          Icons
+                                                                              .keyboard_arrow_right_rounded,
+                                                                          color:
+                                                                              Color(0xFFADADAD),
+                                                                        )
+                                                                      ],
+                                                                    )),
+                                                              ),
+                                                            )
+                                                          : Expanded(
+                                                              flex: 1,
+                                                              key:
+                                                                  shipmentFromKey,
+                                                              child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          15.0),
+                                                                  child:
+                                                                      CustomFormFieldForSeaarch(
+                                                                    controller:
+                                                                        fromController,
+                                                                    // key:
+                                                                    //     shipmentFromKey,
+                                                                    readOnly:
+                                                                        true,
+                                                                    hint:
+                                                                        'Shipment From',
+                                                                    onTap: () {
+                                                                      _isShipmentFromClicked =
+                                                                          !_isShipmentFromClicked;
+                                                                      setState(
+                                                                          () {});
+                                                                      // _overlayEntry
+                                                                      //     ?.remove();
+                                                                      _showOverlay(
+                                                                          context,
+                                                                          'shipment from',
+                                                                          shipmentFromKey);
+
+                                                                      // showFromCountriesListBottomSheet(
+                                                                      //     context,
+                                                                      //     args!
+                                                                      //         .countriesFlagsDto);
+                                                                    },
+                                                                    prefixIcon:
+                                                                        Container(
+                                                                      margin: const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              15),
+                                                                      child: Image
+                                                                          .asset(
+                                                                        'images/takeoff.png',
+                                                                        width:
+                                                                            17,
+                                                                        height:
+                                                                            17,
+                                                                      ),
+                                                                    ),
+                                                                    suffixICon:
+                                                                        Container(
+                                                                      child:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .keyboard_arrow_down_rounded,
+                                                                        // size: 20,
+                                                                        color: Color(
+                                                                            0xFFADADAD),
+                                                                      ),
+                                                                    ),
+                                                                  )),
+                                                            ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                left: 15.0,
+                                                                right: 15),
+                                                        child: Container(
+                                                          // margin: EdgeInsets.only(top: 10),
+                                                          width:
+                                                              double.infinity,
+                                                          height: 1,
+                                                          color:
+                                                              Color(0xFFD6D6D6),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: Container(
+                                                          // margin: EdgeInsets.only(top: 10),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(15.0),
+                                                            child:
+                                                                CustomFormFieldForSeaarch(
+                                                              controller:
+                                                                  fromController,
+                                                              key:
+                                                                  receivingInKey,
+                                                              readOnly: true,
+                                                              hint:
+                                                                  'Receiving In',
+                                                              prefixIcon:
+                                                                  Container(
+                                                                margin:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            15),
+                                                                child:
+                                                                    Image.asset(
+                                                                  'images/land.png',
+                                                                  width: 17,
+                                                                  height: 17,
+                                                                ),
+                                                              ),
+                                                              suffixICon:
+                                                                  Container(
+                                                                child:
+                                                                    const Icon(
+                                                                  Icons
+                                                                      .keyboard_arrow_down_rounded,
+                                                                  // size: 20,
+                                                                  color: Color(
+                                                                      0xFFADADAD),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                // margin: const EdgeInsets.only(top: 20),
+                                                padding: EdgeInsets.only(
+                                                    bottom: 10,
+                                                    left: 20,
+                                                    right: 20),
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                      minimumSize: Size(
+                                                          double.infinity, 60),
+                                                      elevation: 0,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          6)),
+                                                      backgroundColor:
+                                                          _isButtonEnabled
+                                                              ? Theme.of(
+                                                                      context)
+                                                                  .primaryColor
+                                                              : const Color(
+                                                                  0xFFEEEEEE),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 12)),
+                                                  onPressed: _isButtonEnabled
+                                                      ? () {
+                                                          // login();
+                                                        }
+                                                      : null,
+                                                  child: Text(
+                                                    'Search',
+                                                    style: _isButtonEnabled
+                                                        ? Theme.of(context)
+                                                            .textTheme
+                                                            .displayMedium
+                                                            ?.copyWith(
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .scaffoldBackgroundColor,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600)
+                                                        : Theme.of(context)
+                                                            .textTheme
+                                                            .displaySmall,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          Tab(
-                                            text: 'Trips',
-                                          )
+
+                                          // Padding(
+                                          //   padding: const EdgeInsets.all(20.0),
+                                          //   child: Container(
+                                          //     // margin: EdgeInsets.only(
+                                          //     //     top: MediaQuery.sizeOf(context).height * .21),
+                                          //     height: 250,
+                                          //     color: Colors.amber,
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
-                                Container(
-                                  margin: EdgeInsets.only(
-                                      top: MediaQuery.of(context).size.height *
-                                          0.04),
-                                  child: selectedTab == 0
-                                      ? FittedBox(
-                                          fit: BoxFit.fitWidth,
-                                          child: Text(
-                                            'Browse the available shipments',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                          ),
-                                        )
-                                      : FittedBox(
-                                          fit: BoxFit.fitWidth,
-                                          child: Text(
-                                            'Browse the available trips',
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                          ),
-                                        ),
-                                ),
                               ],
                             ),
-                          ),
-                        ),
-                      ),
-                      CupertinoSliverRefreshControl(
-                        onRefresh: () async {
-                          if (selectedTab == 0) {
-                            final box = await Hive.openBox('shipments');
-                            await box.clear();
-                            await box.close();
-                            if (accessTokenProvider.accessToken != null) {
-                              await viewModel.create(
-                                  accessTokenProvider.accessToken!,
-                                  isRefresh: true);
-                            }
-                            setState(() {
-                              shipments.clear();
-                            });
-                          } else {
-                            final box = await Hive.openBox('trips');
-                            await box.clear();
-                            await box.close();
-                            if (accessTokenProvider.accessToken != null) {
-                              await viewModel.getAlltrips(
-                                  accessTokenProvider.accessToken!,
-                                  isRefresh: true);
-                            }
-                            setState(() {
-                              trips.clear();
-                            });
-                          }
-                        },
-                      ),
-                      selectedTab == 0
-                          ? shimmerIsLoading
-                              ? SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, index) => const ShimmerCard(),
-                                    childCount: 2,
-                                  ),
-                                )
-                              : shipmentsIsEmpty
-                                  ? SliverToBoxAdapter(
-                                      child: Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            child: Image.asset(
-                                              'images/no_all_shipments.png',
-                                              width: 350,
-                                              height: 330,
-                                            ),
-                                          ),
-                                          Container(
-                                            child: FittedBox(
-                                              fit: BoxFit.fitWidth,
-                                              child: Text(
-                                                "There are not any shipments\n right now!",
-                                                textAlign: TextAlign.center,
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 21,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ))
-                                  : buildShipmentsList(state)
-                          : shimmerIsLoading
-                              ? SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, index) => const ShimmerCard(),
-                                    childCount: 2,
-                                  ),
-                                )
-                              : tripsIsEmpty
-                                  ? SliverToBoxAdapter(
-                                      child: Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            child: Image.asset(
-                                              'images/no_trips.png',
-                                              width: 350,
-                                              height: 330,
-                                            ),
-                                          ),
-                                          Container(
-                                            child: FittedBox(
-                                              fit: BoxFit.fitWidth,
-                                              child: Text(
-                                                "There are not any trips\n right now!",
-                                                textAlign: TextAlign.center,
-                                                style: GoogleFonts.poppins(
-                                                    fontSize: 21,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ))
-                                  : !isTripPaginationLoading
-                                      ? buildTripsList(
-                                          state as GetAllTripsSuccessState)
-                                      : buildTripsList(state
-                                          as GetAllTripsPaginationLoadingState)
-                    ],
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: () async {
-                    if (selectedTab == 0) {
-                      if (accessTokenProvider.accessToken != null) {
-                        await viewModel.create(accessTokenProvider.accessToken!,
-                            isRefresh: true);
-                      }
-                      // cacheShipments(shipments);
-                    } else {
-                      if (accessTokenProvider.accessToken != null) {
-                        await viewModel.getAlltrips(
-                            accessTokenProvider.accessToken!,
-                            isRefresh: true);
-                      }
-                      // cacheTrips(trips);
-                      // getChachedtrips().then((cachedTrips) {
-                      //   if (cachedTrips.isNotEmpty) {
-                      //     print('trips exist');
-                      //     setState(() {
-                      //       trips = cachedTrips;
-                      //     });
-                      //   } else {
-                      //     viewModel.getAlltrips(token);
-                      //   }
-                      // });
-                    }
-                    setState(() {});
-                  },
-                  child: Scaffold(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    body: CustomScrollView(
-                      controller: scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      slivers: [
-                        SliverAppBar(
-                          expandedHeight:
-                              MediaQuery.of(context).size.height * .244,
-                          floating: false,
-                          pinned: true,
-                          backgroundColor: Theme.of(context).primaryColor,
-                          elevation: 0,
-                          title: Text(
-                            'Hatly',
-                            style: GoogleFonts.poppins(
-                                fontSize: 35,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                          actions: [
                             Container(
-                              margin: const EdgeInsets.only(right: 10),
+                              margin: EdgeInsets.symmetric(vertical: 5),
                               child: Row(
-                                // mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
-                                      // margin: EdgeInsets.only(right: 20),
-                                      ),
-                                  const Icon(
-                                    Icons.search,
-                                    color: Colors.white,
-                                    size: 30,
+                                    margin: EdgeInsets.symmetric(vertical: 10),
+                                    child: Text(
+                                      'Latest Shipments',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayLarge
+                                          ?.copyWith(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w400),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {},
+                                    style: ButtonStyle(
+                                      padding: WidgetStateProperty.all<
+                                          EdgeInsetsGeometry>(EdgeInsets.zero),
+                                    ),
+                                    child: Text(
+                                      'See all',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium,
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                          centerTitle: true,
-                          automaticallyImplyLeading: false,
-                          flexibleSpace: FlexibleSpaceBar(
-                            background: Container(
-                              margin: EdgeInsets.only(
-                                  top: MediaQuery.of(context).size.height *
-                                      0.13),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: const BorderRadius.only(
-                                  bottomLeft: Radius.circular(40),
-                                  bottomRight: Radius.circular(40),
+                            Container(
+                              width: double.infinity,
+                              height: 220,
+                              child: ListView.builder(
+                                itemCount: 3,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) => Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: Container(
+                                    // height: 100,
+                                    width: 320,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: const Color(0xFFEEEEEE),
+                                      ),
+                                      color: const Color(0xFFFFFFFF),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(bottom: 15),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          top: 5),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(25),
+                                                        child: Image.asset(
+                                                          'images/me.jpg',
+                                                          fit: BoxFit.cover,
+                                                          width: 35,
+                                                          height: 35,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 5),
+                                                      child: Text(
+                                                        'Alaa Hosni',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .displayLarge
+                                                            ?.copyWith(
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w300),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                      right: 10),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 40,
+                                                        width: 1.5,
+                                                        color:
+                                                            Color(0xFFD6D6D6),
+                                                        margin: EdgeInsets.only(
+                                                            right: 13),
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    bottom: 5),
+                                                            child: Text(
+                                                              'Reward',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .displayMedium
+                                                                  ?.copyWith(
+                                                                      fontSize:
+                                                                          13,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w300),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              Container(
+                                                                margin:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            5),
+                                                                child: Text(
+                                                                  '24',
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .displayLarge
+                                                                      ?.copyWith(
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.w400),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                'USD',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayLarge
+                                                                    ?.copyWith(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            // margin: EdgeInsets.symmetric(vertical: 15),
+                                            child: Container(
+                                              // margin: EdgeInsets.only(top: 10),
+                                              width: double.infinity,
+                                              height: 1,
+                                              color: Color(0xFFEEEEEE),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 15),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Image.asset(
+                                                  'images/product_image.png',
+                                                  fit: BoxFit.cover,
+                                                  width: 50,
+                                                  height: 50,
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 8.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'GTS 4 Smart Watch, Dual-Band',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .displayLarge
+                                                            ?.copyWith(
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w300),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                            top: 13),
+                                                        child: Row(
+                                                          children: [
+                                                            Image.asset(
+                                                              'images/weight_icob.png',
+                                                              width: 14,
+                                                              height: 14,
+                                                            ),
+                                                            Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      left: 8),
+                                                              child: Text(
+                                                                '15g',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayMedium
+                                                                    ?.copyWith(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                              height: 20,
+                                                              width: 1.5,
+                                                              color: Color(
+                                                                  0xFFD6D6D6),
+                                                              margin: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          15),
+                                                            ),
+                                                            Image.asset(
+                                                              'images/date_icon.png',
+                                                              width: 14,
+                                                              height: 14,
+                                                            ),
+                                                            Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      left: 8),
+                                                              child: Text(
+                                                                'Before: 20 Jun',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayMedium
+                                                                    ?.copyWith(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            // margin: EdgeInsets.symmetric(vertical: 5),
+                                            child: Container(
+                                              // margin: EdgeInsets.only(top: 10),
+                                              width: double.infinity,
+                                              height: 1,
+                                              color: Color(0xFFEEEEEE),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Shipment From:',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayMedium
+                                                          ?.copyWith(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8.0),
+                                                      child: Row(
+                                                        children: [
+                                                          Image.asset(
+                                                            'images/japan_flag.png',
+                                                            width: 18,
+                                                            height: 18,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 5.0),
+                                                            child: Text(
+                                                              'Japan',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .displayLarge
+                                                                  ?.copyWith(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Image.asset(
+                                                  'images/landing_icon.png',
+                                                  width: 22,
+                                                  height: 22,
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Receiving In:',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayMedium
+                                                          ?.copyWith(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8.0),
+                                                      child: Row(
+                                                        children: [
+                                                          Image.asset(
+                                                            'images/egypt.png',
+                                                            width: 18,
+                                                            height: 18,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 5.0),
+                                                            child: Text(
+                                                              'Egypt',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .displayLarge
+                                                                  ?.copyWith(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              child: Column(
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 5),
+                              child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
-                                    // margin: EdgeInsets.only(top: 30),
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.7,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4),
-                                      color: Colors.white54,
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        TabBar(
-                                          controller: tabController,
-                                          indicatorColor: Colors.white,
-                                          indicatorWeight: 2,
-                                          unselectedLabelStyle:
-                                              GoogleFonts.poppins(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600),
-                                          labelStyle: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold),
-                                          labelColor: Colors.black,
-                                          indicatorSize:
-                                              TabBarIndicatorSize.tab,
-                                          indicator: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                          onTap: (index) async {
-                                            selectedTab = index;
-                                            print('index $index');
-                                            if (selectedTab == 1) {
-                                              getTrips();
-                                              setState(() {
-                                                trips.clear();
-                                              });
-                                            } else {
-                                              getShipments();
-                                              print('tabeeed');
-                                              setState(() {
-                                                shipments.clear();
-                                              });
-                                            }
-                                          },
-                                          tabs: const [
-                                            Tab(
-                                              child: Text('Shipments'),
-                                            ),
-                                            Tab(
-                                              text: 'Trips',
-                                            )
-                                          ],
-                                        ),
-                                      ],
+                                    margin: EdgeInsets.symmetric(vertical: 10),
+                                    child: Text(
+                                      'Latest Trips',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayLarge
+                                          ?.copyWith(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w400),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                        top:
-                                            MediaQuery.of(context).size.height *
-                                                0.04),
-                                    child: selectedTab == 0
-                                        ? FittedBox(
-                                            fit: BoxFit.fitWidth,
-                                            child: Text(
-                                              'Browse the available shipments',
-                                              overflow: TextOverflow.ellipsis,
-                                              style: GoogleFonts.poppins(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white),
-                                            ),
-                                          )
-                                        : FittedBox(
-                                            fit: BoxFit.fitWidth,
-                                            child: Text(
-                                              'Browse the available trips',
-                                              style: GoogleFonts.poppins(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white),
-                                            ),
-                                          ),
+                                  TextButton(
+                                    onPressed: () {},
+                                    style: ButtonStyle(
+                                      padding: WidgetStateProperty.all<
+                                          EdgeInsetsGeometry>(EdgeInsets.zero),
+                                    ),
+                                    child: Text(
+                                      'See all',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium,
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
+                            Container(
+                              width: double.infinity,
+                              height: 220,
+                              child: ListView.builder(
+                                itemCount: 3,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) => Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: Container(
+                                    // height: 100,
+                                    width: 320,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: const Color(0xFFEEEEEE),
+                                      ),
+                                      color: const Color(0xFFFFFFFF),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(bottom: 15),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          top: 5),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(25),
+                                                        child: Image.asset(
+                                                          'images/me.jpg',
+                                                          fit: BoxFit.cover,
+                                                          width: 35,
+                                                          height: 35,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 5),
+                                                      child: Text(
+                                                        'Alaa Hosni',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .displayLarge
+                                                            ?.copyWith(
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w300),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Container(
+                                                  margin: EdgeInsets.only(
+                                                      right: 10),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 40,
+                                                        width: 1.5,
+                                                        color:
+                                                            Color(0xFFD6D6D6),
+                                                        margin: EdgeInsets.only(
+                                                            right: 13),
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    bottom: 5),
+                                                            child: Text(
+                                                              'Reward',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .displayMedium
+                                                                  ?.copyWith(
+                                                                      fontSize:
+                                                                          13,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w300),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              Container(
+                                                                margin:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            5),
+                                                                child: Text(
+                                                                  '24',
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .displayLarge
+                                                                      ?.copyWith(
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.w400),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                'USD',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayLarge
+                                                                    ?.copyWith(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            // margin: EdgeInsets.symmetric(vertical: 15),
+                                            child: Container(
+                                              // margin: EdgeInsets.only(top: 10),
+                                              width: double.infinity,
+                                              height: 1,
+                                              color: Color(0xFFEEEEEE),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 15),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Image.asset(
+                                                  'images/product_image.png',
+                                                  fit: BoxFit.cover,
+                                                  width: 50,
+                                                  height: 50,
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 8.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'GTS 4 Smart Watch, Dual-Band',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .displayLarge
+                                                            ?.copyWith(
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w300),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                            top: 13),
+                                                        child: Row(
+                                                          children: [
+                                                            Image.asset(
+                                                              'images/weight_icob.png',
+                                                              width: 14,
+                                                              height: 14,
+                                                            ),
+                                                            Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      left: 8),
+                                                              child: Text(
+                                                                '15g',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayMedium
+                                                                    ?.copyWith(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                              height: 20,
+                                                              width: 1.5,
+                                                              color: Color(
+                                                                  0xFFD6D6D6),
+                                                              margin: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          15),
+                                                            ),
+                                                            Image.asset(
+                                                              'images/date_icon.png',
+                                                              width: 14,
+                                                              height: 14,
+                                                            ),
+                                                            Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      left: 8),
+                                                              child: Text(
+                                                                'Before: 20 Jun',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayMedium
+                                                                    ?.copyWith(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            // margin: EdgeInsets.symmetric(vertical: 5),
+                                            child: Container(
+                                              // margin: EdgeInsets.only(top: 10),
+                                              width: double.infinity,
+                                              height: 1,
+                                              color: Color(0xFFEEEEEE),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Shipment From:',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayMedium
+                                                          ?.copyWith(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8.0),
+                                                      child: Row(
+                                                        children: [
+                                                          Image.asset(
+                                                            'images/japan_flag.png',
+                                                            width: 18,
+                                                            height: 18,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 5.0),
+                                                            child: Text(
+                                                              'Japan',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .displayLarge
+                                                                  ?.copyWith(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Image.asset(
+                                                  'images/landing_icon.png',
+                                                  width: 22,
+                                                  height: 22,
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Receiving In:',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayMedium
+                                                          ?.copyWith(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8.0),
+                                                      child: Row(
+                                                        children: [
+                                                          Image.asset(
+                                                            'images/egypt.png',
+                                                            width: 18,
+                                                            height: 18,
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 5.0),
+                                                            child: Text(
+                                                              'Egypt',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .displayLarge
+                                                                  ?.copyWith(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
-                        selectedTab == 0
-                            ? shimmerIsLoading
-                                ? SliverList(
-                                    delegate: SliverChildBuilderDelegate(
-                                      (context, index) => const ShimmerCard(),
-                                      childCount: 2,
-                                    ),
-                                  )
-                                : shipmentsIsEmpty
-                                    ? SliverToBoxAdapter(
-                                        child: Padding(
-                                        padding: const EdgeInsets.all(15.0),
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              child: Image.asset(
-                                                'images/no_all_shipments.png',
-                                                width: 350,
-                                                height: 330,
-                                              ),
-                                            ),
-                                            Container(
-                                              child: FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  "There are not any shipments\n right now!",
-                                                  textAlign: TextAlign.center,
-                                                  style: GoogleFonts.poppins(
-                                                      fontSize: 21,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ))
-                                    : !isShipmentPaginationLoading
-                                        ? buildShipmentsList(state)
-                                        : buildShipmentsList(state)
-                            : shimmerIsLoading
-                                ? SliverList(
-                                    delegate: SliverChildBuilderDelegate(
-                                      (context, index) => const ShimmerCard(),
-                                      childCount: 2,
-                                    ),
-                                  )
-                                : tripsIsEmpty
-                                    ? SliverToBoxAdapter(
-                                        child: Padding(
-                                        padding: const EdgeInsets.all(15.0),
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              child: Image.asset(
-                                                'images/no_trips.png',
-                                                width: 350,
-                                                height: 330,
-                                              ),
-                                            ),
-                                            Container(
-                                              child: FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  "There are not any trips\n right now!",
-                                                  textAlign: TextAlign.center,
-                                                  style: GoogleFonts.poppins(
-                                                      fontSize: 21,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ))
-                                    : !isTripPaginationLoading
-                                        ? buildTripsList(
-                                            state as GetAllTripsSuccessState)
-                                        : buildTripsList(state
-                                            as GetAllTripsPaginationLoadingState)
-                      ],
+                      ),
                     ),
-                  ),
-                );
+                    // Container(
+
+                    //   height: 200,
+                    //   color: Colors.amber,
+                    // ),
+                  ],
+                ),
+              ),
+            ),
+          );
         });
+  }
+
+  void showFromCountriesListBottomSheet(
+      BuildContext context, CountriesDto countries) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) => CountriesListBottomSheet(
+        countries: countries,
+        selectFromCountry: () {},
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
   }
 
   void getTrips() async {
@@ -1036,6 +1988,9 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
   void getShipments() async {
     if (accessTokenProvider.accessToken != null) {
+      print('from init access token ${accessTokenProvider.accessToken}');
+      print('from init refresh token ${accessTokenProvider.refreshToken}');
+
       await viewModel.create(
         accessTokenProvider.accessToken!,
       );
