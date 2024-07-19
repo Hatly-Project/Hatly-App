@@ -165,6 +165,7 @@ class MyApp extends StatelessWidget {
         primaryColor: MyTheme.primaryColor,
         scaffoldBackgroundColor: MyTheme.backgroundColor,
         fontFamily: "glancyr",
+        // iconTheme: IconThemeData.f,
         textTheme: TextTheme(
             displayLarge: TextStyle(
                 fontSize: 30.0,

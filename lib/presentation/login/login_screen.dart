@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (refreshToken == null) {
       print('token null');
     } else {
-      print('token success');
+      print('refresh from login $refreshToken');
     }
     return refreshToken;
   }
@@ -165,6 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (context, state) {
         return Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            resizeToAvoidBottomInset: true,
             body: Stack(
               children: [
                 Image.asset(
@@ -251,7 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 if (text == null || text.trim().isEmpty) {
                                   return 'please enter password';
                                 }
-                                if (!ValidationUtils.isValidEmail(text)) {
+                                if (!ValidationUtils.isValidPassword(text)) {
                                   return 'Password must be more than 8 characters';
                                 }
                               },

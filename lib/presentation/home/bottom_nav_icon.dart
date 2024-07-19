@@ -10,19 +10,48 @@ class BottomNavIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isSelected
-        ? Container(
-            padding: EdgeInsets.all(6),
-            decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(20)),
-            child: ImageIcon(
-              AssetImage('images/$imageName.png'),
-              color: Theme.of(context).primaryColor,
-            ),
-          )
-        : ImageIcon(
-            AssetImage('images/$imageName.png'),
-            color: Colors.white,
-            size: 25,
-          );
+        ? imageName == 'Add'.toLowerCase()
+            ? Container(
+                padding: EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(20)),
+                child: Icon(
+                  Icons.add,
+                  size: 33,
+                ))
+            : Padding(
+                padding: const EdgeInsets.only(bottom: 5.0),
+                child: ImageIcon(
+                  AssetImage('images/$imageName.png'),
+                  // size: 25,
+                  // color: Theme.of(context).primaryColor,
+                ),
+              )
+        : imageName == 'Add'.toLowerCase()
+            ? Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(26)),
+                child: Icon(
+                  Icons.add,
+                  size: 33,
+                  color: Colors.white,
+                ))
+            : Padding(
+                padding: const EdgeInsets.only(bottom: 5.0),
+                child: ImageIcon(
+                  AssetImage('images/$imageName.png'),
+                  // size: 25,
+                  // color: Theme.of(context).primaryColor,
+                ),
+              );
   }
 }
+
+        // ? Container(
+        //     padding: EdgeInsets.all(6),
+        //     decoration: BoxDecoration(
+        //         color: Colors.white, borderRadius: BorderRadius.circular(20)),
+
