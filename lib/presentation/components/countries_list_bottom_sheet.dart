@@ -67,49 +67,55 @@ class _CountriesListBottomSheetState extends State<CountriesListBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              onChanged: (value) {
-                filterList(value);
-              },
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(17)),
-                ),
-                labelText: 'Search',
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            onChanged: (value) {
+              filterList(value);
+            },
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(17)),
               ),
+              labelText: 'Search',
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              controller: scrollController,
-              itemCount: filteredCountries.length,
-              itemBuilder: (context, index) => CountryFlagCard(
-                countryName: widget.selectFromCountry != null ||
-                        widget.selectToCountry != null
-                    ? filteredCountries[index].name!
-                    : widget.selectCurrency != null
-                        ? filteredCountries[index].currency!
-                        : widget.selectCode != null
-                            ? filteredCountries[index].name!
-                            : filteredCountries[index].iso2!,
-                countriesStatesDto: filteredCountries[index],
-                imageUrl: filteredCountries[index].flag!,
-                selectFromCountry: widget.selectFromCountry,
-                selectCountry: widget.selectCountry,
-                selectCode: widget.selectCode,
-                selectCurrency: widget.selectCurrency,
-                selectToCountry: widget.selectToCountry,
+        ),
+        Expanded(
+          child: ListView.separated(
+            separatorBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.only(left: 15.0, right: 15, top: 15),
+              child: Container(
+                // margin: EdgeInsets.only(top: 10),
+                width: double.infinity,
+                height: 1,
+                color: Color(0xFFD6D6D6),
               ),
             ),
+            controller: scrollController,
+            itemCount: filteredCountries.length,
+            itemBuilder: (context, index) => CountryFlagCard(
+              countryName: widget.selectFromCountry != null ||
+                      widget.selectToCountry != null
+                  ? filteredCountries[index].name!
+                  : widget.selectCurrency != null
+                      ? filteredCountries[index].currency!
+                      : widget.selectCode != null
+                          ? filteredCountries[index].name!
+                          : filteredCountries[index].iso2!,
+              countriesStatesDto: filteredCountries[index],
+              imageUrl: filteredCountries[index].flag!,
+              selectFromCountry: widget.selectFromCountry,
+              selectCountry: widget.selectCountry,
+              selectCode: widget.selectCode,
+              selectCurrency: widget.selectCurrency,
+              selectToCountry: widget.selectToCountry,
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
