@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -189,6 +190,10 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   }
 
   void _showOverlay(BuildContext context, String type, GlobalKey key) {
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
     _animation = Tween<Offset>(
       begin: Offset(0, 1),
       end: Offset(0, 0),
@@ -243,6 +248,12 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   SystemUiOverlayStyle(
+    //       statusBarColor: Colors.transparent,
+    //       systemNavigationBarColor: Colors.transparent,
+    //       statusBarIconBrightness: Brightness.dark),
+    // );
     UserProvider userProvider = BlocProvider.of<UserProvider>(context);
     args = ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
     return BlocConsumer(
@@ -388,20 +399,20 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             onTap: _hideOverlay,
             child: Scaffold(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              body: SingleChildScrollView(
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Image.asset(
-                        'images/pattern.png',
-                        width: 215,
-                        height: 330,
-                        filterQuality: FilterQuality.high,
-                        fit: BoxFit.cover,
-                      ),
+              body: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Image.asset(
+                      'images/pattern.png',
+                      width: 215,
+                      height: 330,
+                      filterQuality: FilterQuality.high,
+                      fit: BoxFit.cover,
                     ),
-                    Container(
+                  ),
+                  SingleChildScrollView(
+                    child: Container(
                       margin: EdgeInsets.symmetric(
                           horizontal: MediaQuery.sizeOf(context).width * .03),
                       child: Container(
@@ -441,24 +452,45 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     top: 1),
-                                                child: Text(
-                                                  'Welcome Back,',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .displayMedium,
-                                                  textAlign: TextAlign.center,
+                                                child: Container(
+                                                  width: 110,
+                                                  // height: 15,
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      'Welcome Back,',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayMedium,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     top: 4),
-                                                child: Text(
-                                                  'Alaa Hosni',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .displayLarge
-                                                      ?.copyWith(fontSize: 22),
-                                                  textAlign: TextAlign.center,
+                                                child: Container(
+                                                  width: 105,
+                                                  // height: 15,
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      'Alaa Hosni',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayLarge
+                                                          ?.copyWith(
+                                                              fontSize: 22),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -1834,13 +1866,13 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                    // Container(
+                  ),
+                  // Container(
 
-                    //   height: 200,
-                    //   color: Colors.amber,
-                    // ),
-                  ],
-                ),
+                  //   height: 200,
+                  //   color: Colors.amber,
+                  // ),
+                ],
               ),
             ),
           );

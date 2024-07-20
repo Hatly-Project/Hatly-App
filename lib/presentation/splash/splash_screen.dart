@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/data/api/api_manager.dart';
@@ -88,6 +89,12 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   SystemUiOverlayStyle(
+    //       statusBarColor: Colors.transparent,
+    //       systemNavigationBarColor: Theme.of(context).primaryColor,
+    //       statusBarIconBrightness: Brightness.dark),
+    // );
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Center(
