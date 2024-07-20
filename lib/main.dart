@@ -77,12 +77,14 @@ void main() async {
 
   // Open the Hive box for shipments
   await Hive.openBox('shipments');
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark),
-  );
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  // SystemChrome.setSystemUIOverlayStyle(
+  //   SystemUiOverlayStyle(
+  //       statusBarColor: Colors.transparent,
+  //       // systemNavigationBarColor: Colors.transparent,
+  //       statusBarIconBrightness: Brightness.dark),
+  // );
   runApp(
     MultiProvider(
       providers: [
