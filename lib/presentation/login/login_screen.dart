@@ -165,266 +165,270 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (context, state) {
         return Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            resizeToAvoidBottomInset: true,
-            body: Stack(
-              children: [
-                Image.asset(
-                  'images/top_corner.png',
-                  fit: BoxFit.fitWidth,
-                  width: double.infinity,
-                ),
-                Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(
-                          top: MediaQuery.sizeOf(context).width * .44),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Welcome Back to ',
-                            style: Theme.of(context).textTheme.displayLarge,
-                          ),
-                          Text('Hatly',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .displayLarge
-                                  ?.copyWith(
-                                      color: Theme.of(context).primaryColor)),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 5),
-                      child: Text(
-                        'Please login with your email and password to \nbe able to use our app',
-                        style: Theme.of(context).textTheme.displayMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Form(
-                      key: formKey,
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 15),
-                            padding: EdgeInsets.only(left: 20, right: 20),
-                            child: CustomFormField(
-                              controller: emailController,
-                              label: null,
-                              hint: 'Email',
-                              keyboardType: TextInputType.emailAddress,
-                              validator: (text) {
-                                if (text == null || text.trim().isEmpty) {
-                                  return 'please enter email';
-                                }
-                                if (!ValidationUtils.isValidEmail(text)) {
-                                  return 'please enter a valid email';
-                                }
-                              },
+            // resizeToAvoidBottomInset: true,
+            body: SingleChildScrollView(
+              child: Stack(
+                children: [
+                  Image.asset(
+                    'images/top_corner.png',
+                    fit: BoxFit.fitWidth,
+                    width: double.infinity,
+                  ),
+                  Column(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(
+                            top: MediaQuery.sizeOf(context).width * .44),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Welcome Back to ',
+                              style: Theme.of(context).textTheme.displayLarge,
                             ),
-                          ),
-                          Container(
-                            // margin: const EdgeInsets.only(top: 15),
-                            padding:
-                                EdgeInsets.only(left: 20, right: 20, top: 15),
-                            child: CustomFormField(
-                              controller: passwordController,
-                              label: null,
-                              hint: 'Password',
-                              keyboardType: TextInputType.text,
-                              isPassword: _obscurePassword,
-                              suffixICon: IconButton(
-                                icon: _obscurePassword
-                                    ? const Icon(
-                                        Icons.visibility_off_outlined,
-                                      )
-                                    : const Icon(
-                                        Icons.visibility_outlined,
-                                      ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
+                            Text('Hatly',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.copyWith(
+                                        color: Theme.of(context).primaryColor)),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 5),
+                        child: Text(
+                          'Please login with your email and password to \nbe able to use our app',
+                          style: Theme.of(context).textTheme.displayMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 15),
+                              padding: EdgeInsets.only(left: 20, right: 20),
+                              child: CustomFormField(
+                                controller: emailController,
+                                label: null,
+                                hint: 'Email',
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (text) {
+                                  if (text == null || text.trim().isEmpty) {
+                                    return 'please enter email';
+                                  }
+                                  if (!ValidationUtils.isValidEmail(text)) {
+                                    return 'please enter a valid email';
+                                  }
                                 },
                               ),
-                              validator: (text) {
-                                if (text == null || text.trim().isEmpty) {
-                                  return 'please enter password';
-                                }
-                                if (!ValidationUtils.isValidPassword(text)) {
-                                  return 'Password must be more than 8 characters';
-                                }
+                            ),
+                            Container(
+                              // margin: const EdgeInsets.only(top: 15),
+                              padding:
+                                  EdgeInsets.only(left: 20, right: 20, top: 15),
+                              child: CustomFormField(
+                                controller: passwordController,
+                                label: null,
+                                hint: 'Password',
+                                keyboardType: TextInputType.text,
+                                isPassword: _obscurePassword,
+                                suffixICon: IconButton(
+                                  icon: _obscurePassword
+                                      ? const Icon(
+                                          Icons.visibility_off_outlined,
+                                        )
+                                      : const Icon(
+                                          Icons.visibility_outlined,
+                                        ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
+                                validator: (text) {
+                                  if (text == null || text.trim().isEmpty) {
+                                    return 'please enter password';
+                                  }
+                                  if (!ValidationUtils.isValidPassword(text)) {
+                                    return 'Password must be more than 8 characters';
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 10, right: 25),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              child: Text(
+                                'Forget Password?',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.copyWith(
+                                        color: Color(0xFF5A5A5A),
+                                        fontWeight: FontWeight.w500),
+                                textAlign: TextAlign.center,
+                              ),
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, ForgetPasswordScreen.routeName,
+                                    arguments: LoginScreenArguments(
+                                        args.countriesFlagsDto));
                               },
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10, right: 25),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            child: Text(
-                              'Forget Password?',
+                      Container(
+                        margin: const EdgeInsets.only(top: 20),
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              minimumSize: Size(double.infinity, 60),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6)),
+                              backgroundColor: _isButtonEnabled
+                                  ? Theme.of(context).primaryColor
+                                  : const Color(0xFFEEEEEE),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 12)),
+                          onPressed: _isButtonEnabled
+                              ? () {
+                                  login();
+                                }
+                              : null,
+                          child: Text(
+                            'Log in',
+                            style: _isButtonEnabled
+                                ? Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600)
+                                : Theme.of(context).textTheme.displaySmall,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(
+                            top: MediaQuery.sizeOf(context).width * .1),
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                child: Divider(
+                                  thickness: 1,
+                                  color: Color(0xFFD6D6D6),
+                                ),
+                              ),
+                            ),
+                            Text(
+                              ' or Log in with... ',
                               style: Theme.of(context)
                                   .textTheme
                                   .displayMedium
                                   ?.copyWith(
-                                      color: Color(0xFF5A5A5A),
-                                      fontWeight: FontWeight.w500),
-                              textAlign: TextAlign.center,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 12),
                             ),
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, ForgetPasswordScreen.routeName,
-                                  arguments: LoginScreenArguments(
-                                      args.countriesFlagsDto));
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 20),
-                      padding: EdgeInsets.only(left: 20, right: 20),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            minimumSize: Size(double.infinity, 60),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6)),
-                            backgroundColor: _isButtonEnabled
-                                ? Theme.of(context).primaryColor
-                                : const Color(0xFFEEEEEE),
-                            padding: const EdgeInsets.symmetric(vertical: 12)),
-                        onPressed: _isButtonEnabled
-                            ? () {
-                                login();
-                              }
-                            : null,
-                        child: Text(
-                          'Log in',
-                          style: _isButtonEnabled
-                              ? Theme.of(context)
-                                  .textTheme
-                                  .displayMedium
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600)
-                              : Theme.of(context).textTheme.displaySmall,
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                child: Divider(
+                                  thickness: 1,
+                                  color: Color(0xFFD6D6D6),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(
-                          top: MediaQuery.sizeOf(context).width * .1),
-                      padding: EdgeInsets.only(left: 20, right: 20),
-                      child: Row(
+                      Row(
                         children: [
                           Expanded(
                             flex: 1,
                             child: Container(
-                              child: Divider(
-                                thickness: 1,
-                                color: Color(0xFFD6D6D6),
+                              margin: const EdgeInsets.only(
+                                top: 20,
+                                left: 16,
+                                right: 16,
+                              ),
+                              // padding: EdgeInsets.only(left: 20, right: 20),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(double.infinity, 60),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(6)),
+                                    side: BorderSide(
+                                        color: Color(0xFFD6D6D6), width: 1),
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12)),
+                                onPressed: () async {
+                                  await _signInWithGoogle(context);
+                                  // register();
+                                },
+                                child: Image.asset(
+                                  'images/devicon_google.png',
+                                  width: 24,
+                                  height: 24,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ),
-                          Text(
-                            ' or Log in with... ',
-                            style: Theme.of(context)
-                                .textTheme
-                                .displayMedium
-                                ?.copyWith(
-                                    fontWeight: FontWeight.w300, fontSize: 12),
                           ),
                           Expanded(
                             flex: 1,
                             child: Container(
-                              child: Divider(
-                                thickness: 1,
-                                color: Color(0xFFD6D6D6),
+                              margin: const EdgeInsets.only(top: 20, right: 16),
+                              // padding: EdgeInsets.only(left: 20, right: 20),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(double.infinity, 60),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(6)),
+                                    side: BorderSide(
+                                        color: Color(0xFFD6D6D6), width: 1),
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12)),
+                                onPressed: () {
+                                  // register();
+                                },
+                                child: Image.asset(
+                                  'images/apple_icon.png',
+                                  width: 24,
+                                  height: 24,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            margin: const EdgeInsets.only(
-                              top: 20,
-                              left: 16,
-                              right: 16,
-                            ),
-                            // padding: EdgeInsets.only(left: 20, right: 20),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(double.infinity, 60),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                  side: BorderSide(
-                                      color: Color(0xFFD6D6D6), width: 1),
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12)),
-                              onPressed: () async {
-                                await _signInWithGoogle(context);
-                                // register();
-                              },
-                              child: Image.asset(
-                                'images/devicon_google.png',
-                                width: 24,
-                                height: 24,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 20, right: 16),
-                            // padding: EdgeInsets.only(left: 20, right: 20),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(double.infinity, 60),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                  side: BorderSide(
-                                      color: Color(0xFFD6D6D6), width: 1),
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12)),
-                              onPressed: () {
-                                // register();
-                              },
-                              child: Image.asset(
-                                'images/apple_icon.png',
-                                width: 24,
-                                height: 24,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ));
       },
     );

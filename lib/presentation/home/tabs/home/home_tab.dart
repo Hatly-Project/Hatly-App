@@ -69,7 +69,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _animation;
   List<CountriesStatesDto> filteredCountries = [];
-  late String fromCountry;
+  String? fromCountry, fromCountryFlag;
   late List<StateDto> fromStatesList;
 
   @override
@@ -231,6 +231,11 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     setState(() {
       fromCountry = selectedCountry;
       // fromCityValue = '';
+      fromCountryFlag = args!
+          .countriesFlagsDto
+          .countries![args!.countriesFlagsDto.countries!
+              .indexWhere((country) => country.name == fromCountry)]
+          .flag;
       fromStatesList = countryStates!;
     });
     print('from $fromCountry');
@@ -656,25 +661,64 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                                     )),
                                                               ),
                                                             )
-                                                          : Expanded(
-                                                              flex: 1,
-                                                              key:
-                                                                  shipmentFromKey,
-                                                              child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(
-                                                                          15.0),
+                                                          : fromCountry == null
+                                                              ? Expanded(
+                                                                  flex: 1,
+                                                                  key:
+                                                                      shipmentFromKey,
                                                                   child:
-                                                                      CustomFormFieldForSeaarch(
-                                                                    controller:
-                                                                        fromController,
-                                                                    // key:
-                                                                    //     shipmentFromKey,
-                                                                    readOnly:
-                                                                        true,
-                                                                    hint:
-                                                                        'Shipment From',
+                                                                      Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .all(
+                                                                              15.0),
+                                                                          child:
+                                                                              CustomFormFieldForSeaarch(
+                                                                            controller:
+                                                                                fromController,
+                                                                            // key:
+                                                                            //     shipmentFromKey,
+                                                                            readOnly:
+                                                                                true,
+                                                                            hint:
+                                                                                'Shipment From',
+                                                                            onTap:
+                                                                                () {
+                                                                              _isShipmentFromClicked = !_isShipmentFromClicked;
+                                                                              setState(() {});
+                                                                              // _overlayEntry
+                                                                              //     ?.remove();
+                                                                              _showOverlay(context, 'shipment from', shipmentFromKey);
+
+                                                                              // showFromCountriesListBottomSheet(
+                                                                              //     context,
+                                                                              //     args!
+                                                                              //         .countriesFlagsDto);
+                                                                            },
+                                                                            prefixIcon:
+                                                                                Container(
+                                                                              margin: const EdgeInsets.only(right: 15),
+                                                                              child: Image.asset(
+                                                                                'images/takeoff.png',
+                                                                                width: 17,
+                                                                                height: 17,
+                                                                              ),
+                                                                            ),
+                                                                            suffixICon:
+                                                                                Container(
+                                                                              child: const Icon(
+                                                                                Icons.keyboard_arrow_down_rounded,
+                                                                                // size: 20,
+                                                                                color: Color(0xFFADADAD),
+                                                                              ),
+                                                                            ),
+                                                                          )),
+                                                                )
+                                                              : Expanded(
+                                                                  flex: 1,
+                                                                  key:
+                                                                      shipmentFromKey,
+                                                                  child:
+                                                                      InkWell(
                                                                     onTap: () {
                                                                       _isShipmentFromClicked =
                                                                           !_isShipmentFromClicked;
@@ -686,40 +730,76 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                                           context,
                                                                           'shipment from',
                                                                           shipmentFromKey);
-
-                                                                      // showFromCountriesListBottomSheet(
-                                                                      //     context,
-                                                                      //     args!
-                                                                      //         .countriesFlagsDto);
                                                                     },
-                                                                    prefixIcon:
-                                                                        Container(
-                                                                      margin: const EdgeInsets
-                                                                          .only(
-                                                                          right:
-                                                                              15),
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'images/takeoff.png',
-                                                                        width:
-                                                                            17,
-                                                                        height:
-                                                                            17,
-                                                                      ),
-                                                                    ),
-                                                                    suffixICon:
-                                                                        Container(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .all(
+                                                                          15.0),
                                                                       child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.spaceBetween,
+                                                                            children: [
+                                                                              Row(
+                                                                                children: [
+                                                                                  Container(
+                                                                                    margin: EdgeInsets.only(right: 10),
+                                                                                    child: Image.asset(
+                                                                                      'images/takeoff.png',
+                                                                                      width: 17,
+                                                                                      height: 17,
+                                                                                    ),
+                                                                                  ),
+                                                                                  Text(
+                                                                                    'Shipment From',
+                                                                                    style: Theme.of(context).textTheme.displayMedium,
+                                                                                    textAlign: TextAlign.center,
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                              Row(
+                                                                                children: [
+                                                                                  ClipRRect(
+                                                                                    borderRadius: BorderRadius.circular(25),
+                                                                                    child: Image.network(
+                                                                                      fromCountryFlag!,
+                                                                                      fit: BoxFit.cover,
+                                                                                      width: 20,
+                                                                                      height: 20,
+                                                                                    ),
+                                                                                  ),
+                                                                                  SizedBox(
+                                                                                    width: MediaQuery.sizeOf(context).width * .04,
+                                                                                  ),
+                                                                                  Container(
+                                                                                    width: MediaQuery.sizeOf(context).width * .50,
+                                                                                    child: Text(
+                                                                                      fromCountry!,
+                                                                                      overflow: TextOverflow.visible,
+                                                                                      style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w400),
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ],
+                                                                          ),
                                                                           const Icon(
-                                                                        Icons
-                                                                            .keyboard_arrow_down_rounded,
-                                                                        // size: 20,
-                                                                        color: Color(
-                                                                            0xFFADADAD),
+                                                                            Icons.keyboard_arrow_down_rounded,
+                                                                            color:
+                                                                                Color(0xFFADADAD),
+                                                                          )
+                                                                        ],
                                                                       ),
                                                                     ),
-                                                                  )),
-                                                            ),
+                                                                  ),
+                                                                ),
                                                       Padding(
                                                         padding:
                                                             const EdgeInsets
