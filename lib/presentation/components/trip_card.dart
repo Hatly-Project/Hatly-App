@@ -15,10 +15,10 @@ import 'package:hatly/presentation/home/tabs/trips/trip_details_arguments.dart';
 import 'package:intl/intl.dart';
 
 class TripCard extends StatefulWidget {
-  TripsDto tripsDto;
+  TripsDto? tripsDto;
   Deal? deal;
 
-  TripCard({required this.tripsDto, this.deal});
+  TripCard({this.tripsDto, this.deal});
 
   @override
   State<TripCard> createState() => _TripCardState();
@@ -28,186 +28,309 @@ class _TripCardState extends State<TripCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(10),
-      child: InkWell(
-        onTap: () => Navigator.pushNamed(context, TripDetails.routeName,
-            arguments: TripDetailsArguments(tripsDto: widget.tripsDto)),
-        child: Card(
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          elevation: 0,
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        widget.tripsDto.origin!,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                            fontSize: 16, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    const Expanded(
-                      child: Icon(
-                        Icons.flight_land_rounded,
-                        color: Colors.black,
-                        size: 30,
-                      ),
-                    ),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: Text(
-                          widget.tripsDto.destination ?? '',
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(
-                              fontSize: 16, fontWeight: FontWeight.w700),
+      width: double.infinity,
+      height: 215,
+      child: ListView.builder(
+        itemCount: 3,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) => Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: Container(
+            // height: 100,
+            width: 320,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color(0xFFEEEEEE),
+              ),
+              color: const Color(0xFFFFFFFF),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(bottom: 15),
+                    child: Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: 5),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: Image.asset(
+                              'images/me.jpg',
+                              fit: BoxFit.cover,
+                              width: 35,
+                              height: 35,
+                            ),
+                          ),
                         ),
-                      ),
+                        Container(
+                          margin: EdgeInsets.only(left: 5),
+                          width: 77,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Alaa Hosni',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayLarge
+                                  ?.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w300),
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      'Departs At ${DateFormat('dd MMMM yyyy').format(widget.tripsDto.departDate!)}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
+                  ),
+                  Container(
+                    // margin: EdgeInsets.symmetric(vertical: 15),
+                    child: Container(
+                      // margin: EdgeInsets.only(top: 10),
+                      width: double.infinity,
+                      height: 1,
+                      color: Color(0xFFEEEEEE),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 15),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        // mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Image.asset(
+                                'images/date_icon.png',
+                                width: 14,
+                                height: 14,
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 5),
+                                width: 75,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Departs On: ',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayMedium
+                                        ?.copyWith(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w300),
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 5),
+                                width: 140,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Fri, 22 Jun - 02:00 PM',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayLarge
+                                        ?.copyWith(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w300),
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 13),
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  'images/weight_icob.png',
+                                  width: 14,
+                                  height: 14,
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  width: 100,
+                                  child: FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text(
+                                      'Available Weight: ',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium
+                                          ?.copyWith(
+                                              // fontSize: 5,
+                                              fontWeight: FontWeight.w300),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 5),
+                                  width: 27,
+                                  child: FittedBox(
+                                    fit: BoxFit.fitWidth,
+                                    child: Text(
+                                      '12Kg',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayLarge
+                                          ?.copyWith(
+                                              // fontSize: 5,
+                                              fontWeight: FontWeight.w300),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Image.asset(
-                          'images/bag.png',
-                          width: 15,
-                          height: 50,
-                          filterQuality: FilterQuality.high,
-                        ),
-                        Text(
-                          '${widget.tripsDto.available.toString()} Available Kg',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                  Container(
+                    // margin: EdgeInsets.symmetric(vertical: 5),
+                    child: Container(
+                      // margin: EdgeInsets.only(top: 10),
+                      width: double.infinity,
+                      height: 1,
+                      color: Color(0xFFEEEEEE),
                     ),
-                    Row(
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 40,
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Text(
+                                  'From:',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayMedium
+                                      ?.copyWith(
+                                          // fontSize: 12,
+                                          fontWeight: FontWeight.w400),
+                                  textAlign: TextAlign.start,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    'images/japan_flag.png',
+                                    width: 18,
+                                    height: 18,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 5.0),
+                                    child: SizedBox(
+                                      width: 42,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'Japan',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge
+                                              ?.copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                         Image.asset(
-                          'images/bag.png',
-                          width: 15,
-                          height: 50,
-                          filterQuality: FilterQuality.high,
-                        ),
-                        Text(
-                          '${widget.tripsDto.consumed.toString()} Consumed Kg',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 2,
-                  thickness: 2,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
-                            child: widget.tripsDto.user!.profilePhoto == null
-                                ? Container(
-                                    height: 50,
-                                    width: 50,
-                                    color: Colors.grey[300],
-                                  )
-                                : base64ToUserImage(
-                                    widget.tripsDto.user!.profilePhoto!)),
-                        const SizedBox(
-                          width: 10,
+                          'images/landing_icon.png',
+                          width: 22,
+                          height: 22,
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              widget.tripsDto.user!.firstName!,
-                              style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                            SizedBox(
+                              width: 18,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'To:',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayMedium
+                                      ?.copyWith(
+                                          // fontSize: 12,
+                                          fontWeight: FontWeight.w400),
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * .01,
-                            ),
-                            Text(
-                              '4.3 Reviews',
-                              style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w400,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    'images/egypt.png',
+                                    width: 18,
+                                    height: 18,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 4.0),
+                                    child: SizedBox(
+                                      width: 45,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'Egypt',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge
+                                              ?.copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ],
                     ),
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        shape: MaterialStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                        backgroundColor: MaterialStatePropertyAll(
-                            Theme.of(context).primaryColor),
-                      ),
-                      onPressed: () {
-                        _showShipmentsListBottomSheet(
-                            context, widget.tripsDto, showSuccessDialog);
-                      },
-                      child: Text(
-                        'Send Request',
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )
-                  ],
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
