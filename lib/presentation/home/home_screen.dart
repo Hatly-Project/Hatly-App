@@ -82,28 +82,65 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      backgroundColor: Color(0xFFFFFFFF),
       builder: (BuildContext context) {
         return Container(
-          height: 150,
-          child: Column(
-            children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.photo),
-                title: Text('Option 1'),
-                onTap: () {
-                  // Handle option 1 action
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.music_note),
-                title: Text('Option 2'),
-                onTap: () {
-                  // Handle option 2 action
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+          height: 200,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Add new shipment',
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayLarge
+                            ?.copyWith(fontSize: 20, color: Color(0xFF5A5A5A)),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_right_rounded,
+                        color: Color(0xFF5A5A5A),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  // margin: EdgeInsets.only(top: 10),
+                  width: double.infinity,
+                  height: 1,
+                  color: Color(0xFFD6D6D6),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Add new trip',
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayLarge
+                            ?.copyWith(fontSize: 20, color: Color(0xFF5A5A5A)),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_right_rounded,
+                        color: Color(0xFF5A5A5A),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

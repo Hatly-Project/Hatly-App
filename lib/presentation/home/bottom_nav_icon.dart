@@ -10,35 +10,35 @@ class BottomNavIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isSelected
-        ? imageName == 'Add'.toLowerCase()
-            ? Container(
-                padding: EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(20)),
-                child: Icon(
-                  Icons.add,
-                  size: 33,
-                ))
-            : Padding(
-                padding: const EdgeInsets.only(bottom: 5.0),
-                child: ImageIcon(
-                  AssetImage('images/$imageName.png'),
-                  // size: 25,
-                  // color: Theme.of(context).primaryColor,
-                ),
-              )
+        ? Padding(
+            padding: const EdgeInsets.only(bottom: 5.0),
+            child: ImageIcon(
+              AssetImage('images/$imageName.png'),
+              // size: 25,
+              // color: Theme.of(context).primaryColor,
+            ),
+          )
         : imageName == 'Add'.toLowerCase()
-            ? Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(26)),
-                child: Icon(
-                  Icons.add,
-                  size: 33,
-                  color: Colors.white,
-                ))
+            ? Column(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    child: Icon(
+                      Icons.add_rounded,
+                      size: 33,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  Text(
+                    'Add',
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        fontSize: 15, color: Theme.of(context).primaryColor),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              )
             : Padding(
                 padding: const EdgeInsets.only(bottom: 5.0),
                 child: ImageIcon(

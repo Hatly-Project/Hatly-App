@@ -15,218 +15,260 @@ import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.d
 import 'package:intl/intl.dart';
 
 class ShipmentCard extends StatelessWidget {
-  ShipmentDto shipmentDto;
-  Function showConfirmedBottomSheet;
+  ShipmentDto? shipmentDto;
+  Function? showConfirmedBottomSheet;
+  final GlobalKey? shipmentCardKey;
   ShipmentCard(
-      {required this.shipmentDto, required this.showConfirmedBottomSheet});
+      {this.shipmentDto, this.showConfirmedBottomSheet, this.shipmentCardKey});
 
   @override
   Widget build(BuildContext context) {
     // print('imgg ${shipmentDto.items!.first.photos!.first.photo}');
     return Container(
-      padding: EdgeInsets.all(6),
-      // margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * .3),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, ShipmentDetails.routeName,
-              arguments: ShipmentDetailsArguments(shipmentDto: shipmentDto));
-        },
-        child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+      key: shipmentCardKey,
+      width: double.infinity,
+      height: 220,
+      child: ListView.builder(
+        itemCount: 3,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) => Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: Container(
+            // height: 100,
+            width: 320,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: const Color(0xFFEEEEEE),
+              ),
+              color: const Color(0xFFFFFFFF),
             ),
-            color: Colors.white,
-            child: Container(
-              width: MediaQuery.of(context).size.width * .95,
-              // height: MediaQuery.of(context).size.height * .29,
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  Container(
+                    margin: EdgeInsets.only(bottom: 15),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            shipmentDto.items!.first.photos!.isEmpty ||
-                                    shipmentDto.items?.first.photos == null
-                                ? Container(
-                                    width: 100,
-                                    height: 100,
-                                    color: Colors.grey[300],
-                                  )
-                                : Image.network(
-                                    shipmentDto
-                                        .items!.first.photos!.first.photo!,
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.fitWidth,
-                                  ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.only(left: 10),
-                                  child: FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Text(
-                                      shipmentDto.title!,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ),
+                            Container(
+                              margin: EdgeInsets.only(top: 5),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: Image.asset(
+                                  'images/me.jpg',
+                                  fit: BoxFit.cover,
+                                  width: 35,
+                                  height: 35,
                                 ),
-                                SizedBox(
-                                  height: 10,
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(left: 5),
+                              width: 77,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'Alaa Hosni',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayLarge
+                                      ?.copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w300),
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                Container(
-                                  width: MediaQuery.sizeOf(context).width * .62,
-                                  child: Row(
-                                    // mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(left: 10),
-                                        // height: 45,
-                                        width:
-                                            MediaQuery.sizeOf(context).width *
-                                                .26,
-                                        child: FittedBox(
-                                          child: Text(
-                                            shipmentDto.from!,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 20,
-                                                color: Colors.grey[600]),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 10, right: 10),
-                                        child: Icon(
-                                          Icons.flight_land_rounded,
-                                          color: Colors.black,
-                                          size: 25,
-                                        ),
-                                      ),
-                                      Container(
-                                        // margin: EdgeInsets.only(left: 10),
-                                        // width: 100,
-                                        child: Expanded(
-                                          child: FittedBox(
-                                            // fit: BoxFit.scaleDown,
-                                            child: Text(
-                                              shipmentDto.to!,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: GoogleFonts.poppins(
-                                                  fontSize: 20,
-                                                  color: Colors.grey[600]),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 15,
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(left: 10),
-                                  child: Text(
-                                    DateFormat('dd MMMM yyyy')
-                                        .format(shipmentDto.expectedDate!),
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 10, color: Colors.grey[600]),
-                                  ),
-                                )
-                              ],
-                            )
+                              ),
+                            ),
                           ],
                         ),
                         Container(
-                          margin: EdgeInsets.only(top: 15),
-                          width: double.infinity,
-                          height: 2,
-                          color: Colors.grey[400],
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(top: 5),
+                          margin: EdgeInsets.only(right: 10),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
+                              Container(
+                                height: 40,
+                                width: 1.5,
+                                color: Color(0xFFD6D6D6),
+                                margin: EdgeInsets.only(right: 13),
+                              ),
+                              Column(
                                 children: [
                                   Container(
-                                    margin: EdgeInsets.only(top: 10),
-                                    child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(25),
-                                        child: shipmentDto.user!.profilePhoto !=
-                                                null
-                                            ? base64ToUserImage(
-                                                shipmentDto.user!.profilePhoto!)
-                                            : Container(
-                                                width: 50,
-                                                height: 50,
-                                                color: Colors.grey[300],
-                                              )),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        shipmentDto.user!.firstName!,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 13,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                .01,
-                                      ),
-                                      Text('4.3 Reviews')
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    shape: MaterialStatePropertyAll(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
+                                    margin: EdgeInsets.only(bottom: 5),
+                                    child: SizedBox(
+                                      width: 50,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'Reward',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayMedium
+                                              ?.copyWith(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w300),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
                                     ),
-                                    backgroundColor: MaterialStatePropertyAll(
-                                        Theme.of(context).primaryColor),
                                   ),
-                                  onPressed: () {
-                                    _showTripsListBottomSheet(context,
-                                        showConfirmedBottomSheet, shipmentDto);
-                                  },
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.only(right: 4),
+                                        width: 23,
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            '24',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge
+                                                ?.copyWith(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                            textAlign: TextAlign.center,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 33,
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            'USD',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge
+                                                ?.copyWith(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.w300),
+                                            textAlign: TextAlign.center,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    // margin: EdgeInsets.symmetric(vertical: 15),
+                    child: Container(
+                      // margin: EdgeInsets.only(top: 10),
+                      width: double.infinity,
+                      height: 1,
+                      color: Color(0xFFEEEEEE),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 15),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          'images/product_image.png',
+                          fit: BoxFit.cover,
+                          width: 50,
+                          height: 50,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 220,
+                                child: FittedBox(
+                                  fit: BoxFit.fitWidth,
                                   child: Text(
-                                    'Send offer',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 13,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
+                                    'GTS 4 Smart Watch, Dual-Band',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayLarge
+                                        ?.copyWith(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w300),
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                              )
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 13),
+                                child: Row(
+                                  children: [
+                                    Image.asset(
+                                      'images/weight_icob.png',
+                                      width: 14,
+                                      height: 14,
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 5),
+                                      width: 27,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          '15g',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayMedium
+                                              ?.copyWith(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w300),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 20,
+                                      width: 1.5,
+                                      color: Color(0xFFD6D6D6),
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 15),
+                                    ),
+                                    Image.asset(
+                                      'images/date_icon.png',
+                                      width: 14,
+                                      height: 14,
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 8),
+                                      width: 110,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'Before: 20 Jun',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayMedium
+                                              ?.copyWith(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w300),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -234,28 +276,140 @@ class ShipmentCard extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 5),
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * .045,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20)),
-                        color: Theme.of(context).primaryColor),
-                    child: Center(
-                      child: Text(
-                        'Shipping Bonus ${shipmentDto.reward} \$',
-                        // textAlign: TextAlign.start,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
-                      ),
+                    // margin: EdgeInsets.symmetric(vertical: 5),
+                    child: Container(
+                      // margin: EdgeInsets.only(top: 10),
+                      width: double.infinity,
+                      height: 1,
+                      color: Color(0xFFEEEEEE),
                     ),
                   ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 95,
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Text(
+                                  'Shipment From:',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayMedium
+                                      ?.copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400),
+                                  textAlign: TextAlign.start,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    'images/japan_flag.png',
+                                    width: 18,
+                                    height: 18,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 5.0),
+                                    child: SizedBox(
+                                      width: 42,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'Japan',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge
+                                              ?.copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Image.asset(
+                          'images/landing_icon.png',
+                          width: 22,
+                          height: 22,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 70,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'Receiving In:',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayMedium
+                                      ?.copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400),
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    'images/egypt.png',
+                                    width: 18,
+                                    height: 18,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 4.0),
+                                    child: SizedBox(
+                                      width: 45,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'Egypt',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge
+                                              ?.copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }
