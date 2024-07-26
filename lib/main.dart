@@ -14,6 +14,7 @@ import 'package:hatly/presentation/home/tabs/chat/chat_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/create_password.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/forget_password_code_screen.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/forget_password_screen.dart';
+import 'package:hatly/presentation/home/tabs/home/search_result_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/edit_profile_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/payment_information_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
@@ -77,14 +78,14 @@ void main() async {
 
   // Open the Hive box for shipments
   await Hive.openBox('shipments');
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  // SystemChrome.setSystemUIOverlayStyle(
-  //   SystemUiOverlayStyle(
-  //       statusBarColor: Colors.transparent,
-  //       // systemNavigationBarColor: Colors.transparent,
-  //       statusBarIconBrightness: Brightness.dark),
-  // );
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        // systemNavigationBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark),
+  );
   runApp(
     MultiProvider(
       providers: [
@@ -231,7 +232,8 @@ class MyApp extends StatelessWidget {
         ForgetPasswordScreen.routeName: (context) => ForgetPasswordScreen(),
         ForgetPasswordOtpScreen.routeName: (context) =>
             ForgetPasswordOtpScreen(),
-        CreatePasswordScreen.routeName: (context) => CreatePasswordScreen()
+        CreatePasswordScreen.routeName: (context) => CreatePasswordScreen(),
+        SearchResultScreen.routeName: (context) => SearchResultScreen(),
       },
     );
   }
