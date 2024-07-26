@@ -216,7 +216,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
             ? Scaffold(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 appBar: AppBar(
-                  backgroundColor: Theme.of(context).primaryColor,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   centerTitle: true,
                   automaticallyImplyLeading: false,
                   title: Text(
