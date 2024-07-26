@@ -23,6 +23,8 @@ import 'package:hatly/presentation/components/custom_text_field.dart';
 import 'package:hatly/presentation/components/trip_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab_viewmodel.dart';
+import 'package:hatly/presentation/home/tabs/home/search_result_screen.dart';
+import 'package:hatly/presentation/home/tabs/home/search_result_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/providers/access_token_provider.dart';
@@ -450,6 +452,9 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                     ),
                   ),
                   SingleChildScrollView(
+                    physics: _isShipmentFromClicked || _isReceivingInClicked
+                        ? NeverScrollableScrollPhysics()
+                        : null,
                     child: Container(
                       margin: EdgeInsets.symmetric(
                           horizontal: MediaQuery.sizeOf(context).width * .03),
@@ -822,9 +827,17 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                                             onTap:
                                                                                 () {
                                                                               _isShipmentFromClicked = !_isShipmentFromClicked;
-                                                                              setState(() {});
+                                                                              print(_isShipmentFromClicked);
+                                                                              setState(() {
+                                                                                if (_overlayEntry != null) {
+                                                                                  _overlayEntry?.remove();
+                                                                                  _overlayEntry = null;
+                                                                                  _isReceivingInClicked = false;
+                                                                                }
+                                                                              });
                                                                               // _overlayEntry
                                                                               //     ?.remove();
+
                                                                               _showOverlay(context, 'shipment from', shipmentFromKey);
 
                                                                               // showFromCountriesListBottomSheet(
@@ -861,7 +874,17 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                                       _isShipmentFromClicked =
                                                                           !_isShipmentFromClicked;
                                                                       setState(
-                                                                          () {});
+                                                                          () {
+                                                                        if (_overlayEntry !=
+                                                                            null) {
+                                                                          _overlayEntry
+                                                                              ?.remove();
+                                                                          _overlayEntry =
+                                                                              null;
+                                                                          _isReceivingInClicked =
+                                                                              false;
+                                                                        }
+                                                                      });
                                                                       // _overlayEntry
                                                                       //     ?.remove();
                                                                       _showOverlay(
@@ -1062,6 +1085,10 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                                                 () {
                                                                               _isReceivingInClicked = !_isReceivingInClicked;
                                                                               setState(() {});
+                                                                              if (_overlayEntry != null) {
+                                                                                _overlayEntry?.remove();
+                                                                                _overlayEntry = null;
+                                                                              }
                                                                               // _overlayEntry
                                                                               //     ?.remove();
                                                                               _showOverlay(context, 'Receiving In', receivingInKey);
@@ -1103,6 +1130,13 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                                           () {});
                                                                       // _overlayEntry
                                                                       //     ?.remove();
+                                                                      if (_overlayEntry !=
+                                                                          null) {
+                                                                        _overlayEntry
+                                                                            ?.remove();
+                                                                        _overlayEntry =
+                                                                            null;
+                                                                      }
                                                                       _showOverlay(
                                                                           context,
                                                                           'Receiving In',
@@ -1218,6 +1252,24 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                           vertical: 12)),
                                                   onPressed: _isButtonEnabled
                                                       ? () {
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              SearchResultScreen
+                                                                  .routeName,
+                                                              arguments:
+                                                                  SearchResultScreenArguments(
+                                                                countriesFlagsDto:
+                                                                    args!
+                                                                        .countriesFlagsDto,
+                                                                fromCountry:
+                                                                    fromCountry,
+                                                                fromCountryFlag:
+                                                                    fromCountryFlag,
+                                                                toCountryName:
+                                                                    toCountryName,
+                                                                toCountryFlag:
+                                                                    toCountryFlag,
+                                                              ));
                                                           // login();
                                                         }
                                                       : null,
