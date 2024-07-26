@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/my_theme.dart';
 import 'package:hatly/presentation/components/shipment_card.dart';
@@ -23,60 +24,97 @@ class _HomeScreenState extends State<HomeScreen> {
   var tabs = [HomeTab(), MyShipmentsTab(), MyTripsTab(), ProfileScreen()];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: tabs[selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        iconSize: 25,
-        enableFeedback: true,
-        // backgroundColor: Colors.transparent,
-        currentIndex: selectedIndex,
-        // selectedFontSize: 5,
-        // unselectedFontSize: 15,
-        selectedLabelStyle: Theme.of(context).textTheme.displayLarge?.copyWith(
-              fontSize: 13.5,
-            ),
-        selectedItemColor: Theme.of(context).textTheme.displayLarge?.color,
-        unselectedLabelStyle:
-            Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontSize: 12.5,
-                ),
-        unselectedItemColor: MyTheme.disabledTextButtonColor,
-        showUnselectedLabels: true,
-        elevation: 10,
-        onTap: (index) {
-          if (index == 2) {
-            isAddSelected = true;
-            _showBottomSheet(context);
-          } else {
-            selectedIndex = index;
-            isAddSelected = false;
-          }
-          setState(() {});
-        },
-        items: [
-          BottomNavigationBarItem(
-              backgroundColor: Colors.white,
-              icon: BottomNavIcon('home', selectedIndex == 0),
-              label: 'Home'),
-          BottomNavigationBarItem(
-              // backgroundColor: Colors.white,
-              icon: BottomNavIcon('fast', selectedIndex == 1),
-              label: 'My Shipments'),
-          BottomNavigationBarItem(
-              // backgroundColor: Colors.white,
-              icon: BottomNavIcon('add', selectedIndex == 2),
-              label: ''),
-          BottomNavigationBarItem(
-              // backgroundColor: Colors.white,
-              icon: BottomNavIcon('airplane', selectedIndex == 3),
-              label: 'My Trips'),
-          BottomNavigationBarItem(
-              // backgroundColor: Colors.white,
-              icon: BottomNavIcon('profile', selectedIndex == 4),
-              label: 'Profile'),
-        ],
-      ),
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: Colors.white,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.dark),
     );
+    return Scaffold(
+        body: tabs[selectedIndex],
+        bottomNavigationBar: NavigationBar(
+          height: 70,
+          animationDuration: Duration(milliseconds: 1000),
+          backgroundColor: Colors.white,
+          indicatorColor: Colors.transparent,
+          // labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (value) {
+            if (value == 2) {
+              isAddSelected = true;
+              _showBottomSheet(context);
+            } else {
+              selectedIndex = value;
+              isAddSelected = false;
+            }
+            setState(() {});
+          },
+          destinations: [
+            const NavigationDestination(
+              icon: ImageIcon(
+                AssetImage('images/home.png'),
+                // size: 25,
+                // color: Theme.of(context).primaryColor,
+                color: Color(0xFFADADAD),
+              ),
+              selectedIcon: ImageIcon(
+                AssetImage('images/home.png'),
+                // size: 25,
+                // color: Theme.of(context).primaryColor,
+              ),
+              label: 'Home',
+            ),
+            const NavigationDestination(
+              icon: ImageIcon(
+                AssetImage('images/fast.png'),
+                // size: 25,
+                color: Color(0xFFADADAD),
+              ),
+              selectedIcon: ImageIcon(
+                AssetImage('images/fast.png'),
+                // size: 25,
+                // color: Color(0xFFADADAD),
+              ),
+              label: 'Shipments',
+            ),
+            InkWell(
+              onTap: () {
+                _showBottomSheet(context);
+              },
+              child: BottomNavIcon('add', selectedIndex == 2),
+            ),
+            const NavigationDestination(
+              icon: ImageIcon(
+                AssetImage('images/airplane.png'),
+                // size: 25,
+                // color: Theme.of(context).primaryColor,
+                color: Color(0xFFADADAD),
+              ),
+              selectedIcon: ImageIcon(
+                AssetImage('images/airplane.png'),
+                // size: 25,
+                // color: Theme.of(context).primaryColor,
+              ),
+              label: 'Trips',
+            ),
+            const NavigationDestination(
+              icon: ImageIcon(
+                AssetImage('images/profile.png'),
+                // size: 25,
+                // color: Theme.of(context).primaryColor,
+                color: Color(0xFFADADAD),
+              ),
+              selectedIcon: ImageIcon(
+                AssetImage('images/profile.png'),
+                // size: 25,
+                // color: Theme.of(context).primaryColor,
+                // color: Color(0xFFADADAD),
+              ),
+              label: 'Profile',
+            ),
+          ],
+        ));
   }
 
   void _showBottomSheet(BuildContext context) {
