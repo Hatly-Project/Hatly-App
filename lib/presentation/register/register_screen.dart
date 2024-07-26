@@ -190,12 +190,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Container(
                             // margin: const EdgeInsets.only(top: 15),
                             padding:
-                                EdgeInsets.only(left: 20, right: 20, top: 12),
+                                EdgeInsets.only(left: 20, right: 20, top: 15),
                             child: CustomFormField(
                               controller: passwordController,
                               label: null,
                               hint: 'Password',
-                              keyboardType: TextInputType.emailAddress,
+                              keyboardType: TextInputType.text,
                               isPassword: _obsecurePassword,
                               suffixICon: IconButton(
                                 icon: _obsecurePassword
@@ -216,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   return 'please enter password';
                                 }
                                 if (!ValidationUtils.isValidPassword(text)) {
-                                  return 'please enter a password more than 8 characters';
+                                  return 'Password must be more than 8 characters';
                                 }
                               },
                             ),
