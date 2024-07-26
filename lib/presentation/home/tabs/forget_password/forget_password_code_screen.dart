@@ -29,6 +29,10 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
   var secondController = TextEditingController(text: '');
   var thirdController = TextEditingController(text: '');
   var fourthController = TextEditingController(text: '');
+  var firstFocusNode = FocusNode();
+  var secondFocusNode = FocusNode();
+  var thirdFocusNode = FocusNode();
+  var fourthFocusNode = FocusNode();
 
   ForgetPasswrodScreenViewmodel viewmodel = ForgetPasswrodScreenViewmodel();
   String otp = '';
@@ -179,8 +183,18 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
                                   child: Center(
                                     child: TextField(
                                       controller: firstController,
+                                      focusNode: firstFocusNode,
                                       onChanged: (value) {
+                                        if (firstController.text
+                                            .trim()
+                                            .isEmpty) {
+                                          FocusScope.of(context)
+                                              .previousFocus();
+                                        } else {
+                                          FocusScope.of(context).nextFocus();
+                                        }
                                         _isFirstEnabled = !_isFirstEnabled;
+
                                         setState(() {});
                                       },
                                       decoration: InputDecoration(
@@ -210,7 +224,17 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
                                   child: Center(
                                     child: TextField(
                                       controller: secondController,
+                                      focusNode: secondFocusNode,
                                       onChanged: (value) {
+                                        if (secondController.text
+                                            .trim()
+                                            .isEmpty) {
+                                          FocusScope.of(context)
+                                              .previousFocus();
+                                        } else {
+                                          FocusScope.of(context).nextFocus();
+                                        }
+
                                         _isSecondEnabled = !_isSecondEnabled;
                                         setState(() {});
                                       },
@@ -241,7 +265,16 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
                                   child: Center(
                                     child: TextField(
                                       controller: thirdController,
+                                      focusNode: thirdFocusNode,
                                       onChanged: (value) {
+                                        if (thirdController.text
+                                            .trim()
+                                            .isEmpty) {
+                                          FocusScope.of(context)
+                                              .previousFocus();
+                                        } else {
+                                          FocusScope.of(context).nextFocus();
+                                        }
                                         _isThirdEnabled = !_isThirdEnabled;
                                         setState(() {});
                                       },
@@ -272,8 +305,16 @@ class _ForgetPasswordOtpScreenState extends State<ForgetPasswordOtpScreen> {
                                   child: Center(
                                     child: TextField(
                                       controller: fourthController,
+                                      focusNode: fourthFocusNode,
                                       onChanged: (value) {
+                                        if (fourthController.text
+                                            .trim()
+                                            .isEmpty) {
+                                          FocusScope.of(context)
+                                              .previousFocus();
+                                        }
                                         _isFourthEnabled = !_isFourthEnabled;
+
                                         setState(() {});
                                       },
                                       decoration: InputDecoration(
