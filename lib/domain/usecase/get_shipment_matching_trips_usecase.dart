@@ -6,9 +6,9 @@ class GetShipmentMatchingTripsUsecase {
 
   GetShipmentMatchingTripsUsecase({required this.repository});
 
-  Future<ShipmentMatchingTripsResponseDto> getShipmentMatchingTrips(
-      {required String token, required int shipmentId}) {
-    return repository.getShipmentMatchingTrips(
-        token: token, shipmentId: shipmentId);
-  }
+  // Future<ShipmentMatchingTripsResponseDto> getShipmentMatchingTrips(
+  //     {required String token,  String? shipmentId}) {
+  //   return repository.getShipmentMatchingTrips(
+  //       token: token);
+  // }
 }

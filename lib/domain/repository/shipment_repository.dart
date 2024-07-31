@@ -25,8 +25,17 @@ abstract class ShipmentRepository {
       List<ItemDto>? items,
       required String token});
 
-  Future<GetAllShipmentResponseDto> getAllShipments(
-      {required String token, int page = 1});
+  Future<GetAllShipmentResponseDto> getAllShipments({
+    required String token,
+    int page = 1,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    String? toCity,
+    bool? latest,
+  });
   Future<GetUserShipmentsDto> getUserShipments({required String token});
 
   Future<MyShipmentDealsResponseDto> getMyShipmentDeals(
@@ -59,6 +68,6 @@ abstract class ShipmentRepository {
   Future<CancelDealResponseDto> cancelDeal(
       {required String token, required int dealId});
 
-  Future<ShipmentMatchingTripsResponseDto> getShipmentMatchingTrips(
-      {required String token, required int shipmentId});
+  // Future<ShipmentMatchingTripsResponseDto> getShipmentMatchingTrips(
+  //     {required String token,  int shipmentId});
 }

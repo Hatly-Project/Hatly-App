@@ -6,18 +6,23 @@ import 'package:hatly/domain/models/get_all_shipments_dto.dart';
 class GetShipmentsResponse {
   bool? status;
   String? message;
-  int? totalPages;
+  int? totalPages, totalData;
 
   List<Shipment>? shipments;
 
   GetShipmentsResponse(
-      {this.status, this.shipments, this.message, this.totalPages});
+      {this.status,
+      this.shipments,
+      this.message,
+      this.totalPages,
+      this.totalData});
 
   factory GetShipmentsResponse.fromMap(Map<String, dynamic> data) {
     return GetShipmentsResponse(
       status: data['status'] as bool?,
       message: data['message'] as String?,
-      totalPages: data['totalData'] as int?,
+      totalPages: data['totalPages'] as int?,
+      totalData: data['totalData'] as int?,
       shipments: (data['shipments'] as List<dynamic>?)
           ?.map((e) => Shipment.fromMap(e as Map<String, dynamic>))
           .toList(),
@@ -27,6 +32,7 @@ class GetShipmentsResponse {
   Map<String, dynamic> toMap() => {
         'status': status,
         'message': message,
+        'totalData': totalData,
         'totalPages': totalPages,
         'shipments': shipments?.map((e) => e.toMap()).toList(),
       };
@@ -50,6 +56,7 @@ class GetShipmentsResponse {
             shipments?.map((shipment) => shipment.toShipmentDto()).toList(),
         status: status,
         totalPages: totalPages,
+        totalData: totalData,
         message: message);
   }
 }

@@ -8,15 +8,17 @@ class GetAllTripsResponse {
   bool? status;
   List<Trip>? trips;
   String? message;
-  int? totalPages;
+  int? totalPages, totalData;
 
-  GetAllTripsResponse({this.status, this.trips, this.message, this.totalPages});
+  GetAllTripsResponse(
+      {this.status, this.trips, this.message, this.totalPages, this.totalData});
 
   factory GetAllTripsResponse.fromMap(Map<String, dynamic> data) {
     return GetAllTripsResponse(
       status: data['status'] as bool?,
       message: data['message'] as String?,
       totalPages: data['totalPages'] as int?,
+      totalData: data['totalData'] as int?,
       trips: (data['trips'] as List<dynamic>?)
           ?.map((e) => Trip.fromMap(e as Map<String, dynamic>))
           .toList(),
@@ -26,6 +28,7 @@ class GetAllTripsResponse {
   Map<String, dynamic> toMap() => {
         'status': status,
         'totalPages': totalPages,
+        'totalData': totalData,
         'message': message,
         'trips': trips?.map((e) => e.toMap()).toList(),
       };
@@ -47,6 +50,7 @@ class GetAllTripsResponse {
     return GetAllTripsResponseDto(
         status: status,
         totalPages: totalPages,
+        totalData: totalData,
         trips: trips?.map((trip) => trip.toTripsDto()).toList(),
         message: message);
   }

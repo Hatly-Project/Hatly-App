@@ -9,12 +9,12 @@ class SendShipmentDealUsecase {
 
   SendShipmentDealUsecase({required this.repository});
 
-  Future<TripDealResponseDto> sendDeal(
-      {required int? shipmentId,
-      required double? reward,
-      required String token,
-      required int tripId}) {
-    return repository.sendDeal(
-        token: token, shipmentId: shipmentId, reward: reward, tripId: tripId);
-  }
+  // Future<TripDealResponseDto> sendDeal(
+  //     { String? shipmentId,
+  //     required double? reward,
+  //     required String token,
+  //     required int tripId}) {
+  //   return repository.sendDeal(
+  //       token: token, shipmentId: shipmentId, reward: reward, tripId: tripId);
+  // }
 }

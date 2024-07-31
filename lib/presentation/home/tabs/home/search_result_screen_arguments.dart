@@ -5,9 +5,15 @@ import 'package:hatly/domain/models/trips_dto.dart';
 class SearchResultScreenArguments {
   List<ShipmentDto>? shipments;
   List<TripsDto>? trips;
-  String? fromCountry, fromCountryFlag, toCountryName, toCountryFlag;
+  String? fromCountry,
+      fromCountryFlag,
+      toCountryName,
+      toCountryFlag,
+      fromCountryIso,
+      toCountryIso;
   CountriesDto countriesFlagsDto;
-
+  int? currentShipmentsPage, totalShipmentsPage, totalData;
+  bool? isShipmentSearch, isTripSearch;
   SearchResultScreenArguments(
       {this.shipments,
       this.trips,
@@ -15,5 +21,12 @@ class SearchResultScreenArguments {
       this.fromCountryFlag,
       this.toCountryFlag,
       this.toCountryName,
+      this.fromCountryIso,
+      this.toCountryIso,
+      this.currentShipmentsPage,
+      this.totalShipmentsPage,
+      this.totalData,
+      this.isShipmentSearch = false,
+      this.isTripSearch = false,
       required this.countriesFlagsDto});
 }

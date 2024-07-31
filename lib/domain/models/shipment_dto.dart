@@ -6,7 +6,7 @@ import 'package:hatly/domain/models/item_dto.dart';
 import 'package:hatly/domain/models/user_model.dart';
 
 class ShipmentDto {
-  int? id;
+  String? id;
   UserDto? user;
   String? title;
   dynamic trip;
@@ -39,7 +39,7 @@ class ShipmentDto {
       this.count});
 
   factory ShipmentDto.fromMap(Map<String, dynamic> data) => ShipmentDto(
-        id: data['id'] as int?,
+        id: data['id'] as String?,
         user: data['user'] == null
             ? null
             : UserDto.fromMap(data['user'] as Map<String, dynamic>),

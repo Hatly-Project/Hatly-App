@@ -504,14 +504,43 @@ class ApiManager {
     }
   }
 
-  Future<GetShipmentsResponse> getAllShipmentsWithCheckAccessToken(
-      {required String accessToken, int page = 1}) async {
+  Future<GetShipmentsResponse> getAllShipmentsWithCheckAccessToken({
+    required String accessToken,
+    int page = 1,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    String? toCity,
+    bool? latest,
+  }) async {
     try {
       if (await chechAccessTokenExpired()) {
-        return await getAllShipments(accessToken: accessToken, page: page);
+        return await getAllShipments(
+          accessToken: accessToken,
+          page: page,
+          beforeExpectedDate: beforeExpectedDate,
+          afterExpectedDate: afterExpectedDate,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          latest: latest,
+        );
       } else {
         var newAccessToken = await refreshAccessToken();
-        return await getAllShipments(accessToken: newAccessToken, page: page);
+        return await getAllShipments(
+          accessToken: newAccessToken,
+          page: page,
+          beforeExpectedDate: beforeExpectedDate,
+          afterExpectedDate: afterExpectedDate,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          latest: latest,
+        );
       }
     } on ServerErrorException catch (e) {
       throw ServerErrorException(
@@ -521,13 +550,32 @@ class ApiManager {
     }
   }
 
-  Future<GetShipmentsResponse> getAllShipments(
-      {required String accessToken, int page = 1}) async {
+  Future<GetShipmentsResponse> getAllShipments({
+    required String accessToken,
+    int page = 1,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    String? toCity,
+    bool? latest,
+  }) async {
     late Response response;
 
     try {
-      var url = Uri.https(baseUrl, '$apiVersion/shipment',
-          {'page': page.toString(), 'take': 4.toString()});
+      var url = Uri.https(baseUrl, '$apiVersion/shipment', {
+        'page': page.toString(),
+        'take': 4.toString(),
+        if (beforeExpectedDate != null)
+          'beforeExpectedDate': beforeExpectedDate,
+        if (afterExpectedDate != null) 'afterExpectedDate': afterExpectedDate,
+        if (from != null) 'from': from,
+        if (fromCity != null) 'fromCity': fromCity,
+        if (to != null) 'to': to,
+        if (toCity != null) 'toCity': toCity,
+        if (latest != null) 'latest': latest,
+      });
       response = await client.get(url, headers: {
         'content-type': 'application/json',
         'authorization': 'Bearer $accessToken'
@@ -643,24 +691,24 @@ class ApiManager {
     }
   }
 
-  Future<ShipmentMatchingTripsResponse>
-      getShipmentMatchingTripsWithCheckAccessToken(
-          {required String accessToken, required int shipmentId}) async {
-    try {
-      if (await chechAccessTokenExpired()) {
-        return await getShipmentMatchingTrips(
-            accessToken: accessToken, shipmentId: shipmentId);
-      } else {
-        var newAccessToken = await refreshAccessToken();
-        return await getShipmentMatchingTrips(
-            accessToken: newAccessToken, shipmentId: shipmentId);
-      }
-    } on ServerErrorException catch (e) {
-      throw ServerErrorException(errorMessage: e.errorMessage);
-    } on Exception catch (e) {
-      throw ServerErrorException(errorMessage: e.toString());
-    }
-  }
+  // Future<ShipmentMatchingTripsResponse>
+  //     getShipmentMatchingTripsWithCheckAccessToken(
+  //         {required String accessToken, int? shipmentId}) async {
+  //   try {
+  //     if (await chechAccessTokenExpired()) {
+  //       return await getShipmentMatchingTrips(
+  //           accessToken: accessToken, shipmentId: shipmentId);
+  //     } else {
+  //       var newAccessToken = await refreshAccessToken();
+  //       return await getShipmentMatchingTrips(
+  //           accessToken: newAccessToken, shipmentId: shipmentId);
+  //     }
+  //   } on ServerErrorException catch (e) {
+  //     throw ServerErrorException(errorMessage: e.errorMessage);
+  //   } on Exception catch (e) {
+  //     throw ServerErrorException(errorMessage: e.toString());
+  //   }
+  // }
 
   Future<ShipmentMatchingTripsResponse> getShipmentMatchingTrips(
       {required String accessToken, required int shipmentId}) async {
@@ -964,8 +1012,8 @@ class ApiManager {
       {required String accessToken, int page = 1}) async {
     late Response response;
     try {
-      var url = Uri.https(
-          baseUrl, 'trips', {'page': page.toString(), 'take': 4.toString()});
+      var url = Uri.https(baseUrl, '$apiVersion/trip',
+          {'page': page.toString(), 'take': 4.toString()});
       response = await client
           .get(url, headers: {'authorization': 'Bearer $accessToken'});
       var getResponse = GetAllTripsResponse.fromJson(response.body);

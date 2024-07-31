@@ -8,11 +8,11 @@ class PhotoDto {
   PhotoDto({this.photo});
 
   factory PhotoDto.fromMap(Map<String, dynamic> data) => PhotoDto(
-        photo: data['photo'] as String?,
+        photo: data['url'] as String?,
       );
 
   Map<String, dynamic> toMap() => {
-        'photo': photo,
+        'url': photo,
       };
 
   /// `dart:convert`
