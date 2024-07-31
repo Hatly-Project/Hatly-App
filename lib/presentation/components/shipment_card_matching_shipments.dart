@@ -310,22 +310,22 @@ class _MatchingShipmentCardState extends State<MatchingShipmentCard> {
   void _showTripDealConfirmationBottomSheet(
       Function showSuccessDialog, Deal deal) {
     // Navigator.pop(context);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[100],
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => TripDealConfirmationBottomSheet(
-        deal: deal,
-        showSuccessDialog: showSuccessDialog,
-      ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-    );
+    // showModalBottomSheet(
+    //   context: context,
+    //   backgroundColor: Colors.grey[100],
+    //   isScrollControlled: true,
+    //   useSafeArea: true,
+    //   builder: (context) => TripDealConfirmationBottomSheet(
+    //     deal: deal,
+    //     showSuccessDialog: showSuccessDialog,
+    //   ),
+    //   shape: const RoundedRectangleBorder(
+    //     borderRadius: BorderRadius.only(
+    //       topLeft: Radius.circular(20),
+    //       topRight: Radius.circular(20),
+    //     ),
+    //   ),
+    // );
   }
 
   Image base64ToImage(String base64String) {

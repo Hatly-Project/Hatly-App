@@ -21,6 +21,7 @@ import 'package:hatly/presentation/components/countries_list.dart';
 import 'package:hatly/presentation/components/countries_list_bottom_sheet.dart';
 import 'package:hatly/presentation/components/custom_fields_for_search.dart';
 import 'package:hatly/presentation/components/custom_text_field.dart';
+import 'package:hatly/presentation/components/horizontal_shipment_card.dart';
 import 'package:hatly/presentation/components/shimmer_card.dart';
 import 'package:hatly/presentation/components/trip_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
@@ -47,7 +48,7 @@ class SearchResultScreen extends StatefulWidget {
 
 class _SearchResultScreenState extends State<SearchResultScreen>
     with TickerProviderStateMixin {
-  late TabController tabController;
+  // late TabController tabController;
   ScrollController scrollController = ScrollController();
   bool shipmentsIsEmpty = false;
   bool tripsIsEmpty = true;
@@ -70,7 +71,9 @@ class _SearchResultScreenState extends State<SearchResultScreen>
   int? totalShipmentsPage,
       currentShipmentsPage = 1,
       totalTripsPage,
-      currentTripsPage = 1;
+      totalTripsData,
+      currentTripsPage = 1,
+      totalShipmentsData;
   SearchResultScreenArguments? args;
   late HomeScreenViewModel viewModel;
   late AccessTokenProvider accessTokenProvider;
@@ -81,8 +84,14 @@ class _SearchResultScreenState extends State<SearchResultScreen>
   late AnimationController _controller;
   late Animation<Offset> _animation;
   List<CountriesStatesDto> filteredCountries = [];
-  String? fromCountry, fromCountryFlag, toCountryName, toCountryFlag;
+  String? fromCountry,
+      fromCountryFlag,
+      toCountryName,
+      toCountryFlag,
+      fromCountryIso,
+      toCountryIso;
   late List<StateDto> fromStatesList, toStatesList;
+  bool? isShipmentSearch, isTripSearch;
 
   @override
   void initState() {
@@ -90,7 +99,6 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     accessTokenProvider =
         Provider.of<AccessTokenProvider>(context, listen: false);
     viewModel = HomeScreenViewModel(accessTokenProvider);
-
 //     UserProvider userProvider =
 //         BlocProvider.of<UserProvider>(context, listen: false);
 
@@ -108,22 +116,16 @@ class _SearchResultScreenState extends State<SearchResultScreen>
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    tabController = TabController(length: 2, vsync: this);
-    if (selectedTab == 0) {
-      getShipments();
-    } else {
-      getTrips();
-    }
-    tabController.addListener(() {
-      setState(() {
-        selectedTab = tabController.index;
-      });
-    });
+    // if (_isShipmentsClicked) {
+    //   getShipments();
+    // } else {
+    //   getTrips();
+    // }
   }
 
   @override
   void dispose() {
-    tabController.dispose();
+    // tabController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -303,6 +305,26 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     fromCountryFlag = args!.fromCountryFlag;
     toCountryName = args!.toCountryName;
     toCountryFlag = args!.toCountryFlag;
+    fromCountryIso = args!.fromCountryIso;
+    toCountryIso = args!.toCountryIso;
+    totalShipmentsPage = args!.totalShipmentsPage;
+    currentShipmentsPage = args!.currentShipmentsPage;
+    isShipmentSearch = args!.isShipmentSearch;
+    isTripSearch = args!.isTripSearch;
+    totalShipmentsData = args!.totalData;
+    if (isShipmentSearch!) {
+      shipments = args!.shipments!;
+      setState(() {});
+    } else if (isTripSearch!) {
+      trips = args!.trips!;
+      _isTripsClicked = true;
+      isTripSearch = false;
+      setState(() {});
+    }
+    if (shipments.isNotEmpty || shipments.isEmpty) {
+      shimmerIsLoading = false;
+      setState(() {});
+    }
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {
@@ -320,10 +342,6 @@ class _SearchResultScreenState extends State<SearchResultScreen>
             //       alertContent: state.loadingMessage,
             //       context: context);
             // }
-          } else if (state is GetAllShipsPaginationLoadingState) {
-            isShipmentPaginationLoading = true;
-          } else if (state is GetAllTripsPaginationLoadingState) {
-            isTripPaginationLoading = true;
           } else if (state is GetAllShipsFailState) {
             print('status code ${state.statusCode}');
             if (Platform.isIOS) {
@@ -392,19 +410,11 @@ class _SearchResultScreenState extends State<SearchResultScreen>
             shimmerIsLoading = false;
             // DialogUtils.hideDialog(context);
           }
-          if (previous is GetAllShipsPaginationLoadingState) {
-            isShipmentPaginationLoading = false;
-          }
-          if (previous is GetAllTripsPaginationLoadingState) {
-            isTripPaginationLoading = false;
-          }
           if (current is GetAllShipsLoadingState ||
               current is GetAllShipsFailState ||
               current is GetAllTripsLoadingState ||
               current is RefreshTokenFailState ||
-              current is GetAllTripsFailState ||
-              current is GetAllShipsPaginationLoadingState ||
-              current is GetAllTripsPaginationLoadingState) {
+              current is GetAllTripsFailState) {
             print(current);
             return true;
           }
@@ -432,6 +442,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
             trips = state.tripsDto;
             currentTripsPage = state.currentPage;
             totalTripsPage = state.totalPages;
+            totalTripsData = state.totalData;
             if (trips.isEmpty) {
               tripsIsEmpty = true;
               print('trips empty');
@@ -1208,12 +1219,17 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                               child: FittedBox(
                                                 fit: BoxFit.scaleDown,
                                                 child: InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isShipmentsClicked =
-                                                          true;
-                                                      _isTripsClicked = false;
-                                                    });
+                                                  onTap: () async {
+                                                    _isShipmentsClicked = true;
+                                                    _isTripsClicked = false;
+                                                    await viewModel
+                                                        .getAllShipments(
+                                                      token: accessTokenProvider
+                                                          .accessToken,
+                                                      from: fromCountryIso,
+                                                      to: toCountryIso,
+                                                    );
+                                                    setState(() {});
                                                   },
                                                   child: Text(
                                                     'Shipments',
@@ -1247,12 +1263,15 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                               child: FittedBox(
                                                 fit: BoxFit.scaleDown,
                                                 child: InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _isTripsClicked = true;
-                                                      _isShipmentsClicked =
-                                                          false;
-                                                    });
+                                                  onTap: () async {
+                                                    _isTripsClicked = true;
+                                                    _isShipmentsClicked = false;
+
+                                                    await viewModel.getAlltrips(
+                                                        accessTokenProvider
+                                                            .accessToken!,
+                                                        isRefresh: true);
+                                                    setState(() {});
                                                   },
                                                   child: Text(
                                                     'Trips',
@@ -1337,19 +1356,46 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                       ),
                     ),
                   ),
-
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      width: 127,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          _isShipmentsClicked
+                              ? '$totalShipmentsData Shipment found'
+                              : '$totalTripsData Trip found',
+                          style: _isButtonEnabled
+                              ? Theme.of(context)
+                                  .textTheme
+                                  .displayMedium
+                                  ?.copyWith(
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600)
+                              : Theme.of(context).textTheme.displayMedium,
+                        ),
+                      ),
+                    ),
+                  ),
                   Expanded(
                     child: CustomScrollView(
                       slivers: [
                         CupertinoSliverRefreshControl(
                           onRefresh: () async {
-                            if (selectedTab == 0) {
+                            if (_isShipmentsClicked) {
                               final box = await Hive.openBox('shipments');
                               await box.clear();
                               await box.close();
                               if (accessTokenProvider.accessToken != null) {
-                                await viewModel.create(
-                                    accessTokenProvider.accessToken!,
+                                await viewModel.getAllShipments(
+                                    token: accessTokenProvider.accessToken!,
+                                    from: fromCountryIso,
+                                    to: toCountryIso,
                                     isRefresh: true);
                               }
                               setState(() {
@@ -1370,7 +1416,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                             }
                           },
                         ),
-                        selectedTab == 0
+                        _isShipmentsClicked
                             ? shimmerIsLoading
                                 ? SliverList(
                                     delegate: SliverChildBuilderDelegate(
@@ -1378,7 +1424,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                       childCount: 2,
                                     ),
                                   )
-                                : shipmentsIsEmpty
+                                : shipmentsIsEmpty || shipments.isEmpty
                                     ? SliverToBoxAdapter(
                                         child: Padding(
                                         padding: const EdgeInsets.all(15.0),
@@ -1415,7 +1461,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                       childCount: 2,
                                     ),
                                   )
-                                : tripsIsEmpty
+                                : tripsIsEmpty || trips.isEmpty
                                     ? SliverToBoxAdapter(
                                         child: Padding(
                                         padding: const EdgeInsets.all(15.0),
@@ -1524,14 +1570,21 @@ class _SearchResultScreenState extends State<SearchResultScreen>
         childCount: shipments.length + 1,
         (context, index) {
           if (index < shipments.length) {
-            return ShipmentCard(
-              shipmentDto: shipments[index],
-              showConfirmedBottomSheet: showSuccessDialog,
+            return Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: HorizontalShipmentCard(
+                shipmentDto: shipments[index],
+                countriesStatesDto: args!.countriesFlagsDto.countries,
+                showConfirmedBottomSheet: showSuccessDialog,
+              ),
             );
           } else {
             if (totalShipmentsPage! >= currentShipmentsPage!) {
               if (accessTokenProvider.accessToken != null) {
-                viewModel.create(accessTokenProvider.accessToken!,
+                viewModel.getAllShipments(
+                    token: accessTokenProvider.accessToken,
+                    from: fromCountryIso,
+                    to: toCountryIso,
                     isPagination: true);
               }
               return Row(
@@ -1688,8 +1741,8 @@ class _SearchResultScreenState extends State<SearchResultScreen>
       print('from init access token ${accessTokenProvider.accessToken}');
       print('from init refresh token ${accessTokenProvider.refreshToken}');
 
-      await viewModel.create(
-        accessTokenProvider.accessToken!,
+      await viewModel.getAllShipments(
+        token: accessTokenProvider.accessToken!,
       );
     }
 

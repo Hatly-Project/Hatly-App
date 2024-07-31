@@ -36,7 +36,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
 
   bool hasShipmentsReachedMax = false, hasTripsReachedMax = false;
   int shipmentsPage = 1, tripsPage = 1;
-  int? totalShipmentPages, totalTripsPages;
+  int? totalShipmentPages, totalTripsPages, totalShipmentsData, totalTripsData;
 
   HomeScreenViewModel(this.accessTokenProvider)
       : super(GetAllShipmentsInitialState()) {
@@ -49,8 +49,18 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
     getAllTripsUsecase = GetAllTripsUsecase(tripsRepository);
   }
 
-  Future<void> create(String token,
-      {bool isPagination = false, isRefresh = false}) async {
+  Future<void> getAllShipments({
+    required String? token,
+    bool isPagination = false,
+    isRefresh = false,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    String? toCity,
+    bool? latest,
+  }) async {
     if (!isPagination) {
       emit(GetAllShipsLoadingState('Loading...'));
     }
@@ -60,7 +70,16 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
         // emit(GetAllShipsPaginationLoadingState('Loading...'));
 
         var response = await getAllShipmentsUsecase.invoke(
-            token: token, page: shipmentsPage);
+          token: token!,
+          page: shipmentsPage,
+          beforeExpectedDate: beforeExpectedDate,
+          afterExpectedDate: beforeExpectedDate,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          latest: latest,
+        );
         totalShipmentPages = response.totalPages;
         print('total pages $totalShipmentPages');
 
@@ -73,7 +92,16 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
         if (isRefresh) {
           print('api refresh');
           shipmentsPage = 1;
-          var response = await getAllShipmentsUsecase.invoke(token: token);
+          var response = await getAllShipmentsUsecase.invoke(
+            token: token!,
+            beforeExpectedDate: beforeExpectedDate,
+            afterExpectedDate: beforeExpectedDate,
+            from: from,
+            fromCity: fromCity,
+            to: to,
+            toCity: toCity,
+            latest: latest,
+          );
           shipments = response.shipments!;
           totalShipmentPages = response.totalPages;
           print('total pages $totalShipmentPages');
@@ -81,10 +109,20 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
         } else {
           print('api normal');
           shipmentsPage = 1;
-          var response = await getAllShipmentsUsecase.invoke(token: token);
+          var response = await getAllShipmentsUsecase.invoke(
+            token: token!,
+            beforeExpectedDate: beforeExpectedDate,
+            afterExpectedDate: beforeExpectedDate,
+            from: from,
+            fromCity: fromCity,
+            to: to,
+            toCity: toCity,
+            latest: latest,
+          );
           shipments = response.shipments!;
           hasShipmentsReachedMax = response.shipments!.isEmpty;
           totalShipmentPages = response.totalPages;
+          totalShipmentsData = response.totalData;
         }
       }
 
@@ -98,6 +136,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
       emit(GetAllShipsSuccessState(
           shipmentDto: shipments,
           totalPages: totalShipmentPages!,
+          totalData: totalShipmentsData!,
           hasReachedMax: hasShipmentsReachedMax,
           currentPage: shipmentsPage));
     } on ServerErrorException catch (e) {
@@ -108,21 +147,125 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
     }
   }
 
-  Future<void> refreshAccessToken() async {
-    // emit(GetAllShipsLoadingState('Loading...'));
+  void clearState() {
+    emit(GetAllShipmentsInitialState());
+  }
+
+  Future<void> searchShipments({
+    required String? token,
+    bool isPagination = false,
+    isRefresh = false,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    String? toCity,
+    bool? latest,
+  }) async {
+    if (!isPagination) {
+      emit(SearchShipsLoadingState('Loading...'));
+    }
 
     try {
-      String newAccessToken = await apiManager.refreshAccessToken();
-      await const FlutterSecureStorage()
-          .write(key: 'accessToken', value: newAccessToken);
-      print('new tokennnnnnnnn $newAccessToken');
-      await create(newAccessToken);
+      if (isPagination) {
+        // emit(GetAllShipsPaginationLoadingState('Loading...'));
+
+        var response = await getAllShipmentsUsecase.invoke(
+          token: token!,
+          page: shipmentsPage,
+          beforeExpectedDate: beforeExpectedDate,
+          afterExpectedDate: beforeExpectedDate,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          latest: latest,
+        );
+        totalShipmentPages = response.totalPages;
+        print('total pages $totalShipmentPages');
+        totalShipmentsData = response.totalData;
+        print('pagination length ${shipments.length}');
+        hasShipmentsReachedMax = response.shipments!.isEmpty;
+        for (var shipment in response.shipments!) {
+          shipments.add(shipment);
+        }
+      } else {
+        if (isRefresh) {
+          print('api refresh');
+          shipmentsPage = 1;
+          var response = await getAllShipmentsUsecase.invoke(
+            token: token!,
+            beforeExpectedDate: beforeExpectedDate,
+            afterExpectedDate: beforeExpectedDate,
+            from: from,
+            fromCity: fromCity,
+            to: to,
+            toCity: toCity,
+            latest: latest,
+          );
+          shipments = response.shipments!;
+          totalShipmentPages = response.totalPages;
+          totalShipmentsData = response.totalData;
+
+          print('total pages $totalShipmentPages');
+          hasShipmentsReachedMax = response.shipments!.isEmpty;
+        } else {
+          print('api normal');
+          shipmentsPage = 1;
+          var response = await getAllShipmentsUsecase.invoke(
+            token: token!,
+            beforeExpectedDate: beforeExpectedDate,
+            afterExpectedDate: beforeExpectedDate,
+            from: from,
+            fromCity: fromCity,
+            to: to,
+            toCity: toCity,
+            latest: latest,
+          );
+          shipments = response.shipments!;
+          hasShipmentsReachedMax = response.shipments!.isEmpty;
+          totalShipmentPages = response.totalPages;
+          totalShipmentsData = response.totalData;
+        }
+      }
+
+      shipmentsPage++;
+      print('page $shipmentsPage');
+      // for (var shipment in response.shipments!) {
+      //   shipments.add(shipment);
+      // }
+
+      // createUserInDb(user);
+      emit(SearchShipsSuccessState(
+          shipmentDto: shipments,
+          totalPages: totalShipmentPages!,
+          hasReachedMax: hasShipmentsReachedMax,
+          totalData: totalShipmentsData!,
+          currentPage: shipmentsPage));
     } on ServerErrorException catch (e) {
-      emit(RefreshTokenFailState(e.errorMessage));
+      emit(SearchShipsFailState('${e.errorMessage} Please Login',
+          statusCode: e.statusCode));
     } on Exception catch (e) {
-      emit(RefreshTokenFailState(e.toString()));
+      emit(SearchShipsFailState(e.toString()));
     }
   }
+
+  // Future<void> refreshAccessToken() async {
+  //   // emit(GetAllShipsLoadingState('Loading...'));
+
+  //   try {
+  //     String newAccessToken = await apiManager.refreshAccessToken();
+  //     await const FlutterSecureStorage()
+  //         .write(key: 'accessToken', value: newAccessToken);
+  //     print('new tokennnnnnnnn $newAccessToken');
+  //     await getAllShipments(token: newAccessToken);
+  //   } on ServerErrorException catch (e) {
+  //     emit(RefreshTokenFailState(e.errorMessage));
+  //   } on Exception catch (e) {
+  //     emit(RefreshTokenFailState(e.toString()));
+  //   }
+  // }
 
   Future<void> getAlltrips(String token,
       {bool isPagination = false, isRefresh = false}) async {
@@ -138,6 +281,8 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
             await getAllTripsUsecase.invoke(token: token, page: tripsPage);
         totalTripsPages = response.totalPages;
         hasTripsReachedMax = response.trips!.isEmpty;
+        totalTripsData = response.totalData;
+
         for (var trip in response.trips!) {
           trips.add(trip);
         }
@@ -147,6 +292,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           var response = await getAllTripsUsecase.invoke(token: token);
           trips = response.trips!;
           totalTripsPages = response.totalPages;
+          totalTripsData = response.totalData;
 
           hasTripsReachedMax = response.trips!.isEmpty;
         } else {
@@ -155,6 +301,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           totalTripsPages = response.totalPages;
           tripsPage = 1;
           hasTripsReachedMax = response.trips!.isEmpty;
+          totalTripsData = response.totalData;
         }
       }
       tripsPage++;
@@ -168,6 +315,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           tripsDto: trips,
           hasReachedMax: hasTripsReachedMax,
           totalPages: totalTripsPages!,
+          totalData: totalTripsData!,
           currentPage: tripsPage));
     } on ServerErrorException catch (e) {
       emit(GetAllTripsFailState(
@@ -185,11 +333,12 @@ class GetAllShipmentsInitialState extends HomeViewState {}
 class GetAllShipsSuccessState extends HomeViewState {
   List<ShipmentDto> shipmentDto;
   bool hasReachedMax;
-  int currentPage, totalPages;
+  int currentPage, totalPages, totalData;
 
   GetAllShipsSuccessState(
       {required this.hasReachedMax,
       required this.totalPages,
+      required this.totalData,
       required this.shipmentDto,
       required this.currentPage});
 }
@@ -198,6 +347,31 @@ class GetAllShipsLoadingState extends HomeViewState {
   String loadingMessage;
 
   GetAllShipsLoadingState(this.loadingMessage);
+}
+
+class SearchShipsSuccessState extends HomeViewState {
+  List<ShipmentDto> shipmentDto;
+  bool hasReachedMax;
+  int currentPage, totalPages, totalData;
+
+  SearchShipsSuccessState(
+      {required this.hasReachedMax,
+      required this.totalPages,
+      required this.shipmentDto,
+      required this.totalData,
+      required this.currentPage});
+}
+
+class SearchShipsLoadingState extends HomeViewState {
+  String loadingMessage;
+
+  SearchShipsLoadingState(this.loadingMessage);
+}
+
+class SearchShipsFailState extends HomeViewState {
+  String failMessage;
+  int? statusCode;
+  SearchShipsFailState(this.failMessage, {this.statusCode});
 }
 
 class GetAllShipsPaginationLoadingState extends HomeViewState {
@@ -215,11 +389,12 @@ class GetAllShipsFailState extends HomeViewState {
 class GetAllTripsSuccessState extends HomeViewState {
   List<TripsDto> tripsDto;
   bool hasReachedMax;
-  int currentPage, totalPages;
+  int currentPage, totalPages, totalData;
 
   GetAllTripsSuccessState(
       {required this.currentPage,
       required this.totalPages,
+      required this.totalData,
       required this.hasReachedMax,
       required this.tripsDto});
 }

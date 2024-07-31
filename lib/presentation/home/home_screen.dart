@@ -26,10 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
           systemNavigationBarColor: Colors.white,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.dark),
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark),
     );
     return Scaffold(
         body: tabs[selectedIndex],

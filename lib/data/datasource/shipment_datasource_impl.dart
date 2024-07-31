@@ -47,10 +47,28 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
   }
 
   @override
-  Future<GetAllShipmentResponseDto> getAllShipments(
-      {required String token, int page = 1}) async {
+  Future<GetAllShipmentResponseDto> getAllShipments({
+    required String token,
+    int page = 1,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    String? toCity,
+    bool? latest,
+  }) async {
     var response = await apiManager.getAllShipmentsWithCheckAccessToken(
-        accessToken: token, page: page);
+      accessToken: token,
+      page: page,
+      beforeExpectedDate: beforeExpectedDate,
+      afterExpectedDate: afterExpectedDate,
+      from: from,
+      fromCity: fromCity,
+      to: to,
+      toCity: toCity,
+      latest: latest,
+    );
     return response.toGetAllShipmetnsDto();
   }
 
@@ -140,12 +158,12 @@ class ShipmentDataSourceImpl implements ShipmentDataSource {
     return response.toResponseDto();
   }
 
-  @override
-  Future<ShipmentMatchingTripsResponseDto> getShipmentMatchingTrips(
-      {required String token, required int shipmentId}) async {
-    var response =
-        await apiManager.getShipmentMatchingTripsWithCheckAccessToken(
-            accessToken: token, shipmentId: shipmentId);
-    return response.toDto();
-  }
+  // @override
+  // Future<ShipmentMatchingTripsResponseDto> getShipmentMatchingTrips(
+  //     {required String token, int? shipmentId}) async {
+  //   var response =
+  //       await apiManager.getShipmentMatchingTripsWithCheckAccessToken(
+  //           accessToken: token, shipmentId: shipmentId);
+  //   return response.toDto();
+  // }
 }

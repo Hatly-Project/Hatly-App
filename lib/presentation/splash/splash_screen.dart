@@ -95,19 +95,16 @@ class _SplashScreenState extends State<SplashScreen>
           systemNavigationBarColor: Theme.of(context).primaryColor,
           statusBarIconBrightness: Brightness.light),
     );
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        body: Center(
-          child: FadeTransition(
-            opacity: _animation,
-            child: Image.asset(
-              "images/splash_logo.png",
-              fit: BoxFit.cover,
-              width: 435,
-              height: 436,
-            ),
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
+      body: Center(
+        child: FadeTransition(
+          opacity: _animation,
+          child: Image.asset(
+            "images/splash_logo.png",
+            fit: BoxFit.cover,
+            width: 435,
+            height: 436,
           ),
         ),
       ),

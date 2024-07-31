@@ -44,9 +44,28 @@ class ShipmentRepositoryImpl implements ShipmentRepository {
   }
 
   @override
-  Future<GetAllShipmentResponseDto> getAllShipments(
-      {required String token, int page = 1}) {
-    return shipmentDataSource.getAllShipments(token: token, page: page);
+  Future<GetAllShipmentResponseDto> getAllShipments({
+    required String token,
+    int page = 1,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    String? toCity,
+    bool? latest,
+  }) {
+    return shipmentDataSource.getAllShipments(
+      token: token,
+      page: page,
+      beforeExpectedDate: beforeExpectedDate,
+      afterExpectedDate: afterExpectedDate,
+      from: from,
+      fromCity: fromCity,
+      to: to,
+      toCity: toCity,
+      latest: latest,
+    );
   }
 
   @override
@@ -113,10 +132,10 @@ class ShipmentRepositoryImpl implements ShipmentRepository {
     throw UnimplementedError();
   }
 
-  @override
-  Future<ShipmentMatchingTripsResponseDto> getShipmentMatchingTrips(
-      {required String token, required int shipmentId}) {
-    return shipmentDataSource.getShipmentMatchingTrips(
-        token: token, shipmentId: shipmentId);
-  }
+  // @override
+  // Future<ShipmentMatchingTripsResponseDto> getShipmentMatchingTrips(
+  //     {required String token,  int? shipmentId}) {
+  //   return shipmentDataSource.getShipmentMatchingTrips(
+  //       token: token, shipmentId: shipmentId);
+  // }
 }

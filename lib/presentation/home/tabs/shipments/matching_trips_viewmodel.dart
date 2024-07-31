@@ -34,21 +34,21 @@ class ShipmentMatchingTripsViewmodel
     _usecase = GetShipmentMatchingTripsUsecase(repository: _shipmentRepository);
   }
 
-  Future<void> getShipmentMatchingTrips(
-      {required int shipmentId, required String token}) async {
-    emit(GetShipmentMatchingTripsLoadingState('Loading...'));
+  // Future<void> getShipmentMatchingTrips(
+  //     {String? shipmentId, required String token}) async {
+  //   emit(GetShipmentMatchingTripsLoadingState('Loading...'));
 
-    try {
-      var response = await _usecase.getShipmentMatchingTrips(
-          token: token, shipmentId: shipmentId);
-      // createUserInDb(user);
-      emit(GetShipmentMatchingTripsSuccessState(response));
-    } on ServerErrorException catch (e) {
-      emit(GetShipmentMatchingTripsFailState(e.errorMessage));
-    } on Exception catch (e) {
-      emit(GetShipmentMatchingTripsFailState(e.toString()));
-    }
-  }
+  //   try {
+  //     var response = await _usecase.getShipmentMatchingTrips(
+  //         token: token, shipmentId: shipmentId!);
+  //     // createUserInDb(user);
+  //     emit(GetShipmentMatchingTripsSuccessState(response));
+  //   } on ServerErrorException catch (e) {
+  //     emit(GetShipmentMatchingTripsFailState(e.errorMessage));
+  //   } on Exception catch (e) {
+  //     emit(GetShipmentMatchingTripsFailState(e.toString()));
+  //   }
+  // }
 }
 
 abstract class GetShipmentMatchingTripsViewState {}

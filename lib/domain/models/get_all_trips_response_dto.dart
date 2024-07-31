@@ -4,8 +4,8 @@ class GetAllTripsResponseDto {
   bool? status;
   List<TripsDto>? trips;
   String? message;
-  int? totalPages;
+  int? totalPages, totalData;
 
   GetAllTripsResponseDto(
-      {this.status, this.trips, this.message, this.totalPages});
+      {this.status, this.trips, this.message, this.totalPages, this.totalData});
 }
