@@ -66,9 +66,9 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
     }
 
     if (accessTokenProvider.accessToken != null) {
-      viewModel.getMyshipmentDeals(
-          token: accessTokenProvider.accessToken!,
-          shipmentId: widget.shipmentDto.id!);
+      // viewModel.getMyshipmentDeals(
+      //     token: accessTokenProvider.accessToken!,
+      //     shipmentId: widget.shipmentDto.id!);
     }
 
     // getCachedMyShipmentsDeals().then((cachedDeals) async {
@@ -119,7 +119,7 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
 
   @override
   Widget build(BuildContext context) {
-    shipmentId = widget.shipmentDto.id!;
+    // shipmentId = widget.shipmentDto.id!;
     // getMyshipmentDeals(token: token, shipmentId: shipment.id!);
 
     return BlocConsumer(
@@ -191,9 +191,9 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
                         CupertinoSliverRefreshControl(
                           onRefresh: () async {
                             if (accessTokenProvider.accessToken != null) {
-                              await viewModel.getMyshipmentDeals(
-                                  token: accessTokenProvider.accessToken!,
-                                  shipmentId: widget.shipmentDto.id!);
+                              // await viewModel.getMyshipmentDeals(
+                              //     token: accessTokenProvider.accessToken!,
+                              //     shipmentId: widget.shipmentDto.id!);
                             }
 
                             setState(() {});
@@ -291,9 +291,9 @@ class _ShipmentDealsState extends State<MyShipmentDeals> {
                   RefreshIndicator(
                     onRefresh: () async {
                       if (accessTokenProvider.accessToken != null) {
-                        await viewModel.getMyshipmentDeals(
-                            token: accessTokenProvider.accessToken!,
-                            shipmentId: widget.shipmentDto.id!);
+                        // await viewModel.getMyshipmentDeals(
+                        //     token: accessTokenProvider.accessToken!,
+                        //     shipmentId: widget.shipmentDto.id!);
                       }
                       // cacheMyShipmentsDeals(deals);
                       setState(() {});

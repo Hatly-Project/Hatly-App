@@ -42,11 +42,11 @@ class _MatchingTripsState extends State<MatchingTripsScreen> {
   // late MyShipmentDealDetailsArgument args;
   bool isLoading = true;
   late AccessTokenProvider accessTokenProvider;
-  Future<void> getShipmentMatchingTrips(
-      {required String token, required int shipmentId}) async {
-    await viewModel.getShipmentMatchingTrips(
-        token: token, shipmentId: shipmentId);
-  }
+  // Future<void> getShipmentMatchingTrips(
+  //     {required String token, required int shipmentId}) async {
+  //   await viewModel.getShipmentMatchingTrips(
+  //       token: token, shipmentId: shipmentId);
+  // }
 
   @override
   void initState() {
@@ -62,11 +62,11 @@ class _MatchingTripsState extends State<MatchingTripsScreen> {
 // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
       loggedInState = userProvider.state as LoggedInState;
-      if (accessTokenProvider.accessToken != null) {
-        viewModel.getShipmentMatchingTrips(
-            token: accessTokenProvider.accessToken!,
-            shipmentId: widget.shipmentDto.id!);
-      }
+      // if (accessTokenProvider.accessToken != null) {
+      //   viewModel.getShipmentMatchingTrips(
+      //       token: accessTokenProvider.accessToken!,
+      //       shipmentId: widget.shipmentDto.id!);
+      // }
 
       // token = loggedInState.accessToken;
       // // Now you can use the 'token' variable as needed in your code.
@@ -127,7 +127,7 @@ class _MatchingTripsState extends State<MatchingTripsScreen> {
   Widget build(BuildContext context) {
     // args = ModalRoute.of(context)?.settings.arguments
     //     as MyShipmentDealDetailsArgument;
-    shipmentId = widget.shipmentDto.id!;
+    // shipmentId = widget.shipmentDto.id!;
     // getShipmentMatchingTrips(token: token, shipmentId: shipment.id!);
 
     return BlocConsumer(
@@ -199,9 +199,9 @@ class _MatchingTripsState extends State<MatchingTripsScreen> {
                         CupertinoSliverRefreshControl(
                           onRefresh: () async {
                             if (accessTokenProvider.accessToken != null) {
-                              await viewModel.getShipmentMatchingTrips(
-                                  token: accessTokenProvider.accessToken!,
-                                  shipmentId: widget.shipmentDto.id!);
+                              // await viewModel.getShipmentMatchingTrips(
+                              //     token: accessTokenProvider.accessToken!,
+                              //     shipmentId: widget.shipmentDto.id!);
                             }
 
                             setState(() {});
@@ -302,9 +302,9 @@ class _MatchingTripsState extends State<MatchingTripsScreen> {
                   RefreshIndicator(
                     onRefresh: () async {
                       if (accessTokenProvider.accessToken != null) {
-                        await viewModel.getShipmentMatchingTrips(
-                            token: accessTokenProvider.accessToken!,
-                            shipmentId: widget.shipmentDto.id!);
+                        // await viewModel.getShipmentMatchingTrips(
+                        //     token: accessTokenProvider.accessToken!,
+                        //     shipmentId: widget.shipmentDto.id!);
                       }
                       // cacheMyShipmentsDeals(trips);
                       setState(() {});

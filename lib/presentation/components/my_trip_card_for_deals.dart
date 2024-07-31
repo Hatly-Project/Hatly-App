@@ -189,22 +189,22 @@ class MyTripCardForDeals extends StatelessWidget {
   void _showTripDealConfirmationBottomSheet(
       BuildContext context, Deal deal, Function showSuccessDialog) {
     Navigator.pop(context);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[100],
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => TripDealConfirmationBottomSheet(
-        deal: deal,
-        showSuccessDialog: showSuccessDialog,
-      ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-    );
+    // showModalBottomSheet(
+    //   context: context,
+    //   backgroundColor: Colors.grey[100],
+    //   isScrollControlled: true,
+    //   useSafeArea: true,
+    //   builder: (context) => TripDealConfirmationBottomSheet(
+    //     deal: deal,
+    //     showSuccessDialog: showSuccessDialog,
+    //   ),
+    //   shape: const RoundedRectangleBorder(
+    //     borderRadius: BorderRadius.only(
+    //       topLeft: Radius.circular(20),
+    //       topRight: Radius.circular(20),
+    //     ),
+    //   ),
+    // );
   }
 
   Image base64ToUserImage(String base64String) {

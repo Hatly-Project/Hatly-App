@@ -7,6 +7,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/shipment.dart';
+import 'package:hatly/domain/models/country_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_details.dart';
@@ -14,21 +15,56 @@ import 'package:hatly/presentation/home/tabs/shipments/shipments_details_argumen
 import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 
-class ShipmentCard extends StatelessWidget {
+class HorizontalShipmentCard extends StatefulWidget {
   ShipmentDto? shipmentDto;
   Function? showConfirmedBottomSheet;
   final GlobalKey? shipmentCardKey;
-  ShipmentCard(
-      {this.shipmentDto, this.showConfirmedBottomSheet, this.shipmentCardKey});
+  List<CountriesStatesDto>? countriesStatesDto;
+  HorizontalShipmentCard(
+      {this.shipmentDto,
+      this.showConfirmedBottomSheet,
+      this.countriesStatesDto,
+      this.shipmentCardKey});
+
+  @override
+  State<HorizontalShipmentCard> createState() => _HorizontalShipmentCardState();
+}
+
+class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
+  late String fromCountryFlag, toCountryFlag, fromCountryName, toCountryName;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    fromCountryFlag = widget
+        .countriesStatesDto![widget.countriesStatesDto!
+            .indexWhere((country) => country.iso2 == widget.shipmentDto!.from)]
+        .flag!;
+
+    fromCountryName = widget
+        .countriesStatesDto![widget.countriesStatesDto!
+            .indexWhere((country) => country.iso2 == widget.shipmentDto!.from)]
+        .name!;
+
+    toCountryFlag = widget
+        .countriesStatesDto![widget.countriesStatesDto!
+            .indexWhere((country) => country.iso2 == widget.shipmentDto!.to)]
+        .flag!;
+    toCountryName = widget
+        .countriesStatesDto![widget.countriesStatesDto!
+            .indexWhere((country) => country.iso2 == widget.shipmentDto!.to)]
+        .name!;
+  }
 
   @override
   Widget build(BuildContext context) {
     // print('imgg ${shipmentDto.items!.first.photos!.first.photo}');
     return Padding(
-      padding: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.only(right: 10, left: 10),
       child: Container(
         // height: 100,
-        width: 320,
+        // width: 320,
         decoration: BoxDecoration(
           border: Border.all(
             color: const Color(0xFFEEEEEE),
@@ -64,7 +100,7 @@ class ShipmentCard extends StatelessWidget {
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              'Alaa Hosni',
+                              "${widget.shipmentDto!.user!.firstName!} ${widget.shipmentDto!.user!.lastName!}",
                               style: Theme.of(context)
                                   .textTheme
                                   .displayLarge
@@ -78,83 +114,6 @@ class ShipmentCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Container(
-                      margin: EdgeInsets.only(right: 10),
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 40,
-                            width: 1.5,
-                            color: Color(0xFFD6D6D6),
-                            margin: EdgeInsets.only(right: 13),
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: SizedBox(
-                                  width: 50,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      'Reward',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .displayMedium
-                                          ?.copyWith(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w300),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.only(right: 4),
-                                    width: 23,
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        '24',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displayLarge
-                                            ?.copyWith(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w400),
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 33,
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        'USD',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displayLarge
-                                            ?.copyWith(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w300),
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                    )
                   ],
                 ),
               ),
@@ -172,8 +131,8 @@ class ShipmentCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.asset(
-                      'images/product_image.png',
+                    Image.network(
+                      widget.shipmentDto!.items!.first.photos!.first.photo!,
                       fit: BoxFit.cover,
                       width: 50,
                       height: 50,
@@ -183,21 +142,19 @@ class ShipmentCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            width: 220,
-                            child: FittedBox(
-                              fit: BoxFit.fitWidth,
-                              child: Text(
-                                'GTS 4 Smart Watch, Dual-Band',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displayLarge
-                                    ?.copyWith(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w300),
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                          Container(
+                            width: 250,
+                            // height: 15,
+                            child: Text(
+                              'GTS 4 Smart Watch, Dual-Band GPS, Alexa Alexa Alexa Alexa',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayLarge
+                                  ?.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w300),
+                              textAlign: TextAlign.start,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Container(
@@ -215,7 +172,7 @@ class ShipmentCard extends StatelessWidget {
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      '15g',
+                                      '${widget.shipmentDto!.wight}g',
                                       style: Theme.of(context)
                                           .textTheme
                                           .displayMedium
@@ -244,7 +201,7 @@ class ShipmentCard extends StatelessWidget {
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(
-                                      'Before: 20 Jun',
+                                      'Before: ${formatDate(widget.shipmentDto!.expectedDate!.toIso8601String())}',
                                       style: Theme.of(context)
                                           .textTheme
                                           .displayMedium
@@ -277,7 +234,7 @@ class ShipmentCard extends StatelessWidget {
               Container(
                 margin: EdgeInsets.symmetric(vertical: 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,26 +260,31 @@ class ShipmentCard extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Row(
                             children: [
-                              Image.asset(
-                                'images/japan_flag.png',
-                                width: 18,
-                                height: 18,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.network(
+                                  fromCountryFlag,
+                                  width: 18,
+                                  height: 18,
+                                  fit: BoxFit.fill,
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 5.0),
                                 child: SizedBox(
-                                  width: 42,
+                                  width: 100,
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
                                     child: Text(
-                                      'Japan',
+                                      fromCountryName,
                                       style: Theme.of(context)
                                           .textTheme
                                           .displayLarge
                                           ?.copyWith(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
-                                      textAlign: TextAlign.center,
+                                      textAlign: TextAlign.start,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -362,10 +324,14 @@ class ShipmentCard extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Row(
                             children: [
-                              Image.asset(
-                                'images/egypt.png',
-                                width: 18,
-                                height: 18,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.network(
+                                  toCountryFlag,
+                                  width: 18,
+                                  height: 18,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 4.0),
@@ -373,15 +339,16 @@ class ShipmentCard extends StatelessWidget {
                                   width: 45,
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
                                     child: Text(
-                                      'Egypt',
+                                      toCountryName,
                                       style: Theme.of(context)
                                           .textTheme
                                           .displayLarge
                                           ?.copyWith(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
-                                      textAlign: TextAlign.center,
+                                      textAlign: TextAlign.start,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -392,6 +359,83 @@ class ShipmentCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    Container(
+                      // margin: EdgeInsets.only(right: 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 40,
+                            width: 1.5,
+                            color: Color(0xFFD6D6D6),
+                            margin: EdgeInsets.only(right: 10),
+                          ),
+                          Column(
+                            children: [
+                              Container(
+                                margin: EdgeInsets.only(bottom: 5),
+                                child: SizedBox(
+                                  width: 50,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Reward',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium
+                                          ?.copyWith(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w300),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 4),
+                                    width: 33,
+                                    child: FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text(
+                                        widget.shipmentDto!.reward.toString(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayLarge
+                                            ?.copyWith(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w400),
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 30,
+                                    child: FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text(
+                                        'USD',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayLarge
+                                            ?.copyWith(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w300),
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    )
                   ],
                 ),
               )
@@ -440,5 +484,13 @@ class ShipmentCard extends StatelessWidget {
       width: 50,
       height: 50,
     );
+  }
+
+  String formatDate(String initDate) {
+    DateTime date = DateTime.parse(initDate);
+    DateFormat formatter = DateFormat("dd MMM");
+    String formattedDate = formatter.format(date);
+    return formattedDate;
+    print(formattedDate); // Output: 30 Aug
   }
 }

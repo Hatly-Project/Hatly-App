@@ -37,21 +37,21 @@ class MyShipmentsScreenViewModel extends Cubit<ShipmentViewState> {
     _usecase = GetShipmentMatchingTripsUsecase(repository: shipmentRepository);
   }
 
-  Future<void> getShipmentMatchingTrips(
-      {required int shipmentId, required String token}) async {
-    emit(GetMyShipmentMatchingTripsLoadingState('Loading...'));
+  // Future<void> getShipmentMatchingTrips(
+  //     {required int shipmentId, required String token}) async {
+  //   emit(GetMyShipmentMatchingTripsLoadingState('Loading...'));
 
-    try {
-      var response = await _usecase.getShipmentMatchingTrips(
-          token: token, shipmentId: shipmentId);
-      // createUserInDb(user);
-      emit(GetMyShipmentMatchingTripsSuccessState(response));
-    } on ServerErrorException catch (e) {
-      emit(GetMyShipmentMatchingTripsFailState(e.errorMessage));
-    } on Exception catch (e) {
-      emit(GetMyShipmentMatchingTripsFailState(e.toString()));
-    }
-  }
+  //   try {
+  //     var response = await _usecase.getShipmentMatchingTrips(
+  //         token: token, shipmentId: shipmentId);
+  //     // createUserInDb(user);
+  //     emit(GetMyShipmentMatchingTripsSuccessState(response));
+  //   } on ServerErrorException catch (e) {
+  //     emit(GetMyShipmentMatchingTripsFailState(e.errorMessage));
+  //   } on Exception catch (e) {
+  //     emit(GetMyShipmentMatchingTripsFailState(e.toString()));
+  //   }
+  // }
 
   void create(
       {String? title,
