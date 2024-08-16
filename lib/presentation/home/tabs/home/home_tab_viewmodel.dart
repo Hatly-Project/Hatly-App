@@ -38,8 +38,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
   int shipmentsPage = 1, tripsPage = 1;
   int? totalShipmentPages, totalTripsPages, totalShipmentsData, totalTripsData;
 
-  HomeScreenViewModel(this.accessTokenProvider)
-      : super(GetAllShipmentsInitialState()) {
+  HomeScreenViewModel(this.accessTokenProvider) : super(GetAllInitialState()) {
     apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     shipmentDataSource = ShipmentDataSourceImpl(apiManager);
     shipmentRepository = ShipmentRepositoryImpl(shipmentDataSource);
@@ -73,7 +72,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           token: token!,
           page: shipmentsPage,
           beforeExpectedDate: beforeExpectedDate,
-          afterExpectedDate: beforeExpectedDate,
+          afterExpectedDate: afterExpectedDate,
           from: from,
           fromCity: fromCity,
           to: to,
@@ -85,6 +84,8 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
 
         print('pagination length ${shipments.length}');
         hasShipmentsReachedMax = response.shipments!.isEmpty;
+        totalShipmentsData = response.totalData;
+
         for (var shipment in response.shipments!) {
           shipments.add(shipment);
         }
@@ -95,7 +96,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           var response = await getAllShipmentsUsecase.invoke(
             token: token!,
             beforeExpectedDate: beforeExpectedDate,
-            afterExpectedDate: beforeExpectedDate,
+            afterExpectedDate: afterExpectedDate,
             from: from,
             fromCity: fromCity,
             to: to,
@@ -106,13 +107,14 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           totalShipmentPages = response.totalPages;
           print('total pages $totalShipmentPages');
           hasShipmentsReachedMax = response.shipments!.isEmpty;
+          totalShipmentsData = response.totalData;
         } else {
           print('api normal');
           shipmentsPage = 1;
           var response = await getAllShipmentsUsecase.invoke(
             token: token!,
             beforeExpectedDate: beforeExpectedDate,
-            afterExpectedDate: beforeExpectedDate,
+            afterExpectedDate: afterExpectedDate,
             from: from,
             fromCity: fromCity,
             to: to,
@@ -148,7 +150,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
   }
 
   void clearState() {
-    emit(GetAllShipmentsInitialState());
+    emit(GetAllInitialState());
   }
 
   Future<void> searchShipments({
@@ -175,7 +177,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           token: token!,
           page: shipmentsPage,
           beforeExpectedDate: beforeExpectedDate,
-          afterExpectedDate: beforeExpectedDate,
+          afterExpectedDate: afterExpectedDate,
           from: from,
           fromCity: fromCity,
           to: to,
@@ -197,7 +199,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           var response = await getAllShipmentsUsecase.invoke(
             token: token!,
             beforeExpectedDate: beforeExpectedDate,
-            afterExpectedDate: beforeExpectedDate,
+            afterExpectedDate: afterExpectedDate,
             from: from,
             fromCity: fromCity,
             to: to,
@@ -216,7 +218,7 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
           var response = await getAllShipmentsUsecase.invoke(
             token: token!,
             beforeExpectedDate: beforeExpectedDate,
-            afterExpectedDate: beforeExpectedDate,
+            afterExpectedDate: afterExpectedDate,
             from: from,
             fromCity: fromCity,
             to: to,
@@ -267,8 +269,18 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
   //   }
   // }
 
-  Future<void> getAlltrips(String token,
-      {bool isPagination = false, isRefresh = false}) async {
+  Future<void> getAlltrips({
+    required String token,
+    bool isPagination = false,
+    isRefresh = false,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    bool? latest,
+    String? toCity,
+  }) async {
     if (!isPagination) {
       emit(GetAllTripsLoadingState('Loading...'));
     }
@@ -277,8 +289,17 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
       if (isPagination) {
         print('page pagination $tripsPage');
         // emit(GetAllTripsPaginationLoadingState('Loading...'));
-        var response =
-            await getAllTripsUsecase.invoke(token: token, page: tripsPage);
+        var response = await getAllTripsUsecase.invoke(
+          token: token,
+          page: tripsPage,
+          beforeExpectedDate: beforeExpectedDate,
+          afterExpectedDate: afterExpectedDate,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          latest: latest,
+        );
         totalTripsPages = response.totalPages;
         hasTripsReachedMax = response.trips!.isEmpty;
         totalTripsData = response.totalData;
@@ -289,14 +310,32 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
       } else {
         if (isRefresh) {
           tripsPage = 1;
-          var response = await getAllTripsUsecase.invoke(token: token);
+          var response = await getAllTripsUsecase.invoke(
+            token: token,
+            beforeExpectedDate: beforeExpectedDate,
+            afterExpectedDate: afterExpectedDate,
+            from: from,
+            fromCity: fromCity,
+            to: to,
+            toCity: toCity,
+            latest: latest,
+          );
           trips = response.trips!;
           totalTripsPages = response.totalPages;
           totalTripsData = response.totalData;
 
           hasTripsReachedMax = response.trips!.isEmpty;
         } else {
-          var response = await getAllTripsUsecase.invoke(token: token);
+          var response = await getAllTripsUsecase.invoke(
+            token: token,
+            beforeExpectedDate: beforeExpectedDate,
+            afterExpectedDate: afterExpectedDate,
+            from: from,
+            fromCity: fromCity,
+            to: to,
+            toCity: toCity,
+            latest: latest,
+          );
           trips = response.trips!;
           totalTripsPages = response.totalPages;
           tripsPage = 1;
@@ -324,11 +363,106 @@ class HomeScreenViewModel extends Cubit<HomeViewState> {
       emit(GetAllTripsFailState(failMessage: e.toString()));
     }
   }
+
+  Future<void> searchTrips({
+    required String token,
+    bool isPagination = false,
+    isRefresh = false,
+    String? beforeExpectedDate,
+    String? afterExpectedDate,
+    String? from,
+    String? fromCity,
+    String? to,
+    bool? latest,
+    String? toCity,
+  }) async {
+    if (!isPagination) {
+      emit(SearchTripsLoadingState('Loading...'));
+    }
+
+    try {
+      if (isPagination) {
+        print('page pagination $tripsPage');
+        // emit(GetAllTripsPaginationLoadingState('Loading...'));
+        var response = await getAllTripsUsecase.invoke(
+          token: token,
+          page: tripsPage,
+          beforeExpectedDate: beforeExpectedDate,
+          afterExpectedDate: afterExpectedDate,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          latest: latest,
+        );
+        totalTripsPages = response.totalPages;
+        hasTripsReachedMax = response.trips!.isEmpty;
+        totalTripsData = response.totalData;
+
+        for (var trip in response.trips!) {
+          trips.add(trip);
+        }
+      } else {
+        if (isRefresh) {
+          tripsPage = 1;
+          var response = await getAllTripsUsecase.invoke(
+            token: token,
+            beforeExpectedDate: beforeExpectedDate,
+            afterExpectedDate: afterExpectedDate,
+            from: from,
+            fromCity: fromCity,
+            to: to,
+            toCity: toCity,
+            latest: latest,
+          );
+          trips = response.trips!;
+          totalTripsPages = response.totalPages;
+          totalTripsData = response.totalData;
+
+          hasTripsReachedMax = response.trips!.isEmpty;
+        } else {
+          var response = await getAllTripsUsecase.invoke(
+            token: token,
+            beforeExpectedDate: beforeExpectedDate,
+            afterExpectedDate: afterExpectedDate,
+            from: from,
+            fromCity: fromCity,
+            to: to,
+            toCity: toCity,
+            latest: latest,
+          );
+          trips = response.trips!;
+          totalTripsPages = response.totalPages;
+          tripsPage = 1;
+          hasTripsReachedMax = response.trips!.isEmpty;
+          totalTripsData = response.totalData;
+        }
+      }
+      tripsPage++;
+      print('page $tripsPage');
+      // for (var shipment in response.shipments!) {
+      //   shipments.add(shipment);
+      // }
+
+      // createUserInDb(user);
+      emit(SearchTripsSuccessState(
+          tripsDto: trips,
+          hasReachedMax: hasTripsReachedMax,
+          totalPages: totalTripsPages!,
+          totalData: totalTripsData!,
+          currentPage: tripsPage));
+    } on ServerErrorException catch (e) {
+      emit(SearchTripsFailState(
+          failMessage: e.errorMessage, statusCode: e.statusCode));
+    } on Exception catch (e) {
+      emit(SearchTripsFailState(failMessage: e.toString()));
+    }
+  }
 }
 
 abstract class HomeViewState {}
 
-class GetAllShipmentsInitialState extends HomeViewState {}
+class GetAllInitialState extends HomeViewState {}
 
 class GetAllShipsSuccessState extends HomeViewState {
   List<ShipmentDto> shipmentDto;
@@ -374,10 +508,29 @@ class SearchShipsFailState extends HomeViewState {
   SearchShipsFailState(this.failMessage, {this.statusCode});
 }
 
-class GetAllShipsPaginationLoadingState extends HomeViewState {
+class SearchTripsSuccessState extends HomeViewState {
+  List<TripsDto> tripsDto;
+  bool hasReachedMax;
+  int currentPage, totalPages, totalData;
+
+  SearchTripsSuccessState(
+      {required this.hasReachedMax,
+      required this.totalPages,
+      required this.tripsDto,
+      required this.totalData,
+      required this.currentPage});
+}
+
+class SearchTripsLoadingState extends HomeViewState {
   String loadingMessage;
 
-  GetAllShipsPaginationLoadingState(this.loadingMessage);
+  SearchTripsLoadingState(this.loadingMessage);
+}
+
+class SearchTripsFailState extends HomeViewState {
+  String? failMessage;
+  int? statusCode;
+  SearchTripsFailState({this.failMessage, this.statusCode});
 }
 
 class GetAllShipsFailState extends HomeViewState {
@@ -403,12 +556,6 @@ class GetAllTripsLoadingState extends HomeViewState {
   String loadingMessage;
 
   GetAllTripsLoadingState(this.loadingMessage);
-}
-
-class GetAllTripsPaginationLoadingState extends HomeViewState {
-  String loadingMessage;
-
-  GetAllTripsPaginationLoadingState(this.loadingMessage);
 }
 
 class GetAllTripsFailState extends HomeViewState {

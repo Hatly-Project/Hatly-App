@@ -36,26 +36,26 @@ class _CountriesListState extends State<CountriesList> {
     if (query.isNotEmpty) {
       if (widget.selectCurrency != null) {
         widget.countries.countries?.forEach((country) {
-          if (country.currency!.toLowerCase().contains(query.toLowerCase())) {
+          if (country.currency!.toLowerCase().startsWith(query.toLowerCase())) {
             filteredCountries.add(country);
           }
         });
       } else if (widget.selectFromCountry != null ||
           widget.selectToCountry != null) {
         widget.countries.countries?.forEach((country) {
-          if (country.name!.toLowerCase().contains(query.toLowerCase())) {
+          if (country.name!.toLowerCase().startsWith(query.toLowerCase())) {
             filteredCountries.add(country);
           }
         });
       } else if (widget.selectCountry != null) {
         widget.countries.countries?.forEach((country) {
-          if (country.iso2!.toLowerCase().contains(query.toLowerCase())) {
+          if (country.iso2!.toLowerCase().startsWith(query.toLowerCase())) {
             filteredCountries.add(country);
           }
         });
       } else if (widget.selectCode != null) {
         widget.countries.countries?.forEach((country) {
-          if (country.name!.toLowerCase().contains(query.toLowerCase())) {
+          if (country.name!.toLowerCase().startsWith(query.toLowerCase())) {
             filteredCountries.add(country);
           }
         });

@@ -21,9 +21,26 @@ class TripsDatasourceImpl implements TripsDatasource {
 
   @override
   Future<GetAllTripsResponseDto> getAllTrips(
-      {required String token, int page = 1}) async {
+      {required String token,
+      String? beforeExpectedDate,
+      String? afterExpectedDate,
+      String? from,
+      String? fromCity,
+      String? to,
+      String? toCity,
+      bool? latest,
+      int page = 1}) async {
     var response = await apiManager.getAllTripsWithCheckAccessToken(
-        accessToken: token, page: page);
+      accessToken: token,
+      page: page,
+      beforeExpectedDate: beforeExpectedDate,
+      afterExpectedDate: afterExpectedDate,
+      from: from,
+      fromCity: fromCity,
+      to: to,
+      toCity: toCity,
+      latest: latest,
+    );
 
     return response.toTripsResponseDto();
   }

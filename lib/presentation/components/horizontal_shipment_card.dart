@@ -78,41 +78,35 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
               Container(
                 margin: EdgeInsets.only(bottom: 15),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(top: 5),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
-                            child: Image.asset(
-                              'images/me.jpg',
-                              fit: BoxFit.cover,
-                              width: 35,
-                              height: 35,
-                            ),
-                          ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: Image.asset(
+                          'images/me.jpg',
+                          fit: BoxFit.cover,
+                          width: 35,
+                          height: 35,
                         ),
-                        Container(
-                          margin: EdgeInsets.only(left: 5),
-                          width: 77,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              "${widget.shipmentDto!.user!.firstName!} ${widget.shipmentDto!.user!.lastName!}",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .displayLarge
-                                  ?.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 5),
+                      width: 77,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "${widget.shipmentDto!.user!.firstName!} ${widget.shipmentDto!.user!.lastName!}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayLarge
+                              ?.copyWith(
+                                  fontSize: 15, fontWeight: FontWeight.w300),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -129,11 +123,11 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
               Container(
                 margin: EdgeInsets.symmetric(vertical: 15),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.network(
                       widget.shipmentDto!.items!.first.photos!.first.photo!,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fitHeight,
                       width: 50,
                       height: 50,
                     ),
@@ -141,12 +135,14 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
-                            width: 250,
+                            width: 270,
                             // height: 15,
                             child: Text(
-                              'GTS 4 Smart Watch, Dual-Band GPS, Alexa Alexa Alexa Alexa',
+                              widget.shipmentDto!.title!,
                               style: Theme.of(context)
                                   .textTheme
                                   .displayLarge
@@ -158,7 +154,8 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: 13),
+                            margin: EdgeInsets.only(top: 10),
+                            // margin: EdgeInsets.symmetric(vertical: 6),
                             child: Row(
                               children: [
                                 Image.asset(

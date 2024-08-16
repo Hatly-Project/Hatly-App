@@ -20,8 +20,25 @@ class TripsRepositoryImpl implements TripsRepository {
 
   @override
   Future<GetAllTripsResponseDto> getAllTrips(
-      {required String token, int page = 1}) {
-    return tripsDatasource.getAllTrips(token: token, page: page);
+      {required String token,
+      String? beforeExpectedDate,
+      String? afterExpectedDate,
+      String? from,
+      String? fromCity,
+      String? to,
+      String? toCity,
+      bool? latest,
+      int page = 1}) {
+    return tripsDatasource.getAllTrips(
+        token: token,
+        page: page,
+        beforeExpectedDate: beforeExpectedDate,
+        afterExpectedDate: afterExpectedDate,
+        from: from,
+        fromCity: fromCity,
+        to: to,
+        latest: latest,
+        toCity: toCity);
   }
 
   @override

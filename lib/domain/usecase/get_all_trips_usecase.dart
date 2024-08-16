@@ -6,7 +6,24 @@ class GetAllTripsUsecase {
 
   GetAllTripsUsecase(this.tripsRepository);
 
-  Future<GetAllTripsResponseDto> invoke({required String token, int page = 1}) {
-    return tripsRepository.getAllTrips(token: token, page: page);
+  Future<GetAllTripsResponseDto> invoke(
+      {required String token,
+      String? beforeExpectedDate,
+      String? afterExpectedDate,
+      String? from,
+      String? fromCity,
+      String? to,
+      String? toCity,
+      bool? latest,
+      int page = 1}) {
+    return tripsRepository.getAllTrips(
+        token: token,
+        page: page,
+        beforeExpectedDate: beforeExpectedDate,
+        afterExpectedDate: afterExpectedDate,
+        from: from,
+        fromCity: fromCity,
+        to: to,
+        toCity: toCity);
   }
 }
