@@ -993,13 +993,41 @@ class ApiManager {
   }
 
   Future<GetAllTripsResponse> getAllTripsWithCheckAccessToken(
-      {required String accessToken, int page = 1}) async {
+      {required String accessToken,
+      String? beforeExpectedDate,
+      String? afterExpectedDate,
+      String? from,
+      String? fromCity,
+      String? to,
+      bool? latest,
+      String? toCity,
+      int page = 1}) async {
     try {
       if (await chechAccessTokenExpired()) {
-        return await getAllTrips(accessToken: accessToken, page: page);
+        return await getAllTrips(
+          accessToken: accessToken,
+          page: page,
+          beforeExpectedDate: beforeExpectedDate,
+          afterExpectedDate: afterExpectedDate,
+          from: from,
+          fromCity: fromCity,
+          latest: latest,
+          to: to,
+          toCity: toCity,
+        );
       } else {
         var newAccessToken = await refreshAccessToken();
-        return await getAllTrips(accessToken: newAccessToken, page: page);
+        return await getAllTrips(
+          accessToken: newAccessToken,
+          page: page,
+          beforeExpectedDate: beforeExpectedDate,
+          afterExpectedDate: afterExpectedDate,
+          from: from,
+          fromCity: fromCity,
+          to: to,
+          toCity: toCity,
+          latest: latest,
+        );
       }
     } on ServerErrorException catch (e) {
       throw ServerErrorException(errorMessage: e.errorMessage);
@@ -1009,11 +1037,29 @@ class ApiManager {
   }
 
   Future<GetAllTripsResponse> getAllTrips(
-      {required String accessToken, int page = 1}) async {
+      {required String accessToken,
+      String? beforeExpectedDate,
+      String? afterExpectedDate,
+      String? from,
+      String? fromCity,
+      String? to,
+      String? toCity,
+      bool? latest,
+      int page = 1}) async {
     late Response response;
     try {
-      var url = Uri.https(baseUrl, '$apiVersion/trip',
-          {'page': page.toString(), 'take': 4.toString()});
+      var url = Uri.https(baseUrl, '$apiVersion/trip', {
+        'page': page.toString(),
+        'take': 4.toString(),
+        if (beforeExpectedDate != null)
+          'beforeExpectedDate': beforeExpectedDate,
+        if (afterExpectedDate != null) 'afterExpectedDate': afterExpectedDate,
+        if (from != null) 'from': from,
+        if (fromCity != null) 'fromCity': fromCity,
+        if (to != null) 'to': to,
+        if (toCity != null) 'toCity': toCity,
+        if (latest != null) 'latest': latest,
+      });
       response = await client
           .get(url, headers: {'authorization': 'Bearer $accessToken'});
       var getResponse = GetAllTripsResponse.fromJson(response.body);

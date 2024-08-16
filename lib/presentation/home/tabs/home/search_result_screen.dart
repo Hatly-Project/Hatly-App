@@ -22,6 +22,7 @@ import 'package:hatly/presentation/components/countries_list_bottom_sheet.dart';
 import 'package:hatly/presentation/components/custom_fields_for_search.dart';
 import 'package:hatly/presentation/components/custom_text_field.dart';
 import 'package:hatly/presentation/components/horizontal_shipment_card.dart';
+import 'package:hatly/presentation/components/horizontal_trip_card.dart';
 import 'package:hatly/presentation/components/shimmer_card.dart';
 import 'package:hatly/presentation/components/trip_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
@@ -31,6 +32,7 @@ import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_b
 import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/shipment_dto.dart';
@@ -71,9 +73,10 @@ class _SearchResultScreenState extends State<SearchResultScreen>
   int? totalShipmentsPage,
       currentShipmentsPage = 1,
       totalTripsPage,
-      totalTripsData,
+      totalTripsData = 0,
       currentTripsPage = 1,
-      totalShipmentsData;
+      totalShipmentsDataArgument = 0,
+      totalShipmentData;
   SearchResultScreenArguments? args;
   late HomeScreenViewModel viewModel;
   late AccessTokenProvider accessTokenProvider;
@@ -84,12 +87,25 @@ class _SearchResultScreenState extends State<SearchResultScreen>
   late AnimationController _controller;
   late Animation<Offset> _animation;
   List<CountriesStatesDto> filteredCountries = [];
-  String? fromCountry,
+  String? fromCountryArgument,
+      fromCountryFlagArgument,
       fromCountryFlag,
+      toCountryNameArgument,
       toCountryName,
+      toCountryFlagArgument,
       toCountryFlag,
+      fromCountryIsoArgument,
+      fromCountry,
+      toCountryIsoArgument,
       fromCountryIso,
-      toCountryIso;
+      toCountryIso,
+      date;
+  bool _isInitialized = false;
+  List<CountriesStatesDto>? countries;
+
+  late TextEditingController dateController = TextEditingController();
+  late TextEditingController weightController = TextEditingController();
+
   late List<StateDto> fromStatesList, toStatesList;
   bool? isShipmentSearch, isTripSearch;
 
@@ -121,6 +137,33 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     // } else {
     //   getTrips();
     // }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      final args = ModalRoute.of(context)!.settings.arguments
+          as SearchResultScreenArguments;
+      fromCountryArgument = args.fromCountry;
+      fromCountryFlagArgument = args.fromCountryFlag;
+      toCountryNameArgument = args.toCountryName;
+      toCountryFlagArgument = args.toCountryFlag;
+      fromCountryIsoArgument = args.fromCountryIso;
+      toCountryIsoArgument = args.toCountryIso;
+      totalShipmentsPage = args.totalShipmentsPage;
+      currentShipmentsPage = args.currentShipmentsPage;
+      isShipmentSearch = args.isShipmentSearch;
+      isTripSearch = args.isTripSearch;
+      trips = args.trips ?? [];
+      countries = args.countriesFlagsDto.countries;
+      shipments = args.shipments ?? [];
+      totalShipmentsDataArgument = args.totalData;
+      print('dataa $totalShipmentsDataArgument');
+      _isTripsClicked = isTripSearch!;
+      _isShipmentsClicked = isShipmentSearch!;
+      _isInitialized = true; // Ensure initialization happens only once
+    }
   }
 
   @override
@@ -249,22 +292,30 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     var index = args!.countriesFlagsDto.countries
         ?.indexWhere((country) => country.name == selectedCountry);
     var countryStates = args!.countriesFlagsDto.countries![index!].states;
+    fromCountryIso = args!.countriesFlagsDto.countries![index].iso2;
 
     setState(() {
+      fromCountryArgument = selectedCountry;
       fromCountry = selectedCountry;
+      print(fromCountry);
       // fromCityValue = '';
-      fromCountryFlag = args!
+
+      fromCountryFlagArgument = args!
           .countriesFlagsDto
           .countries![args!.countriesFlagsDto.countries!
-              .indexWhere((country) => country.name == fromCountry)]
+              .indexWhere((country) => country.name == fromCountryArgument)]
           .flag;
+      fromCountryFlag = fromCountryFlagArgument;
       fromStatesList = countryStates!;
-      if (fromCountry != null && toCountryName != null) {
+      if (fromCountry != null ||
+          toCountryName != null ||
+          dateController.text.isNotEmpty ||
+          weightController.text.isNotEmpty) {
         _isButtonEnabled = true;
         print('enabled');
       }
     });
-    print('from $fromCountry');
+    print('from $fromCountryArgument');
   }
 
   void selectDestinationCountry(String selectedCountry) {
@@ -272,22 +323,44 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     var index = args!.countriesFlagsDto.countries
         ?.indexWhere((country) => country.name == selectedCountry);
     var countryStates = args!.countriesFlagsDto.countries![index!].states;
+    toCountryIso = args!.countriesFlagsDto.countries![index].iso2;
 
     setState(() {
+      toCountryNameArgument = selectedCountry;
       toCountryName = selectedCountry;
       // fromCityValue = '';
-      toCountryFlag = args!
+      toCountryFlagArgument = args!
           .countriesFlagsDto
           .countries![args!.countriesFlagsDto.countries!
-              .indexWhere((country) => country.name == toCountryName)]
+              .indexWhere((country) => country.name == toCountryNameArgument)]
           .flag;
+      toCountryFlag = toCountryFlagArgument;
       toStatesList = countryStates!;
-      if (fromCountry != null && toCountryName != null) {
+      if (fromCountry != null ||
+          toCountryName != null ||
+          dateController.text.isNotEmpty ||
+          weightController.text.isNotEmpty) {
         _isButtonEnabled = true;
         print('enabled');
       }
     });
-    print('to $toCountryName');
+    print('to $toCountryNameArgument');
+  }
+
+  bool checkIsButtonEnabled() {
+    print('checl');
+    if (fromCountryArgument != null ||
+        toCountryNameArgument != null ||
+        dateController.text.isNotEmpty ||
+        weightController.text.isNotEmpty) {
+      setState(() {
+        _isButtonEnabled = true;
+      });
+      print('trueeeeeeee');
+      return _isButtonEnabled;
+    }
+
+    return _isButtonEnabled;
   }
 
   @override
@@ -299,28 +372,9 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     //       statusBarIconBrightness: Brightness.dark),
     // );
     UserProvider userProvider = BlocProvider.of<UserProvider>(context);
-    args = ModalRoute.of(context)!.settings.arguments
-        as SearchResultScreenArguments;
-    fromCountry = args!.fromCountry;
-    fromCountryFlag = args!.fromCountryFlag;
-    toCountryName = args!.toCountryName;
-    toCountryFlag = args!.toCountryFlag;
-    fromCountryIso = args!.fromCountryIso;
-    toCountryIso = args!.toCountryIso;
-    totalShipmentsPage = args!.totalShipmentsPage;
-    currentShipmentsPage = args!.currentShipmentsPage;
-    isShipmentSearch = args!.isShipmentSearch;
-    isTripSearch = args!.isTripSearch;
-    totalShipmentsData = args!.totalData;
-    if (isShipmentSearch!) {
-      shipments = args!.shipments!;
-      setState(() {});
-    } else if (isTripSearch!) {
-      trips = args!.trips!;
-      _isTripsClicked = true;
-      isTripSearch = false;
-      setState(() {});
-    }
+
+    // _isButtonEnabled =
+    //     fromCountryArgument != null && toCountryNameArgument != null;
     if (shipments.isNotEmpty || shipments.isEmpty) {
       shimmerIsLoading = false;
       setState(() {});
@@ -426,6 +480,8 @@ class _SearchResultScreenState extends State<SearchResultScreen>
             shipments = state.shipmentDto;
             currentShipmentsPage = state.currentPage;
             totalShipmentsPage = state.totalPages;
+            totalShipmentData = state.totalData;
+            print('total data $totalShipmentData');
             print('ship length ${shipments.length}');
             if (shipments.isEmpty) {
               shipmentsIsEmpty = true;
@@ -595,7 +651,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                     )),
                                               ),
                                             )
-                                          : fromCountry == null
+                                          : fromCountryArgument == null
                                               ? Expanded(
                                                   flex: 1,
                                                   key: shipmentFromKey,
@@ -746,7 +802,10 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                                             25),
                                                                     child: Image
                                                                         .network(
-                                                                      fromCountryFlag!,
+                                                                      fromCountryFlag !=
+                                                                              null
+                                                                          ? fromCountryFlag!
+                                                                          : fromCountryFlagArgument!,
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       width: 20,
@@ -763,7 +822,10 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                                     width: 100,
                                                                     height: 20,
                                                                     child: Text(
-                                                                      fromCountry!,
+                                                                      fromCountry !=
+                                                                              null
+                                                                          ? fromCountry!
+                                                                          : fromCountryArgument!,
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis,
@@ -905,7 +967,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                     )),
                                               ),
                                             )
-                                          : toCountryName == null
+                                          : toCountryNameArgument == null
                                               ? Expanded(
                                                   flex: 1,
                                                   key: receivingInKey,
@@ -924,14 +986,17 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                         onTap: () {
                                                           _isReceivingInClicked =
                                                               !_isReceivingInClicked;
-                                                          setState(() {});
-                                                          if (_overlayEntry !=
-                                                              null) {
-                                                            _overlayEntry
-                                                                ?.remove();
-                                                            _overlayEntry =
-                                                                null;
-                                                          }
+                                                          setState(() {
+                                                            if (_overlayEntry !=
+                                                                null) {
+                                                              _overlayEntry
+                                                                  ?.remove();
+                                                              _overlayEntry =
+                                                                  null;
+                                                              _isShipmentFromClicked =
+                                                                  false;
+                                                            }
+                                                          });
                                                           // _overlayEntry
                                                           //     ?.remove();
                                                           _showOverlay(
@@ -1044,7 +1109,10 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                                             25),
                                                                     child: Image
                                                                         .network(
-                                                                      toCountryFlag!,
+                                                                      toCountryFlag !=
+                                                                              null
+                                                                          ? toCountryFlag!
+                                                                          : toCountryFlagArgument!,
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       width: 20,
@@ -1061,7 +1129,10 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                                     width: 100,
                                                                     height: 20,
                                                                     child: Text(
-                                                                      toCountryName!,
+                                                                      toCountryName !=
+                                                                              null
+                                                                          ? toCountryName!
+                                                                          : toCountryNameArgument!,
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis,
@@ -1100,8 +1171,10 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                     children: [
                                       Expanded(
                                         child: TextFormField(
+                                          controller: dateController,
                                           readOnly: true,
-                                          enabled: false,
+                                          enabled: true,
+                                          onTap: () => _selectDate(context),
                                           decoration: InputDecoration(
                                             contentPadding: EdgeInsets.all(18),
                                             focusedBorder: OutlineInputBorder(
@@ -1157,7 +1230,10 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                       ),
                                       Expanded(
                                         child: TextFormField(
+                                          controller: weightController,
                                           keyboardType: TextInputType.number,
+                                          onChanged: (value) =>
+                                              checkIsButtonEnabled(),
                                           decoration: InputDecoration(
                                             contentPadding: EdgeInsets.all(18),
                                             focusedBorder: OutlineInputBorder(
@@ -1222,14 +1298,17 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                   onTap: () async {
                                                     _isShipmentsClicked = true;
                                                     _isTripsClicked = false;
+                                                    dateController.clear();
+                                                    weightController.clear();
                                                     await viewModel
                                                         .getAllShipments(
                                                       token: accessTokenProvider
                                                           .accessToken,
-                                                      from: fromCountryIso,
-                                                      to: toCountryIso,
+                                                      from:
+                                                          fromCountryIsoArgument,
+                                                      to: toCountryIsoArgument,
                                                     );
-                                                    setState(() {});
+                                                    // setState(() {});
                                                   },
                                                   child: Text(
                                                     'Shipments',
@@ -1266,12 +1345,16 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                   onTap: () async {
                                                     _isTripsClicked = true;
                                                     _isShipmentsClicked = false;
-
+                                                    dateController.clear();
+                                                    weightController.clear();
                                                     await viewModel.getAlltrips(
-                                                        accessTokenProvider
-                                                            .accessToken!,
-                                                        isRefresh: true);
-                                                    setState(() {});
+                                                      token: accessTokenProvider
+                                                          .accessToken!,
+                                                      from:
+                                                          fromCountryIsoArgument,
+                                                      to: toCountryIsoArgument,
+                                                    );
+                                                    // setState(() {});
                                                   },
                                                   child: Text(
                                                     'Trips',
@@ -1322,7 +1405,32 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                                     const EdgeInsets.symmetric(
                                                         vertical: 12)),
                                             onPressed: _isButtonEnabled
-                                                ? () {
+                                                ? () async {
+                                                    _isShipmentsClicked
+                                                        ? await viewModel
+                                                            .getAllShipments(
+                                                            token:
+                                                                accessTokenProvider
+                                                                    .accessToken,
+                                                            from: fromCountryIso ??
+                                                                fromCountryIsoArgument,
+                                                            to: toCountryIso ??
+                                                                toCountryIsoArgument,
+                                                            beforeExpectedDate:
+                                                                date,
+                                                          )
+                                                        : await viewModel
+                                                            .getAlltrips(
+                                                            token:
+                                                                accessTokenProvider
+                                                                    .accessToken!,
+                                                            from: fromCountryIso ??
+                                                                fromCountryIsoArgument,
+                                                            to: toCountryIso ??
+                                                                toCountryIsoArgument,
+                                                            beforeExpectedDate:
+                                                                date,
+                                                          );
                                                     // login();
                                                   }
                                                 : null,
@@ -1366,18 +1474,11 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                         alignment: Alignment.centerLeft,
                         child: Text(
                           _isShipmentsClicked
-                              ? '$totalShipmentsData Shipment found'
+                              ? totalShipmentData != null
+                                  ? ' $totalShipmentData Shipment found'
+                                  : ' $totalShipmentsDataArgument Shipment found'
                               : '$totalTripsData Trip found',
-                          style: _isButtonEnabled
-                              ? Theme.of(context)
-                                  .textTheme
-                                  .displayMedium
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600)
-                              : Theme.of(context).textTheme.displayMedium,
+                          style: Theme.of(context).textTheme.displayMedium,
                         ),
                       ),
                     ),
@@ -1394,8 +1495,8 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                               if (accessTokenProvider.accessToken != null) {
                                 await viewModel.getAllShipments(
                                     token: accessTokenProvider.accessToken!,
-                                    from: fromCountryIso,
-                                    to: toCountryIso,
+                                    from: fromCountryIsoArgument,
+                                    to: toCountryIsoArgument,
                                     isRefresh: true);
                               }
                               setState(() {
@@ -1407,7 +1508,9 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                               await box.close();
                               if (accessTokenProvider.accessToken != null) {
                                 await viewModel.getAlltrips(
-                                    accessTokenProvider.accessToken!,
+                                    token: accessTokenProvider.accessToken!,
+                                    from: fromCountryIsoArgument,
+                                    to: toCountryIsoArgument,
                                     isRefresh: true);
                               }
                               setState(() {
@@ -1490,11 +1593,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                                           ],
                                         ),
                                       ))
-                                    : !isTripPaginationLoading
-                                        ? buildTripsList(
-                                            state as GetAllTripsSuccessState)
-                                        : buildTripsList(state
-                                            as GetAllTripsPaginationLoadingState)
+                                    : buildTripsList(state)
                       ],
                     ),
                   )
@@ -1528,25 +1627,61 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     );
   }
 
-  void getTrips() async {
-    if (accessTokenProvider.accessToken != null) {
-      await viewModel.getAlltrips(
-        accessTokenProvider.accessToken!,
-      );
-    }
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime selectedDate = DateTime.now();
+    if (Platform.isIOS) {
+      await showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return SizedBox(
+            height: 300,
+            width: double.infinity,
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              initialDateTime: selectedDate,
+              onDateTimeChanged: (DateTime newDate) {
+                setState(() {
+                  selectedDate = newDate;
+                  final formattedDate = DateFormat('dd MMMM yyyy')
+                      .format(selectedDate); // Format the dateController
 
-    // getChachedtrips().then((cachedTrips) {
-    //   if (cachedTrips.isNotEmpty) {
-    //     print('trips exist');
-    //     setState(() {
-    //       trips = cachedTrips;
-    //     });
-    //   } else {
-    //     setState(() {
-    //       viewModel.getAlltrips(token);
-    //     });
-    //   }
-    // });
+                  dateController.text = formattedDate;
+                  date = selectedDate.toIso8601String();
+                  print(date);
+                  checkIsButtonEnabled();
+                  // dateController = selectedDate.toIso8601String();
+
+                  //                   final formattedDate = TimeOfDay.fromDateTime(selectedDate);
+                  // // Format the dateController
+                  // dateController.text = formattedDate.format(context);
+                });
+              },
+            ),
+          );
+        },
+      );
+    } else if (Platform.isAndroid) {
+      var picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2101),
+      );
+
+      if (picked != null && picked != selectedDate) {
+        setState(() {
+          selectedDate = picked;
+          final formattedDate = DateFormat('dd MMMM yyyy')
+              .format(selectedDate); // Format the dateController
+          // Format the dateController
+          dateController.text = formattedDate;
+          date = selectedDate.toIso8601String();
+          checkIsButtonEnabled();
+
+          // dateController = selectedDate.toIso8601String();
+        });
+      }
+    }
   }
 
   void showSuccessDialog(String successMsg) {
@@ -1574,7 +1709,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
               margin: EdgeInsets.only(bottom: 10),
               child: HorizontalShipmentCard(
                 shipmentDto: shipments[index],
-                countriesStatesDto: args!.countriesFlagsDto.countries,
+                countriesStatesDto: countries,
                 showConfirmedBottomSheet: showSuccessDialog,
               ),
             );
@@ -1583,8 +1718,8 @@ class _SearchResultScreenState extends State<SearchResultScreen>
               if (accessTokenProvider.accessToken != null) {
                 viewModel.getAllShipments(
                     token: accessTokenProvider.accessToken,
-                    from: fromCountryIso,
-                    to: toCountryIso,
+                    from: fromCountryIsoArgument,
+                    to: toCountryIsoArgument,
                     isPagination: true);
               }
               return Row(
@@ -1679,14 +1814,18 @@ class _SearchResultScreenState extends State<SearchResultScreen>
         childCount: trips.length + 1,
         (context, index) {
           if (index < trips.length) {
-            return TripCard(
+            return HorizontalTripCard(
               tripsDto: trips[index],
+              countriesStatesDto: countries,
               // showConfirmedBottomSheet: showSuccessDialog,
             );
           } else {
             if (totalTripsPage! >= currentTripsPage!) {
               if (accessTokenProvider.accessToken != null) {
-                viewModel.getAlltrips(accessTokenProvider.accessToken!,
+                viewModel.getAlltrips(
+                    token: accessTokenProvider.accessToken!,
+                    from: fromCountryIsoArgument,
+                    to: toCountryIsoArgument,
                     isPagination: true);
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,

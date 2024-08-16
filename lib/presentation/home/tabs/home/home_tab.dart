@@ -357,12 +357,9 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             }
           }
 
-          if (state is SearchShipsLoadingState) {
-            shimmerIsLoading = true;
-            // ListView.builder(
-            //   itemCount: 2,
-            //   itemBuilder: (context, index) => const ShimmerCard(),
-            // );
+          if (state is SearchTripsLoadingState) {
+            print(state);
+            isLoading = true;
             // if (Platform.isIOS) {
             //   DialogUtils.showDialogIos(
             //       alertMsg: 'Loading',
@@ -374,17 +371,30 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             //       alertContent: state.loadingMessage,
             //       context: context);
             // }
-          } else if (state is GetAllTripsFailState) {
+          } else if (state is SearchTripsFailState) {
+            print('status code ${state.statusCode}');
             if (Platform.isIOS) {
               DialogUtils.showDialogIos(
                   alertMsg: 'Fail',
                   alertContent: state.failMessage,
                   statusCode: state.statusCode,
+                  onAction: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, 'Login',
+                        arguments:
+                            LoginScreenArguments(args!.countriesFlagsDto));
+                  },
                   context: context);
             } else {
               DialogUtils.showDialogAndroid(
                   alertMsg: 'Fail',
                   alertContent: state.failMessage,
+                  onAction: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, 'Login',
+                        arguments:
+                            LoginScreenArguments(args!.countriesFlagsDto));
+                  },
                   statusCode: state.statusCode,
                   context: context);
             }
@@ -392,15 +402,14 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
         },
         listenWhen: (previous, current) {
           if (previous is SearchShipsLoadingState ||
-              previous is GetAllTripsLoadingState) {
+              previous is SearchTripsLoadingState) {
             isLoading = false;
             // DialogUtils.hideDialog(context);
           }
           if (current is SearchShipsLoadingState ||
               current is SearchShipsFailState ||
-              current is GetAllTripsLoadingState ||
-              current is RefreshTokenFailState ||
-              current is GetAllTripsFailState) {
+              current is SearchTripsLoadingState ||
+              current is SearchTripsFailState) {
             print(current);
             return true;
           }
@@ -446,7 +455,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
             isLoading = false;
           }
-          if (state is GetAllTripsSuccessState) {
+          if (state is SearchTripsSuccessState) {
             print('tripss');
             trips = state.tripsDto;
             currentTripsPage = state.currentPage;
@@ -459,7 +468,29 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               tripsIsEmpty = false;
               // cacheTrips(trips);
             }
-            shimmerIsLoading = false;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pushNamed(
+                context,
+                SearchResultScreen.routeName,
+                arguments: SearchResultScreenArguments(
+                  countriesFlagsDto: args!.countriesFlagsDto,
+                  fromCountry: fromCountry,
+                  fromCountryFlag: fromCountryFlag,
+                  toCountryName: toCountryName,
+                  toCountryFlag: toCountryFlag,
+                  fromCountryIso: fromCountryIso,
+                  toCountryIso: toCountryIso,
+                  trips: trips,
+                  totalData: totalData,
+                  isTripSearch: true,
+                  currentShipmentsPage: currentShipmentsPage,
+                  totalShipmentsPage: totalShipmentsPage,
+                ),
+              );
+            });
+            viewModel.clearState();
+
+            isLoading = false;
           }
           return GestureDetector(
             onTap: _overlayEntry == null ? null : _hideOverlay,
@@ -558,6 +589,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                     // height: 15,
                                                     child: FittedBox(
                                                       fit: BoxFit.scaleDown,
+                                                      alignment:
+                                                          Alignment.centerLeft,
                                                       child: Text(
                                                         '$userFirstName $userLastName',
                                                         style: Theme.of(context)
@@ -1113,12 +1146,13 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                                               () {
                                                                             _isReceivingInClicked =
                                                                                 !_isReceivingInClicked;
-                                                                            setState(() {});
-                                                                            if (_overlayEntry !=
-                                                                                null) {
-                                                                              _overlayEntry?.remove();
-                                                                              _overlayEntry = null;
-                                                                            }
+                                                                            setState(() {
+                                                                              if (_overlayEntry != null) {
+                                                                                _overlayEntry?.remove();
+                                                                                _overlayEntry = null;
+                                                                                _isShipmentFromClicked = false;
+                                                                              }
+                                                                            });
                                                                             // _overlayEntry
                                                                             //     ?.remove();
                                                                             _showOverlay(
@@ -1288,14 +1322,23 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                                                 vertical: 12)),
                                                     onPressed: _isButtonEnabled
                                                         ? () async {
-                                                            await viewModel
-                                                                .searchShipments(
-                                                              token: accessTokenProvider
-                                                                  .accessToken,
-                                                              from:
-                                                                  fromCountryIso,
-                                                              to: toCountryIso,
-                                                            );
+                                                            _isShipmentsClicked
+                                                                ? await viewModel
+                                                                    .searchShipments(
+                                                                    token: accessTokenProvider
+                                                                        .accessToken,
+                                                                    from:
+                                                                        fromCountryIso,
+                                                                    to: toCountryIso,
+                                                                  )
+                                                                : await viewModel
+                                                                    .searchTrips(
+                                                                    token: accessTokenProvider
+                                                                        .accessToken!,
+                                                                    from:
+                                                                        fromCountryIso,
+                                                                    to: toCountryIso,
+                                                                  );
 
                                                             // login();
                                                           }
@@ -1510,26 +1553,26 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     );
   }
 
-  void getTrips() async {
-    if (accessTokenProvider.accessToken != null) {
-      await viewModel.getAlltrips(
-        accessTokenProvider.accessToken!,
-      );
-    }
+  // void getTrips() async {
+  //   if (accessTokenProvider.accessToken != null) {
+  //     await viewModel.getAlltrips(
+  //       accessTokenProvider.accessToken!,
+  //     );
+  //   }
 
-    // getChachedtrips().then((cachedTrips) {
-    //   if (cachedTrips.isNotEmpty) {
-    //     print('trips exist');
-    //     setState(() {
-    //       trips = cachedTrips;
-    //     });
-    //   } else {
-    //     setState(() {
-    //       viewModel.getAlltrips(token);
-    //     });
-    //   }
-    // });
-  }
+  //   // getChachedtrips().then((cachedTrips) {
+  //   //   if (cachedTrips.isNotEmpty) {
+  //   //     print('trips exist');
+  //   //     setState(() {
+  //   //       trips = cachedTrips;
+  //   //     });
+  //   //   } else {
+  //   //     setState(() {
+  //   //       viewModel.getAlltrips(token);
+  //   //     });
+  //   //   }
+  //   // });
+  // }
 
   void showSuccessDialog(String successMsg) {
     _showShipmentDealConfirmedBottomSheet(context);
@@ -1649,54 +1692,54 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     //     : SliverToBoxAdapter(child: Container());
   }
 
-  Widget buildTripsList(Object? state) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: trips.length + 1,
-        (context, index) {
-          if (index < trips.length) {
-            return TripCard(
-              tripsDto: trips[index],
-              // showConfirmedBottomSheet: showSuccessDialog,
-            );
-          } else {
-            if (totalTripsPage! >= currentTripsPage!) {
-              if (accessTokenProvider.accessToken != null) {
-                viewModel.getAlltrips(accessTokenProvider.accessToken!,
-                    isPagination: true);
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Platform.isIOS
-                        ? const CupertinoActivityIndicator(
-                            radius: 11,
-                            color: Colors.black,
-                          )
-                        : const CircularProgressIndicator(),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Text(
-                      "Loading",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[400]),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                  ],
-                );
-              }
-            }
-          }
-          return Container();
-        },
-      ),
-    );
-  }
+  // Widget buildTripsList(Object? state) {
+  //   return SliverList(
+  //     delegate: SliverChildBuilderDelegate(
+  //       childCount: trips.length + 1,
+  //       (context, index) {
+  //         if (index < trips.length) {
+  //           return TripCard(
+  //             tripsDto: trips[index],
+  //             // showConfirmedBottomSheet: showSuccessDialog,
+  //           );
+  //         } else {
+  //           if (totalTripsPage! >= currentTripsPage!) {
+  //             if (accessTokenProvider.accessToken != null) {
+  //               viewModel.getAlltrips(accessTokenProvider.accessToken!,
+  //                   isPagination: true);
+  //               return Row(
+  //                 mainAxisAlignment: MainAxisAlignment.center,
+  //                 children: [
+  //                   Platform.isIOS
+  //                       ? const CupertinoActivityIndicator(
+  //                           radius: 11,
+  //                           color: Colors.black,
+  //                         )
+  //                       : const CircularProgressIndicator(),
+  //                   const SizedBox(
+  //                     width: 15,
+  //                   ),
+  //                   Text(
+  //                     "Loading",
+  //                     textAlign: TextAlign.center,
+  //                     style: GoogleFonts.poppins(
+  //                         fontSize: 15,
+  //                         fontWeight: FontWeight.bold,
+  //                         color: Colors.grey[400]),
+  //                   ),
+  //                   const SizedBox(
+  //                     height: 10,
+  //                   ),
+  //                 ],
+  //               );
+  //             }
+  //           }
+  //         }
+  //         return Container();
+  //       },
+  //     ),
+  //   );
+  // }
 
   void _showShipmentDealConfirmedBottomSheet(BuildContext context) {
     showModalBottomSheet(

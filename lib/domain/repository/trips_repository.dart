@@ -15,7 +15,15 @@ import 'package:hatly/domain/models/trip_matching_shipments_response_dto.dart';
 
 abstract class TripsRepository {
   Future<GetAllTripsResponseDto> getAllTrips(
-      {required String token, int page = 1});
+      {required String token,
+      String? beforeExpectedDate,
+      String? afterExpectedDate,
+      String? from,
+      String? fromCity,
+      String? to,
+      String? toCity,
+      bool? latest,
+      int page = 1});
 
   Future<CreateTripResponseDto> createTrip(
       {String? origin,
