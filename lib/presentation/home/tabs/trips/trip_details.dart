@@ -1,513 +1,249 @@
-import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hatly/domain/models/country_dto.dart';
+import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
+import 'package:hatly/my_theme.dart';
+import 'package:hatly/presentation/components/item_card.dart';
+import 'package:hatly/presentation/components/shipment_details_card.dart';
+import 'package:hatly/presentation/components/shopping_items_card.dart';
+import 'package:hatly/presentation/components/trip_details_card.dart';
 import 'package:hatly/presentation/home/bottom_nav_icon.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
-import 'package:hatly/presentation/home/tabs/shipments/shipment_list_bottom_sheet.dart';
+import 'package:hatly/presentation/home/tabs/shipments/shipments_details_arguments.dart';
+import 'package:hatly/presentation/home/tabs/shipments/trips_list_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_details_arguments.dart';
-import 'package:hatly/utils/dialog_utils.dart';
-import 'package:intl/intl.dart';
+import 'package:hatly/providers/auth_provider.dart';
 
 class TripDetails extends StatefulWidget {
+  String? shipmentTitle;
   static const routeName = 'TripDetails';
-  TripDetails({super.key});
+
+  TripDetails({this.shipmentTitle});
 
   @override
-  State<TripDetails> createState() => _TripDetailsState();
+  State<TripDetails> createState() => _ShipmentDetailsState();
 }
 
-class _TripDetailsState extends State<TripDetails> {
-  int selectedIndex = 0;
+class _ShipmentDetailsState extends State<TripDetails> {
+  ScrollController scrollController = ScrollController();
+
+  var selectedIndex = 0;
+
+  var isSelected = false;
+  final GlobalKey key = GlobalKey();
+  double _listViewHeight = 0.0;
+  late String fromCountryFlag,
+      toCountryFlag,
+      fromCountryName,
+      toCountryName,
+      userFirstName,
+      userLastName,
+      userProfilePhoto;
+  late List<CountriesStatesDto> countriesStatesDto;
+  late TripsDto tripsDto;
+  // late int shoppingItems;
+
   @override
-  Widget build(BuildContext context) {
-    var args =
-        ModalRoute.of(context)!.settings.arguments as TripDetailsArguments;
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    UserProvider userProvider =
+        BlocProvider.of<UserProvider>(context, listen: false);
 
-    var trip = args.tripsDto;
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        automaticallyImplyLeading: true,
-        iconTheme: IconThemeData(color: Colors.white),
-        centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width * .2,
-              child: Text(
-                trip.origin!,
-                overflow: TextOverflow.fade,
-                style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-            ),
-            Image.asset(
-              'images/black-plane-2.png',
-              width: 30,
-              height: 20,
-            ),
-            Container(),
-            Container(
-              width: MediaQuery.of(context).size.width * .2,
-              child: Text(
-                trip.destination!,
-                overflow: TextOverflow.fade,
-                style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        // iconSize: 10,
-        enableFeedback: true,
-        backgroundColor: Theme.of(context).primaryColor,
-        currentIndex: selectedIndex,
-        elevation: 0,
-        onTap: (index) {
-          selectedIndex = index;
-          setState(() {});
-        },
-        items: [
-          BottomNavigationBarItem(
-              backgroundColor: Theme.of(context).primaryColor,
-              icon: BottomNavIcon('home', selectedIndex == 0),
-              label: 'Home'),
-          BottomNavigationBarItem(
-              backgroundColor: Theme.of(context).primaryColor,
-              icon: BottomNavIcon('fast', selectedIndex == 1),
-              label: 'My Shipments'),
-          BottomNavigationBarItem(
-              backgroundColor: Theme.of(context).primaryColor,
-              icon: BottomNavIcon('airplane', selectedIndex == 2),
-              label: 'My Trips'),
-          BottomNavigationBarItem(
-              backgroundColor: Theme.of(context).primaryColor,
-              icon: BottomNavIcon('profile', selectedIndex == 3),
-              label: ''),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Color.fromRGBO(47, 40, 77, 30)),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: trip.user!.profilePhoto != null
-                                  ? Image.network(
-                                      trip.user!.profilePhoto!,
-                                      width: 50,
-                                      height: 50,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Container(
-                                      height: 50,
-                                      width: 50,
-                                      color: Colors.grey[300],
-                                    ),
-                            ),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  trip.user!.firstName!,
-                                  overflow: TextOverflow.fade,
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                                Text(
-                                  '${trip.user!.averageRating.toString()} Reviews',
-                                  overflow: TextOverflow.fade,
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                                Text(
-                                  '${substractDates(trip.createdAt!)} days ago',
-                                  overflow: TextOverflow.fade,
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Card(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  color: Colors.amber,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(12),
-                                      topRight: Radius.circular(12)),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        width:
-                                            MediaQuery.sizeOf(context).width *
-                                                .17,
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            'Departure',
-                                            overflow: TextOverflow.fade,
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Theme.of(context)
-                                                    .primaryColor),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width:
-                                            MediaQuery.sizeOf(context).width *
-                                                .2,
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            '${DateFormat('dd-MMM-yyyy').format(trip.departDate!)}',
-                                            overflow: TextOverflow.fade,
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Theme.of(context)
-                                                    .primaryColor),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          .29,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          trip.origin!,
-                                          overflow: TextOverflow.fade,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                        ),
-                                      ),
-                                    ),
-                                    Image.asset(
-                                      'images/black-plane-2.png',
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          .29,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          trip.destination!,
-                                          overflow: TextOverflow.fade,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          .3,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          'Available Weight',
-                                          overflow: TextOverflow.fade,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          .1,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          '${trip.available} Kg',
-                                          overflow: TextOverflow.fade,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          .33,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          'Consumed Weight',
-                                          overflow: TextOverflow.fade,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          .1,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          '${trip.consumed} Kg',
-                                          overflow: TextOverflow.fade,
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(12),
-                              ),
-                              color: Color.fromARGB(255, 140, 128, 153),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * .13,
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        'Notes:  ',
-                                        overflow: TextOverflow.fade,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * .5,
-                                    child: Text(
-                                      trip.note ?? 'No Notes',
-                                      textAlign: TextAlign.left,
-                                      overflow: TextOverflow.visible,
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(12),
-                              ),
-                              color: Color.fromARGB(255, 140, 128, 153),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * .3,
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        'Meeting Points:  ',
-                                        overflow: TextOverflow.fade,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * .35,
-                                    child: Text(
-                                      trip.addressMeeting ?? 'Any',
-                                      overflow: TextOverflow.fade,
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(12),
-                            bottomRight: Radius.circular(12))),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(12),
-                                  bottomRight: Radius.circular(12))),
-                          backgroundColor: Colors.amber,
-                          padding: const EdgeInsets.symmetric(vertical: 12)),
-                      onPressed: () {
-                        _showShipmentsListBottomSheet(
-                            context, trip, showSuccessDialog);
-                      },
-                      child: Text(
-                        'Send Offer',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+// Check if the current state is LoggedInState and then access the token
+    if (userProvider.state is LoggedInState) {
+      LoggedInState loggedInState = userProvider.state as LoggedInState;
+      userFirstName = loggedInState.user.firstName!;
+      userLastName = loggedInState.user.lastName!;
+      userProfilePhoto = loggedInState.user.profilePhoto ?? '';
+      // token = loggedInState.accessToken;
+      // Now you can use the 'token' variable as needed in your code.
+      // getAccessToken(accessTokenProvider);
+    } else {
+      print(
+          'User is not logged in.'); // Handle the scenario where the user is not logged in.
+    }
   }
 
-  void _showShipmentsListBottomSheet(
-      BuildContext contex, TripsDto trip, Function showSuccessDialog) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[100],
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => ShipmentsListBottomSheet(
-        tripsDto: trip,
-        showSuccessDialog: showSuccessDialog,
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)!.settings.arguments as TripDetailsArguments;
+    tripsDto = args.tripsDto;
+    countriesStatesDto = args.countriesStatesDto!;
+
+    fromCountryFlag = countriesStatesDto[countriesStatesDto
+            .indexWhere((country) => country.iso2 == tripsDto.origin)]
+        .flag!;
+
+    fromCountryName = countriesStatesDto[countriesStatesDto
+            .indexWhere((country) => country.iso2 == tripsDto.origin)]
+        .name!;
+
+    toCountryFlag = countriesStatesDto[countriesStatesDto
+            .indexWhere((country) => country.iso2 == tripsDto.destination)]
+        .flag!;
+    toCountryName = countriesStatesDto[countriesStatesDto
+            .indexWhere((country) => country.iso2 == tripsDto.destination)]
+        .name!;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: true,
+        title: Text(
+          'Trip Details',
+          style:
+              Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 20),
+          textScaler: TextScaler.noScaling,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TripDetailsCard(
+              fromCountryFlag: fromCountryFlag,
+              fromCountryName: fromCountryName,
+              toCountryFlag: toCountryFlag,
+              toCountryName: toCountryName,
+              tripsDto: tripsDto,
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 15),
+              child: Text(
+                'Posted by',
+                style: Theme.of(context)
+                    .textTheme
+                    .displayLarge
+                    ?.copyWith(fontSize: 17),
+                textScaler: TextScaler.noScaling,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+                border: Border.all(
+                  color: Colors.grey[200]!,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: InkWell(
+                  onTap: () {},
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: Image.asset(
+                              'images/me.jpg',
+                              fit: BoxFit.cover,
+                              width: 35,
+                              height: 35,
+                            ),
+                          ),
+                          Text(
+                            ' $userFirstName $userLastName',
+                            style: Theme.of(context)
+                                .textTheme
+                                .displayLarge
+                                ?.copyWith(
+                                    fontSize: 18, color: Color(0xFF5A5A5A)),
+                            textScaler: TextScaler.noScaling,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_right_rounded,
+                        color: MyTheme.iconColor,
+                        size: 30,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 15),
+              child: Text(
+                'Notes',
+                style: Theme.of(context)
+                    .textTheme
+                    .displayLarge
+                    ?.copyWith(fontSize: 17),
+                textScaler: TextScaler.noScaling,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Container(
+                width: double.infinity,
+                height: 50,
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  border: Border.all(
+                    color: Colors.grey[200]!,
+                  ),
+                ),
+                child: Text(
+                  tripsDto.note ?? 'No Notes',
+                  // textAlign: TextAlign.start,
+                  style: Theme.of(context)
+                      .textTheme
+                      .displayMedium
+                      ?.copyWith(fontSize: 15),
+                  textScaler: TextScaler.noScaling,
+                  overflow: TextOverflow.ellipsis,
+                )),
+            Expanded(child: Container()),
+            Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              padding: EdgeInsets.only(bottom: 10, left: 20, right: 20),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 60),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6)),
+                    backgroundColor: Theme.of(context).primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12)),
+                onPressed: () async {
+                  // login();
+                },
+                child: Text(
+                  'Send Request',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                  textScaler: TextScaler.noScaling,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -538,13 +274,33 @@ class _TripDetailsState extends State<TripDetails> {
     );
   }
 
-  String substractDates(DateTime dateTime) {
-    DateTime dateNow = DateTime.now();
+  void _showTripsListBottomSheet(BuildContext context,
+      Function showSuccessDialog, ShipmentDto shipmentDto) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[100],
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => TripsListBottomSheet(
+        showSuccessDialog: showSuccessDialog,
+        shipmentDto: shipmentDto,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+    );
+  }
 
-    var substractedDate = dateNow.difference(dateTime);
-
-    var daysAgo = substractedDate.inDays;
-
-    return daysAgo.toString();
+  Image base64ToImage(String base64String) {
+    Uint8List bytes = base64.decode(base64String);
+    return Image.memory(
+      bytes,
+      fit: BoxFit.fitHeight,
+      width: 100,
+      height: 100,
+    );
   }
 }

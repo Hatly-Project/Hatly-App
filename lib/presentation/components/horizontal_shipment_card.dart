@@ -62,362 +62,157 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
     // print('imgg ${shipmentDto.items!.first.photos!.first.photo}');
     return Padding(
       padding: const EdgeInsets.only(right: 10, left: 10),
-      child: Container(
-        // height: 100,
-        // width: 320,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: const Color(0xFFEEEEEE),
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            ShipmentDetails.routeName,
+            arguments: ShipmentDetailsArguments(
+                shipmentDto: widget.shipmentDto!,
+                countriesStatesDto: widget.countriesStatesDto),
+          );
+        },
+        child: Container(
+          // height: 100,
+          // width: 320,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color(0xFFEEEEEE),
+            ),
+            color: const Color(0xFFFFFFFF),
           ),
-          color: const Color(0xFFFFFFFF),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(bottom: 15),
-                child: Row(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(top: 5),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: Image.asset(
-                          'images/me.jpg',
-                          fit: BoxFit.cover,
-                          width: 35,
-                          height: 35,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(bottom: 15),
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(top: 5),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: Image.asset(
+                            'images/me.jpg',
+                            fit: BoxFit.cover,
+                            width: 35,
+                            height: 35,
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(left: 5),
-                      width: 77,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${widget.shipmentDto!.user!.firstName!} ${widget.shipmentDto!.user!.lastName!}",
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayLarge
-                              ?.copyWith(
-                                  fontSize: 15, fontWeight: FontWeight.w300),
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
+                      Container(
+                        margin: EdgeInsets.only(left: 5),
+                        width: 77,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "${widget.shipmentDto!.user!.firstName!} ${widget.shipmentDto!.user!.lastName!}",
+                            style: Theme.of(context)
+                                .textTheme
+                                .displayLarge
+                                ?.copyWith(
+                                    fontSize: 15, fontWeight: FontWeight.w300),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Container(
-                // margin: EdgeInsets.symmetric(vertical: 15),
-                child: Container(
-                  // margin: EdgeInsets.only(top: 10),
-                  width: double.infinity,
-                  height: 1,
-                  color: Color(0xFFEEEEEE),
+                Container(
+                  // margin: EdgeInsets.symmetric(vertical: 15),
+                  child: Container(
+                    // margin: EdgeInsets.only(top: 10),
+                    width: double.infinity,
+                    height: 1,
+                    color: Color(0xFFEEEEEE),
+                  ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 15),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.network(
-                      widget.shipmentDto!.items!.first.photos!.first.photo!,
-                      fit: BoxFit.fitHeight,
-                      width: 50,
-                      height: 50,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        // mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            width: 270,
-                            // height: 15,
-                            child: Text(
-                              widget.shipmentDto!.title!,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .displayLarge
-                                  ?.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300),
-                              textAlign: TextAlign.start,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            // margin: EdgeInsets.symmetric(vertical: 6),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'images/weight_icob.png',
-                                  width: 14,
-                                  height: 14,
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(left: 5),
-                                  width: 27,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      '${widget.shipmentDto!.wight}g',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .displayMedium
-                                          ?.copyWith(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w300),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: 20,
-                                  width: 1.5,
-                                  color: Color(0xFFD6D6D6),
-                                  margin: EdgeInsets.symmetric(horizontal: 15),
-                                ),
-                                Image.asset(
-                                  'images/date_icon.png',
-                                  width: 14,
-                                  height: 14,
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(left: 8),
-                                  width: 110,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      'Before: ${formatDate(widget.shipmentDto!.expectedDate!.toIso8601String())}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .displayMedium
-                                          ?.copyWith(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w300),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 15),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.network(
+                        widget.shipmentDto!.items!.first.photos!.first.photo!,
+                        fit: BoxFit.fitHeight,
+                        width: 50,
+                        height: 50,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                // margin: EdgeInsets.symmetric(vertical: 5),
-                child: Container(
-                  // margin: EdgeInsets.only(top: 10),
-                  width: double.infinity,
-                  height: 1,
-                  color: Color(0xFFEEEEEE),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 95,
-                          child: FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: Text(
-                              'Shipment From:',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .displayMedium
-                                  ?.copyWith(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400),
-                              textAlign: TextAlign.start,
-                              overflow: TextOverflow.ellipsis,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: 270,
+                              // height: 15,
+                              child: Text(
+                                widget.shipmentDto!.title!,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.copyWith(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w300),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.network(
-                                  fromCountryFlag,
-                                  width: 18,
-                                  height: 18,
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 5.0),
-                                child: SizedBox(
-                                  width: 100,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      fromCountryName,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .displayLarge
-                                          ?.copyWith(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                      textAlign: TextAlign.start,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Image.asset(
-                      'images/landing_icon.png',
-                      width: 22,
-                      height: 22,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 70,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Receiving In:',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .displayMedium
-                                  ?.copyWith(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.network(
-                                  toCountryFlag,
-                                  width: 18,
-                                  height: 18,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 4.0),
-                                child: SizedBox(
-                                  width: 45,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      toCountryName,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .displayLarge
-                                          ?.copyWith(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                      textAlign: TextAlign.start,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      // margin: EdgeInsets.only(right: 10),
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 40,
-                            width: 1.5,
-                            color: Color(0xFFD6D6D6),
-                            margin: EdgeInsets.only(right: 10),
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(bottom: 5),
-                                child: SizedBox(
-                                  width: 50,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      'Reward',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .displayMedium
-                                          ?.copyWith(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w300),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                            Container(
+                              margin: EdgeInsets.only(top: 10),
+                              // margin: EdgeInsets.symmetric(vertical: 6),
+                              child: Row(
                                 children: [
+                                  Image.asset(
+                                    'images/weight_icob.png',
+                                    width: 14,
+                                    height: 14,
+                                  ),
                                   Container(
-                                    margin: const EdgeInsets.only(right: 4),
-                                    width: 33,
+                                    margin: EdgeInsets.only(left: 5),
+                                    width: 27,
                                     child: FittedBox(
-                                      fit: BoxFit.fitWidth,
+                                      fit: BoxFit.scaleDown,
                                       child: Text(
-                                        widget.shipmentDto!.reward.toString(),
+                                        '${widget.shipmentDto!.wight}g',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .displayLarge
+                                            .displayMedium
                                             ?.copyWith(
                                                 fontSize: 15,
-                                                fontWeight: FontWeight.w400),
+                                                fontWeight: FontWeight.w300),
                                         textAlign: TextAlign.center,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 30,
+                                  Container(
+                                    height: 20,
+                                    width: 1.5,
+                                    color: Color(0xFFD6D6D6),
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 15),
+                                  ),
+                                  Image.asset(
+                                    'images/date_icon.png',
+                                    width: 14,
+                                    height: 14,
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(left: 8),
+                                    width: 110,
                                     child: FittedBox(
-                                      fit: BoxFit.fitWidth,
+                                      fit: BoxFit.scaleDown,
                                       child: Text(
-                                        'USD',
+                                        'Before: ${formatDate(widget.shipmentDto!.expectedDate!.toIso8601String())}',
                                         style: Theme.of(context)
                                             .textTheme
-                                            .displayLarge
+                                            .displayMedium
                                             ?.copyWith(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w300),
@@ -427,16 +222,233 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
                                     ),
                                   ),
                                 ],
-                              )
-                            ],
-                          )
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  // margin: EdgeInsets.symmetric(vertical: 5),
+                  child: Container(
+                    // margin: EdgeInsets.only(top: 10),
+                    width: double.infinity,
+                    height: 1,
+                    color: Color(0xFFEEEEEE),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 95,
+                            child: FittedBox(
+                              fit: BoxFit.fitWidth,
+                              child: Text(
+                                'Shipment From:',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.copyWith(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(
+                                    fromCountryFlag,
+                                    width: 18,
+                                    height: 18,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 5.0),
+                                  child: SizedBox(
+                                    width: 100,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        fromCountryName,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayLarge
+                                            ?.copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400),
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                    )
-                  ],
-                ),
-              )
-            ],
+                      Image.asset(
+                        'images/landing_icon.png',
+                        width: 22,
+                        height: 22,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 70,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Receiving In:',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.copyWith(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(
+                                    toCountryFlag,
+                                    width: 18,
+                                    height: 18,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 4.0),
+                                  child: SizedBox(
+                                    width: 45,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        toCountryName,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayLarge
+                                            ?.copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400),
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        // margin: EdgeInsets.only(right: 10),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 40,
+                              width: 1.5,
+                              color: Color(0xFFD6D6D6),
+                              margin: EdgeInsets.only(right: 10),
+                            ),
+                            Column(
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  child: SizedBox(
+                                    width: 50,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        'Reward',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayMedium
+                                            ?.copyWith(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w300),
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(right: 4),
+                                      width: 33,
+                                      child: FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: Text(
+                                          widget.shipmentDto!.reward.toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge
+                                              ?.copyWith(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w400),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 30,
+                                      child: FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: Text(
+                                          'USD',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge
+                                              ?.copyWith(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w300),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

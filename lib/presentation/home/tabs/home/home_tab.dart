@@ -106,6 +106,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       userFirstName = loggedInState.user.firstName;
       userLastName = loggedInState.user.lastName;
       userProfilePhoto = loggedInState.user.profilePhoto;
+      print('photo $userProfilePhoto');
       // token = loggedInState.accessToken;
       // Now you can use the 'token' variable as needed in your code.
       // getAccessToken(accessTokenProvider);
