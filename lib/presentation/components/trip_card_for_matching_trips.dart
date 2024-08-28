@@ -32,7 +32,8 @@ class _TripCardState extends State<MatchingTripCard> {
       padding: EdgeInsets.all(10),
       child: InkWell(
         onTap: () => Navigator.pushNamed(context, TripDetails.routeName,
-            arguments: TripDetailsArguments(tripsDto: widget.tripsDto)),
+            // arguments: TripDetailsArguments(tripsDto: widget.tripsDto)
+            ),
         child: Card(
           color: Colors.white,
           shape: RoundedRectangleBorder(

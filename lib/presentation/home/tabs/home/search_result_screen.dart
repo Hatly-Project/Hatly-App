@@ -143,22 +143,22 @@ class _SearchResultScreenState extends State<SearchResultScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInitialized) {
-      final args = ModalRoute.of(context)!.settings.arguments
+      args = ModalRoute.of(context)!.settings.arguments
           as SearchResultScreenArguments;
-      fromCountryArgument = args.fromCountry;
-      fromCountryFlagArgument = args.fromCountryFlag;
-      toCountryNameArgument = args.toCountryName;
-      toCountryFlagArgument = args.toCountryFlag;
-      fromCountryIsoArgument = args.fromCountryIso;
-      toCountryIsoArgument = args.toCountryIso;
-      totalShipmentsPage = args.totalShipmentsPage;
-      currentShipmentsPage = args.currentShipmentsPage;
-      isShipmentSearch = args.isShipmentSearch;
-      isTripSearch = args.isTripSearch;
-      trips = args.trips ?? [];
-      countries = args.countriesFlagsDto.countries;
-      shipments = args.shipments ?? [];
-      totalShipmentsDataArgument = args.totalData;
+      fromCountryArgument = args!.fromCountry;
+      fromCountryFlagArgument = args!.fromCountryFlag;
+      toCountryNameArgument = args!.toCountryName;
+      toCountryFlagArgument = args!.toCountryFlag;
+      fromCountryIsoArgument = args!.fromCountryIso;
+      toCountryIsoArgument = args!.toCountryIso;
+      totalShipmentsPage = args!.totalShipmentsPage;
+      currentShipmentsPage = args!.currentShipmentsPage;
+      isShipmentSearch = args!.isShipmentSearch;
+      isTripSearch = args!.isTripSearch;
+      trips = args!.trips ?? [];
+      countries = args!.countriesFlagsDto.countries;
+      shipments = args!.shipments ?? [];
+      totalShipmentsDataArgument = args!.totalData;
       print('dataa $totalShipmentsDataArgument');
       _isTripsClicked = isTripSearch!;
       _isShipmentsClicked = isShipmentSearch!;
@@ -1485,6 +1485,9 @@ class _SearchResultScreenState extends State<SearchResultScreen>
                   ),
                   Expanded(
                     child: CustomScrollView(
+                      physics: _isShipmentFromClicked || _isReceivingInClicked
+                          ? NeverScrollableScrollPhysics()
+                          : null,
                       slivers: [
                         CupertinoSliverRefreshControl(
                           onRefresh: () async {

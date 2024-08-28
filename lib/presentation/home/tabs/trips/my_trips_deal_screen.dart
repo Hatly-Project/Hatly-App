@@ -72,7 +72,8 @@ class _TripDealsState extends State<MyTripDeals> {
 
     if (accessTokenProvider.accessToken != null) {
       viewModel.getMyTripDeals(
-          token: accessTokenProvider.accessToken!, tripId: widget.tripsDto.id!);
+          token: accessTokenProvider.accessToken!,
+          tripId: widget.tripsDto.id!.length);
     }
 
     // getCachedMyShipmentsDeals().then((cachedDeals) async {
@@ -123,7 +124,7 @@ class _TripDealsState extends State<MyTripDeals> {
 
   @override
   Widget build(BuildContext context) {
-    shipmentId = widget.tripsDto.id!;
+    shipmentId = widget.tripsDto.id!.length;
     // getMyshipmentDeals(token: token, shipmentId: shipment.id!);
 
     return BlocConsumer(
@@ -197,7 +198,7 @@ class _TripDealsState extends State<MyTripDeals> {
                             if (accessTokenProvider.accessToken != null) {
                               await viewModel.getMyTripDeals(
                                   token: accessTokenProvider.accessToken!,
-                                  tripId: widget.tripsDto.id!);
+                                  tripId: widget.tripsDto.id!.length);
                             }
 
                             setState(() {});
@@ -297,7 +298,7 @@ class _TripDealsState extends State<MyTripDeals> {
                       if (accessTokenProvider.accessToken != null) {
                         await viewModel.getMyTripDeals(
                             token: accessTokenProvider.accessToken!,
-                            tripId: widget.tripsDto.id!);
+                            tripId: widget.tripsDto.id!.length);
                       }
                       // cacheMyShipmentsDeals(deals);
                       setState(() {});

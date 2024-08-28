@@ -6,4 +6,5 @@ class MyTheme {
   static var textColor = Color(0xFF080808);
   static var smallTextColor = Color(0xFF848484);
   static var disabledTextButtonColor = Color(0xFFADADAD);
+  static var iconColor = Color(0xFF5A5A5A);
 }
