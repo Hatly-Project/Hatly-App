@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:hatly/data/api/book_info.dart';
 import 'package:hatly/data/api/items_not_allowed.dart';
 import 'package:hatly/data/api/shipment.dart';
@@ -7,7 +6,7 @@ import 'package:hatly/data/api/user.dart';
 import 'package:hatly/domain/models/trips_dto.dart';
 
 class Trip {
-  int? id;
+  String? id;
   String? origin, originCity;
   String? destination, destinationCity;
   int? available;
@@ -40,7 +39,7 @@ class Trip {
   });
 
   factory Trip.fromMap(Map<String, dynamic> data) => Trip(
-        id: data['id'] as int?,
+        id: data['id'] as String?,
         origin: data['origin'] as String?,
         destination: data['destination'] as String?,
         originCity: data['originCity'] as String?,

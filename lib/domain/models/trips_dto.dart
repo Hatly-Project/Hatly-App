@@ -7,7 +7,7 @@ import 'package:hatly/domain/models/shipment_dto.dart';
 import 'package:hatly/domain/models/user_model.dart';
 
 class TripsDto {
-  int? id;
+  String? id;
   String? origin, originCity;
   String? destination, destinationCity;
   int? available;
@@ -40,7 +40,7 @@ class TripsDto {
   });
 
   factory TripsDto.fromMap(Map<String, dynamic> data) => TripsDto(
-        id: data['id'] as int?,
+        id: data['id'] as String?,
         origin: data['origin'] as String?,
         destination: data['destination'] as String?,
         originCity: data['originCity'] as String?,

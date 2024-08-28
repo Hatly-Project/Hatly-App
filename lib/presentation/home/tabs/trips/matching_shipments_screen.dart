@@ -60,7 +60,8 @@ class _MatchingShipmentsScreenState extends State<MatchingShipmentsScreen> {
       if (accessTokenProvider.accessToken != null) {
         viewModel.getMyTripMatchingShipments(
             token: accessTokenProvider.accessToken!,
-            tripId: widget.tripsDto.id!);
+            tripId: widget.tripsDto.id!.length
+            );
       }
 
       // token = loggedInState.accessToken;
@@ -122,7 +123,7 @@ class _MatchingShipmentsScreenState extends State<MatchingShipmentsScreen> {
   Widget build(BuildContext context) {
     // args = ModalRoute.of(context)?.settings.arguments
     //     as MyShipmentDealDetailsArgument;
-    tripId = widget.tripsDto.id!;
+    tripId = widget.tripsDto.id!.length;
     // getMyTripMatchingShipments(token: token, shipmentId: shipment.id!);
 
     return BlocConsumer(
@@ -196,7 +197,7 @@ class _MatchingShipmentsScreenState extends State<MatchingShipmentsScreen> {
                             if (accessTokenProvider.accessToken != null) {
                               await viewModel.getMyTripMatchingShipments(
                                   token: accessTokenProvider.accessToken!,
-                                  tripId: widget.tripsDto.id!);
+                                  tripId: widget.tripsDto.id!.length);
                             }
 
                             setState(() {});
@@ -298,7 +299,7 @@ class _MatchingShipmentsScreenState extends State<MatchingShipmentsScreen> {
                       if (accessTokenProvider.accessToken != null) {
                         await viewModel.getMyTripMatchingShipments(
                             token: accessTokenProvider.accessToken!,
-                            tripId: widget.tripsDto.id!);
+                            tripId: widget.tripsDto.id!.length);
                       }
                       // cacheMyShipmentsDeals(matchingShipments);
                       setState(() {});

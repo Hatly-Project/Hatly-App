@@ -29,7 +29,7 @@ class ShipmentDealViewmodel extends Cubit<ShipmentDealViewState> {
       {required String? shipmentId,
       required double? reward,
       required String token,
-      required int tripId}) async {
+      required String? tripId}) async {
     emit(ShipmentDealLoadingState('Loading... '));
 
     try {
