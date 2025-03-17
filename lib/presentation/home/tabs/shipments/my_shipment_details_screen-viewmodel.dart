@@ -14,14 +14,14 @@ class MyShipmentDetailsScreenViewModel
   late ApiManager apiManager;
   late ShipmentRepository shipmentRepository;
   late ShipmentDataSource shipmentDataSource;
-  late GetMyShipmentDealsUsecase getMyShipmentDealsUsecase;
+  // late GetMyShipmentDealsUsecase getMyShipmentDealsUsecase;
   AccessTokenProvider? accessTokenProvider;
   MyShipmentDetailsScreenViewModel({this.accessTokenProvider})
       : super(MyshipmentDetailsInitialState()) {
     apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     shipmentDataSource = ShipmentDataSourceImpl(apiManager);
     shipmentRepository = ShipmentRepositoryImpl(shipmentDataSource);
-    getMyShipmentDealsUsecase = GetMyShipmentDealsUsecase(shipmentRepository);
+    // getMyShipmentDealsUsecase = GetMyShipmentDealsUsecase(shipmentRepository);
   }
 
   Future<void> getMyshipmentDeals(
@@ -29,10 +29,10 @@ class MyShipmentDetailsScreenViewModel
     emit(MyshipmentDealsLoadingState(loadingMessage: 'Loading... '));
 
     try {
-      var response = await getMyShipmentDealsUsecase.getMyShipmentDeals(
-          token: token, shipmentId: shipmentId);
+      // var response = await getMyShipmentDealsUsecase.getMyShipmentDeals(
+      //     token: token, shipmentId: shipmentId);
 
-      emit(MyshipmentDealsSuccessState(responseDto: response));
+      // emit(MyshipmentDealsSuccessState(responseDto: response));
     } on ServerErrorException catch (e) {
       emit(MyshipmentDealsFailState(failMessage: e.errorMessage));
     }

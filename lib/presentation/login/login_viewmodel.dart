@@ -9,6 +9,7 @@ import 'package:hatly/domain/repository/auth_repository.dart';
 import 'package:hatly/domain/usecase/login_google_usecase.dart';
 import 'package:hatly/domain/usecase/login_usecase.dart';
 import 'package:hatly/domain/usecase/register_usecase.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 
 import '../../domain/models/user_model.dart';
 
@@ -31,6 +32,7 @@ class LoginViewModel extends Cubit<LoginViewState> {
 
     try {
       var response = await loginUseCase.invoke(email, password);
+      print("response: ${response.accessToken}");
       // createUserInDb(user);
       emit(LoginSuccessState(response));
     } on ServerErrorException catch (e) {

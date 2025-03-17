@@ -194,6 +194,7 @@ class _MyShipmentsTabState extends State<MyShipmentsTab> {
         if (state is GetMyShipmentsSuccessState) {
           print('getMySuccess');
           myShipments = state.responseDto.shipments ?? [];
+          print("shipments length ${myShipments.length}");
           if (myShipments.isEmpty) {
             isMyshipmentEmpty = true;
             clearData();

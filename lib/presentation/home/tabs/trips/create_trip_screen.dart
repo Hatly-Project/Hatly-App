@@ -22,7 +22,7 @@ import 'package:hatly/presentation/home/tabs/trips/states_list_bottom_sheet.dart
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:multi_dropdown/multiselect_dropdown.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../providers/auth_provider.dart';
@@ -690,48 +690,49 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                         Container(
                           margin: EdgeInsets.only(top: 10),
                           child: Center(
-                            child: MultiSelectDropDown(
-                              controller: _controller,
-                              onOptionSelected: (items) {
-                                itemsNotAllowed = items
-                                    .map((item) =>
-                                        ItemsNotAllowedDto(name: item.label))
-                                    .toList();
+                            child: Container(),
+                            // child: MultiSelectDropDown(
+                            //   controller: _controller,
+                            //   onOptionSelected: (items) {
+                            //     itemsNotAllowed = items
+                            //         .map((item) =>
+                            //             ItemsNotAllowedDto(name: item.label))
+                            //         .toList();
 
-                                for (var element in itemsNotAllowed) {
-                                  print(element.name);
-                                }
-                              },
-                              options: const <ValueItem>[
-                                ValueItem(
-                                    label: 'Mobiles & Tablets',
-                                    value: 'Mobiles & Tablets'),
-                                ValueItem(label: 'Laptops', value: 'Laptops'),
-                                ValueItem(
-                                    label: 'Cosmetics', value: 'Cosmetics'),
-                                ValueItem(label: 'Clothing', value: 'Clothing'),
-                                ValueItem(
-                                    label: 'Shoes & Bags',
-                                    value: 'Shoes & Bags'),
-                                ValueItem(
-                                    label: 'Watches & Sunglasses',
-                                    value: 'Watches & Sunglasses'),
-                                ValueItem(
-                                    label: 'Supplements', value: 'Supplements'),
-                                ValueItem(
-                                    label: 'Food & Beverages',
-                                    value: 'Food & Beverages'),
-                                ValueItem(label: 'Books', value: 'Books'),
-                              ],
-                              selectionType: SelectionType.multi,
-                              chipConfig:
-                                  const ChipConfig(wrapType: WrapType.scroll),
-                              dropdownHeight: 500,
-                              optionTextStyle: const TextStyle(
-                                  fontSize: 13, fontWeight: FontWeight.w500),
-                              selectedOptionIcon:
-                                  const Icon(Icons.check_circle),
-                            ),
+                            //     for (var element in itemsNotAllowed) {
+                            //       print(element.name);
+                            //     }
+                            //   },
+                            //   options: const <ValueItem>[
+                            //     ValueItem(
+                            //         label: 'Mobiles & Tablets',
+                            //         value: 'Mobiles & Tablets'),
+                            //     ValueItem(label: 'Laptops', value: 'Laptops'),
+                            //     ValueItem(
+                            //         label: 'Cosmetics', value: 'Cosmetics'),
+                            //     ValueItem(label: 'Clothing', value: 'Clothing'),
+                            //     ValueItem(
+                            //         label: 'Shoes & Bags',
+                            //         value: 'Shoes & Bags'),
+                            //     ValueItem(
+                            //         label: 'Watches & Sunglasses',
+                            //         value: 'Watches & Sunglasses'),
+                            //     ValueItem(
+                            //         label: 'Supplements', value: 'Supplements'),
+                            //     ValueItem(
+                            //         label: 'Food & Beverages',
+                            //         value: 'Food & Beverages'),
+                            //     ValueItem(label: 'Books', value: 'Books'),
+                            //   ],
+                            //   selectionType: SelectionType.multi,
+                            //   chipConfig:
+                            //       const ChipConfig(wrapType: WrapType.scroll),
+                            //   dropdownHeight: 500,
+                            //   optionTextStyle: const TextStyle(
+                            //       fontSize: 13, fontWeight: FontWeight.w500),
+                            //   selectedOptionIcon:
+                            //       const Icon(Icons.check_circle),
+                            // ),
                           ),
                         ),
                         Container(

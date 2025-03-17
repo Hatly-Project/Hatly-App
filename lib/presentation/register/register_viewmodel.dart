@@ -6,6 +6,7 @@ import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/datasource/auth_datasource.dart';
 import 'package:hatly/domain/repository/auth_repository.dart';
 import 'package:hatly/domain/usecase/register_usecase.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 
 import '../../domain/models/user_model.dart';
 
@@ -14,8 +15,10 @@ class RegisterViewModel extends Cubit<RegisterViewState> {
   late AuthRepository authRepository;
   late AuthDataSource authDataSource;
   late RegisterUseCase registerUseCase;
-  RegisterViewModel() : super(RegisterInitialState()) {
-    apiManager = ApiManager();
+  late AccessTokenProvider accessTokenProvider;
+  RegisterViewModel({required this.accessTokenProvider})
+      : super(RegisterInitialState()) {
+    apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     authDataSource = AuthDataSourceImpl(apiManager);
     authRepository = AuthRepositoryImpl(authDataSource);
     registerUseCase = RegisterUseCase(authRepository);

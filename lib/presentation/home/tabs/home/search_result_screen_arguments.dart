@@ -13,10 +13,12 @@ class SearchResultScreenArguments {
       toCountryIso;
   CountriesDto countriesFlagsDto;
   int? currentShipmentsPage, totalShipmentsPage, totalData;
-  bool? isShipmentSearch, isTripSearch;
+  bool? isShipmentSearch, isTripSearch, isAllShipments, isAllTrips;
   SearchResultScreenArguments(
       {this.shipments,
       this.trips,
+      this.isAllShipments = false,
+      this.isAllTrips = false,
       this.fromCountry,
       this.fromCountryFlag,
       this.toCountryFlag,

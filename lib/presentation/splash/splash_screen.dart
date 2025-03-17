@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -10,6 +11,7 @@ import 'package:hatly/presentation/home/home_screen.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/welcome/welcome_screen.dart';
 import 'package:hatly/presentation/welcome/welcome_screen_arguments.dart';
+import 'package:hatly/providers/countries_list_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -23,7 +25,9 @@ class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-
+  ApiManager apiManager = ApiManager();
+  CountriesDto? countriesList;
+  bool? tokenValid;
   @override
   void initState() {
     super.initState();
@@ -45,15 +49,8 @@ class _SplashScreenState extends State<SplashScreen>
       if (status == AnimationStatus.completed) {
         UserProvider userProvider =
             BlocProvider.of<UserProvider>(context, listen: false);
-
-        getCountriesFlags().then((countries) => userProvider.state
-                is LoggedInState
-            ? countries != null
-                ? Navigator.pushReplacementNamed(context, HomeScreen.routeName,
-                    arguments: HomeScreenArguments(countries))
-                : null
-            : Navigator.pushReplacementNamed(context, WelcomeScreen.routeName,
-                arguments: WelcomeScreenArguments(countries!)));
+        print("state ${userProvider.state}");
+        checkAndNavigate();
       }
     });
 
@@ -61,30 +58,26 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
   }
 
-  ApiManager apiManager = ApiManager();
+  void checkAndNavigate() async {
+    UserProvider userProvider =
+        BlocProvider.of<UserProvider>(context, listen: false);
+    countriesList = await getCountriesFlags().then((countries) {
+      context
+          .read<CountriesListProvider>()
+          .setCountriesList(countries: countries!);
 
-  CountriesDto? countriesList;
-
-  Future<CountriesDto?> getCountriesFlags() async {
-    try {
-      var response = await apiManager.getCountriesFlags();
-      var countries = response.toDto();
-      countriesList = countries;
-    } on ServerErrorException catch (e) {
-      DialogUtils.showDialogIos(
-          context: context, alertMsg: 'Fail', alertContent: e.errorMessage);
-    } on Exception catch (e) {
-      DialogUtils.showDialogIos(
-          context: context, alertMsg: 'Fail', alertContent: e.toString());
+      return countries;
+    });
+    print("ssss");
+    if (userProvider.state is LoggedInState) {
+      if ((await isTokenValid())!) {
+        Navigator.pushReplacementNamed(context, HomeScreen.routeName,
+            arguments: HomeScreenArguments(countriesList!));
+      } else {
+        Navigator.pushReplacementNamed(context, WelcomeScreen.routeName,
+            arguments: WelcomeScreenArguments(countriesList!));
+      }
     }
-    return countriesList;
-  }
-
-  @override
-  void dispose() {
-    // Dispose the animation controller to free up resources
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -109,5 +102,40 @@ class _SplashScreenState extends State<SplashScreen>
         ),
       ),
     );
+  }
+
+  Future<bool?> isTokenValid() async {
+    try {
+      tokenValid = await apiManager.chechAccessTokenExpired();
+    } on ServerErrorException catch (e) {
+      DialogUtils.showDialogIos(
+          context: context, alertMsg: 'Fail', alertContent: e.errorMessage);
+    } on Exception catch (e) {
+      DialogUtils.showDialogIos(
+          context: context, alertMsg: 'Fail', alertContent: e.toString());
+    }
+    return tokenValid;
+  }
+
+  Future<CountriesDto?> getCountriesFlags() async {
+    try {
+      var response = await apiManager.getCountriesFlags();
+      var countries = response.toDto();
+      countriesList = countries;
+    } on ServerErrorException catch (e) {
+      DialogUtils.showDialogIos(
+          context: context, alertMsg: 'Fail', alertContent: e.errorMessage);
+    } on Exception catch (e) {
+      DialogUtils.showDialogIos(
+          context: context, alertMsg: 'Fail', alertContent: e.toString());
+    }
+    return countriesList;
+  }
+
+  @override
+  void dispose() {
+    // Dispose the animation controller to free up resources
+    _controller.dispose();
+    super.dispose();
   }
 }

@@ -29,19 +29,19 @@ class GetMyTripDealDetailsViewModel extends Cubit<MyTripDealDetailsViewState> {
   late ApiManager _apiManager;
   late TripsRepository _tripsRepository;
   late TripsDatasource _tripsDataSource;
-  late GetMyTripDealDetailsUsecase _usecase;
-  late AcceptTripDealUsecase _acceptTripDealUsecase;
-  late TripCounterOfferUsecase _shipmentCounterOfferUsecase;
+  // late GetMyTripDealDetailsUsecase _usecase;
+  // late AcceptTripDealUsecase _acceptTripDealUsecase;
+  // late TripCounterOfferUsecase _shipmentCounterOfferUsecase;
   AccessTokenProvider accessTokenProvider;
   GetMyTripDealDetailsViewModel(this.accessTokenProvider)
       : super(MyTripDealDetailsInitialState()) {
     _apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     _tripsDataSource = TripsDatasourceImpl(_apiManager);
     _tripsRepository = TripsRepositoryImpl(_tripsDataSource);
-    _usecase = GetMyTripDealDetailsUsecase(repository: _tripsRepository);
-    _acceptTripDealUsecase = AcceptTripDealUsecase(_tripsRepository);
-    _shipmentCounterOfferUsecase =
-        TripCounterOfferUsecase(tripsRepository: _tripsRepository);
+    // _usecase = GetMyTripDealDetailsUsecase(repository: _tripsRepository);
+    // _acceptTripDealUsecase = AcceptTripDealUsecase(_tripsRepository);
+    // _shipmentCounterOfferUsecase =
+    //     TripCounterOfferUsecase(tripsRepository: _tripsRepository);
     // _cancelShipmentDealUsecae = CancelShipmentDealUsecae(_tripsRepository);
   }
 
@@ -50,10 +50,10 @@ class GetMyTripDealDetailsViewModel extends Cubit<MyTripDealDetailsViewState> {
     emit(GetMyTripDealDetailsLoadingState('Loading...'));
 
     try {
-      var response =
-          await _usecase.getMyTripDealDetails(token: token, dealId: dealId);
+      // var response =
+      //     await _usecase.getMyTripDealDetails(token: token, dealId: dealId);
       // createUserInDb(user);
-      emit(GetMyTripDealDetailsSuccessState(response));
+      // emit(GetMyTripDealDetailsSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(GetMyTripDealDetailsFailState(e.errorMessage));
     } on Exception catch (e) {
@@ -66,10 +66,10 @@ class GetMyTripDealDetailsViewModel extends Cubit<MyTripDealDetailsViewState> {
     emit(AcceptTripDealLoadingState('Loading...'));
 
     try {
-      var response = await _acceptTripDealUsecase.acceptTripDeal(
-          token: token, dealId: dealId, status: 'accepted', dealType: 'trip');
+      // var response = await _acceptTripDealUsecase.acceptTripDeal(
+      //     token: token, dealId: dealId, status: 'accepted', dealType: 'trip');
       // createUserInDb(user);
-      emit(AcceptTripDealSuccessState(response));
+      // emit(AcceptTripDealSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(AcceptTripDealFailState(e.errorMessage));
     } on Exception catch (e) {
@@ -82,10 +82,10 @@ class GetMyTripDealDetailsViewModel extends Cubit<MyTripDealDetailsViewState> {
     emit(RejectTripDealLoadingState('Loading...'));
 
     try {
-      var response = await _acceptTripDealUsecase.acceptTripDeal(
-          token: token, dealId: dealId, status: 'rejected', dealType: 'trip');
+      // var response = await _acceptTripDealUsecase.acceptTripDeal(
+      //     token: token, dealId: dealId, status: 'rejected', dealType: 'trip');
       // createUserInDb(user);
-      emit(RejectTripDealSuccessState(response));
+      // emit(RejectTripDealSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(RejectTripDealFailState(e.errorMessage));
     } on Exception catch (e) {
@@ -116,9 +116,9 @@ class GetMyTripDealDetailsViewModel extends Cubit<MyTripDealDetailsViewState> {
     emit(CounterOfferLoadingState('Loading...'));
 
     try {
-      var response = await _shipmentCounterOfferUsecase.invoke(
-          token: token, dealId: dealId, reward: reward);
-      emit(CounterOfferSuccessState(response));
+      // var response = await _shipmentCounterOfferUsecase.invoke(
+      //     token: token, dealId: dealId, reward: reward);
+      // emit(CounterOfferSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(CounterOfferFailState(e.errorMessage));
     } on Exception catch (e) {

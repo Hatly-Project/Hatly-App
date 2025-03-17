@@ -14,10 +14,12 @@ import 'package:hatly/presentation/home/tabs/chat/chat_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/create_password.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/forget_password_code_screen.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/forget_password_screen.dart';
+import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/search_result_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/edit_profile_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/payment_information_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
+import 'package:hatly/presentation/home/tabs/shipments/add_shipment_screen.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';
@@ -36,6 +38,7 @@ import 'package:hatly/presentation/login/login_screen.dart';
 import 'package:hatly/presentation/register/register_screen.dart';
 import 'package:hatly/presentation/splash/splash_screen.dart';
 import 'package:hatly/presentation/welcome/welcome_screen.dart';
+import 'package:hatly/providers/countries_list_provider.dart';
 import 'package:hatly/providers/firebase_messaging_provider.dart';
 import 'package:hatly/providers/payment_provider.dart';
 import 'package:hatly/services/local_notifications_service.dart';
@@ -43,6 +46,8 @@ import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'my_theme.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,14 +84,6 @@ void main() async {
   // Open the Hive box for shipments
   await Hive.openBox('shipments');
 
-  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
-  // SystemChrome.setSystemUIOverlayStyle(
-  //   SystemUiOverlayStyle(
-  //       statusBarColor: Colors.transparent,
-  //       // systemNavigationBarColor: Colors.transparent,
-  //       statusBarIconBrightness: Brightness.dark),
-  // );
   runApp(
     MultiProvider(
       providers: [
@@ -100,16 +97,14 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => PaymentProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => CountriesListProvider(),
+        ),
         // Add more providers as needed
       ],
       child: MyApp(),
     ),
   );
-  // runApp(BlocProvider(
-  //     create: (BuildContext context) {
-  //       return UserProvider();
-  //     },
-  //     child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -126,29 +121,17 @@ class MyApp extends StatelessWidget {
     UserProvider userProvider =
         BlocProvider.of<UserProvider>(context, listen: true);
 
-// Check if the current state is LoggedInState and then access the token
+    // Check if the current state is LoggedInState and then access the token
     if (userProvider.state is LoggedInState) {
-      LoggedInState loggedInState = userProvider.state as LoggedInState;
-
       if (fcmProvider.isRefreshed == true) {
         print('fcmmmm refreshed true ${fcmProvider.fcmToken}');
         // fcmProvider.isRefreshed = false;
-        ApiManager().refreshFCMTokenWithCheckAccessToken(
+        ApiManager().refreshFCMToken(
             accessToken: accessTokenProvider.accessToken!,
             fcmToken: fcmProvider.fcmToken!);
         fcmProvider.isRefreshed = false;
       }
-      // if (accessTokenProvider.accessToken != null) {
-      //   print('toool ${accessTokenProvider.accessToken}');
 
-      //   if (accessTokenProvider.accessToken != loggedInState.accessToken) {
-      //     print('toool ${accessTokenProvider.accessToken}');
-      //     userProvider.refreshAccessToken();
-      //   }
-      //   userToken = loggedInState.accessToken;
-      // }
-
-      // Now you can use the 'token' variable as needed in your code.
       print('access token from main: ${accessTokenProvider.accessToken}');
 
       print('User token from main: $userToken');
@@ -164,10 +147,12 @@ class MyApp extends StatelessWidget {
     }
     return MaterialApp(
       title: 'Flutter Demo',
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: MyTheme.primaryColor,
         scaffoldBackgroundColor: MyTheme.backgroundColor,
+        dividerColor: MyTheme.dividerColor,
         fontFamily: "glancyr",
         // iconTheme: IconThemeData.f,
         textTheme: TextTheme(
@@ -235,6 +220,7 @@ class MyApp extends StatelessWidget {
             ForgetPasswordOtpScreen(),
         CreatePasswordScreen.routeName: (context) => CreatePasswordScreen(),
         SearchResultScreen.routeName: (context) => SearchResultScreen(),
+        AddShipmentScreen.routeName: (context) => AddShipmentScreen(),
       },
     );
   }

@@ -13,7 +13,7 @@ import 'package:hatly/domain/models/get_user_trip_response_dto.dart';
 import 'package:hatly/domain/models/items_not_allowed_dto.dart';
 import 'package:hatly/domain/models/shipment_deal_response_dto.dart';
 import 'package:hatly/domain/models/shipment_dto.dart';
-import 'package:hatly/domain/models/trip_deal_response.dart';
+import 'package:hatly/domain/models/deal_response_dto.dart';
 import 'package:hatly/domain/repository/trips_repository.dart';
 import 'package:hatly/domain/usecase/create_trip_usecase.dart';
 import 'package:hatly/domain/usecase/get_all_trips_usecase.dart';
@@ -25,13 +25,13 @@ class TripDealViewModel extends Cubit<TripDealViewState> {
   late ApiManager apiManager;
   late TripsRepository repository;
   late TripsDatasource tripsDatasource;
-  late SendTripDealUsecase sendTripDealUsecase;
+  // late SendTripDealUsecase sendTripDealUsecase;
   AccessTokenProvider accessTokenProvider;
   TripDealViewModel(this.accessTokenProvider) : super(TripDealInitialState()) {
     apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     tripsDatasource = TripsDatasourceImpl(apiManager);
     repository = TripsRepositoryImpl(tripsDatasource);
-    sendTripDealUsecase = SendTripDealUsecase(repository: repository);
+    // sendTripDealUsecase = SendTripDealUsecase(repository: repository);
   }
 
   void sendDealOnShipment(
@@ -41,9 +41,9 @@ class TripDealViewModel extends Cubit<TripDealViewState> {
       required int tripId}) async {
     try {
       emit(CreateTripDealLoadingState('Loading...'));
-      var response = await sendTripDealUsecase.sendDeal(
-          token: token, tripId: tripId, shipmentId: shipmentId, reward: reward);
-      emit(CreateTripDealSuccessState(response));
+      // var response = await sendTripDealUsecase.sendDeal(
+      //     token: token, tripId: tripId, shipmentId: shipmentId, reward: reward);
+      // emit(CreateTripDealSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(CreateTripDealFailState(e.errorMessage));
     }

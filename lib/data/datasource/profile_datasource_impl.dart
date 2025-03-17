@@ -36,7 +36,7 @@ class PaymentInfoDatasourceImpl implements ProfileDatasource {
       String? ip,
       required String? accessToken,
       String? phone}) async {
-    var response = await apiManager.updateProfileWithCheckAccessToken(
+    var response = await apiManager.updateProfile(
       accessToken: accessToken,
       dob: dob,
       address: address,

@@ -10,6 +10,7 @@ import 'package:hatly/domain/models/user_model.dart';
 import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/presentation/register/register_screen_arguments.dart';
 import 'package:hatly/presentation/register/register_viewmodel.dart';
+import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 
 import '../../utils/validation_utils.dart';
@@ -35,7 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   var passwordController = TextEditingController(text: '');
 
-  RegisterViewModel viewModel = RegisterViewModel();
+  late RegisterViewModel viewModel;
   @override
   void initState() {
     super.initState();
@@ -98,7 +99,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as RegisterScreenArguments;
-    var countriesList = args.countriesFlagsDto;
+    var accessTokenProvider = context.read<AccessTokenProvider>();
+    viewModel = RegisterViewModel(accessTokenProvider: accessTokenProvider);
     return BlocConsumer(
       bloc: viewModel,
       buildWhen: (previous, current) {
