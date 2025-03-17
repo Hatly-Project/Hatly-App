@@ -6,6 +6,7 @@ import 'package:hatly/presentation/components/shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab.dart';
 import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
+import 'package:hatly/presentation/home/tabs/shipments/add_shipment_screen.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipments_tab.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips.dart';
 import 'bottom_nav_icon.dart';
@@ -131,23 +132,32 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: <Widget>[
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Add new shipment',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displayLarge
-                            ?.copyWith(fontSize: 20, color: Color(0xFF5A5A5A)),
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Icon(
-                        Icons.keyboard_arrow_right_rounded,
-                        color: Color(0xFF5A5A5A),
-                      )
-                    ],
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AddShipmentScreen.routeName,
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Add new shipment',
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayLarge
+                              ?.copyWith(
+                                  fontSize: 20, color: Color(0xFF5A5A5A)),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Icon(
+                          Icons.keyboard_arrow_right_rounded,
+                          color: Color(0xFF5A5A5A),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 Container(

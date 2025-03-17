@@ -7,4 +7,5 @@ class MyTheme {
   static var smallTextColor = Color(0xFF848484);
   static var disabledTextButtonColor = Color(0xFFADADAD);
   static var iconColor = Color(0xFF5A5A5A);
+  static var dividerColor = Colors.transparent;
 }

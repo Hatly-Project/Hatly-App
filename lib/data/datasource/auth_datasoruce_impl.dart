@@ -75,10 +75,17 @@ class AuthDataSourceImpl implements AuthDataSource {
 
   @override
   Future<SendResetEmailResponseDto> resetPassword(
-      String otp, String newPassword) async {
-    var response =
-        await apiManager.resetPassword(otp: otp, newPassword: newPassword);
-
-    return response.toDto();
+      String otp, String newPassword) {
+    // TODO: implement resetPassword
+    throw UnimplementedError();
   }
+
+  // @override
+  // Future<SendResetEmailResponseDto> resetPassword(
+  //     String otp, String newPassword) async {
+  //   var response =
+  //       await apiManager.resetPassword(otp: otp, newPassword: newPassword);
+
+  //   return response.toDto();
+  // }
 }

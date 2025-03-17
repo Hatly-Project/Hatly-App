@@ -22,7 +22,7 @@ class MyTripDetailsScreenViewModel extends Cubit<MyTripDetailsViewState> {
   late ApiManager apiManager;
   late TripsRepository tripsRepository;
   late TripsDatasource tripsDatasource;
-  late GetMyTripDealsUsecase getMyTripDealsUsecase;
+  // late GetMyTripDealsUsecase getMyTripDealsUsecase;
   late GetMyTripMatchingShipmentsUsecase getMyTripMatchingShipmentsUsecase;
   AccessTokenProvider? accessTokenProvider;
   MyTripDetailsScreenViewModel({this.accessTokenProvider})
@@ -30,7 +30,7 @@ class MyTripDetailsScreenViewModel extends Cubit<MyTripDetailsViewState> {
     apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     tripsDatasource = TripsDatasourceImpl(apiManager);
     tripsRepository = TripsRepositoryImpl(tripsDatasource);
-    getMyTripDealsUsecase = GetMyTripDealsUsecase(tripsRepository);
+    // getMyTripDealsUsecase = GetMyTripDealsUsecase(tripsRepository);
     getMyTripMatchingShipmentsUsecase =
         GetMyTripMatchingShipmentsUsecase(repository: tripsRepository);
   }
@@ -40,10 +40,10 @@ class MyTripDetailsScreenViewModel extends Cubit<MyTripDetailsViewState> {
     emit(MyTripDealsLoadingState(loadingMessage: 'Loading... '));
 
     try {
-      var response = await getMyTripDealsUsecase.getMytripDeals(
-          token: token, tripId: tripId);
+      // var response = await getMyTripDealsUsecase.getMytripDeals(
+      //     token: token, tripId: tripId);
 
-      emit(MyTripDealsSuccessState(responseDto: response));
+      // emit(MyTripDealsSuccessState(responseDto: response));
     } on ServerErrorException catch (e) {
       emit(MyTripDealsFailState(failMessage: e.errorMessage));
     }

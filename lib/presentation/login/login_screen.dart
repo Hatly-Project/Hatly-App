@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hatly/data/api/api_manager.dart';
+import 'package:hatly/presentation/components/button_widget.dart';
 import 'package:hatly/presentation/home/tabs/forget_password/forget_password_screen.dart';
 import 'package:hatly/providers/access_token_provider.dart';
 import 'package:hatly/providers/auth_provider.dart';
@@ -44,8 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
   var emailController = TextEditingController(text: '');
 
   var passwordController = TextEditingController(text: '');
-
-  LoginViewModel viewModel = LoginViewModel();
+  late LoginViewModel viewModel;
   FlutterSecureStorage storage = const FlutterSecureStorage();
   String? refreshToken;
 
@@ -66,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     emailController.addListener(_checkFormCompletion);
     passwordController.addListener(_checkFormCompletion);
+    viewModel = LoginViewModel();
   }
 
   void _checkFormCompletion() {
@@ -85,11 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     FCMProvider fcmProvider = Provider.of<FCMProvider>(context);
-    AccessTokenProvider accessTokenProvider =
-        Provider.of<AccessTokenProvider>(context);
-
-    final args =
-        ModalRoute.of(context)!.settings.arguments as LoginScreenArguments;
+    var accessTokenProvider = context.read<AccessTokenProvider>();
     return BlocConsumer(
       bloc: viewModel,
       buildWhen: (previous, current) {
@@ -136,6 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           print('load');
         } else if (state is LoginSuccessState) {
+          print("success token ${state.loginResponseDto.accessToken}");
           getRefreshToken().then((refreshToken) {
             UserProvider userProvider =
                 BlocProvider.of<UserProvider>(context, listen: false);
@@ -158,8 +156,10 @@ class _LoginScreenState extends State<LoginScreen> {
           //       fcmToken: fcmProvider.fcmToken!);
           // }
           print('success');
-          Navigator.pushReplacementNamed(context, HomeScreen.routeName,
-              arguments: HomeScreenArguments(args.countriesFlagsDto));
+          Navigator.pushReplacementNamed(
+            context,
+            HomeScreen.routeName,
+          );
           // Navigator.pushNamed(context, LoginScreen.routeName);
         }
       },
@@ -285,9 +285,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 onPressed: () {
                                   Navigator.pushNamed(
-                                      context, ForgetPasswordScreen.routeName,
-                                      arguments: LoginScreenArguments(
-                                          args.countriesFlagsDto));
+                                    context,
+                                    ForgetPasswordScreen.routeName,
+                                  );
                                 },
                               ),
                             ],
@@ -296,37 +296,46 @@ class _LoginScreenState extends State<LoginScreen> {
                         Container(
                           margin: const EdgeInsets.only(top: 20),
                           padding: EdgeInsets.only(left: 20, right: 20),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                minimumSize: Size(double.infinity, 60),
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6)),
-                                backgroundColor: _isButtonEnabled
-                                    ? Theme.of(context).primaryColor
-                                    : const Color(0xFFEEEEEE),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12)),
-                            onPressed: _isButtonEnabled
-                                ? () {
-                                    login();
-                                  }
-                                : null,
-                            child: Text(
-                              'Log in',
-                              style: _isButtonEnabled
-                                  ? Theme.of(context)
-                                      .textTheme
-                                      .displayMedium
-                                      ?.copyWith(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600)
-                                  : Theme.of(context).textTheme.displaySmall,
-                            ),
+                          child: ButtonWidget(
+                            isButtonEnabled: _isButtonEnabled,
+                            buttonText: 'Log In',
+                            onPressed: login,
                           ),
                         ),
+                        // Container(
+                        //   margin: const EdgeInsets.only(top: 20),
+                        //   padding: EdgeInsets.only(left: 20, right: 20),
+                        //   child: ElevatedButton(
+                        //     style: ElevatedButton.styleFrom(
+                        //         minimumSize: Size(double.infinity, 60),
+                        //         elevation: 0,
+                        //         shape: RoundedRectangleBorder(
+                        //             borderRadius: BorderRadius.circular(6)),
+                        //         backgroundColor: _isButtonEnabled
+                        //             ? Theme.of(context).primaryColor
+                        //             : const Color(0xFFEEEEEE),
+                        //         padding:
+                        //             const EdgeInsets.symmetric(vertical: 12)),
+                        //     onPressed: _isButtonEnabled
+                        //         ? () {
+                        //             login();
+                        //           }
+                        //         : null,
+                        //     child: Text(
+                        //       'Log in',
+                        //       style: _isButtonEnabled
+                        //           ? Theme.of(context)
+                        //               .textTheme
+                        //               .displayMedium
+                        //               ?.copyWith(
+                        //                   color: Theme.of(context)
+                        //                       .scaffoldBackgroundColor,
+                        //                   fontSize: 16,
+                        //                   fontWeight: FontWeight.w600)
+                        //           : Theme.of(context).textTheme.displaySmall,
+                        //     ),
+                        //   ),
+                        // ),
                         Container(
                           margin: EdgeInsets.only(
                               top: MediaQuery.sizeOf(context).width * .1),

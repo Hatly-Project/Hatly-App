@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hatly/data/api/trip_deal/deals.dart';
+import 'package:hatly/data/api/deals/deal_request.dart';
 import 'package:hatly/domain/models/deal.dart';
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmation_bottom_sheet.dart';
 import 'package:hatly/presentation/home/tabs/trips/trip_deal_confirmation_bottom_sheet.dart';

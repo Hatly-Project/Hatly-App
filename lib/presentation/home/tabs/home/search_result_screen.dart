@@ -145,24 +145,32 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     if (!_isInitialized) {
       args = ModalRoute.of(context)!.settings.arguments
           as SearchResultScreenArguments;
-      fromCountryArgument = args!.fromCountry;
-      fromCountryFlagArgument = args!.fromCountryFlag;
-      toCountryNameArgument = args!.toCountryName;
-      toCountryFlagArgument = args!.toCountryFlag;
-      fromCountryIsoArgument = args!.fromCountryIso;
-      toCountryIsoArgument = args!.toCountryIso;
-      totalShipmentsPage = args!.totalShipmentsPage;
-      currentShipmentsPage = args!.currentShipmentsPage;
-      isShipmentSearch = args!.isShipmentSearch;
-      isTripSearch = args!.isTripSearch;
-      trips = args!.trips ?? [];
-      countries = args!.countriesFlagsDto.countries;
-      shipments = args!.shipments ?? [];
-      totalShipmentsDataArgument = args!.totalData;
-      print('dataa $totalShipmentsDataArgument');
-      _isTripsClicked = isTripSearch!;
-      _isShipmentsClicked = isShipmentSearch!;
-      _isInitialized = true; // Ensure initialization happens only once
+      if (args != null) {
+        fromCountryArgument = args!.fromCountry;
+        fromCountryFlagArgument = args!.fromCountryFlag;
+        toCountryNameArgument = args!.toCountryName;
+        toCountryFlagArgument = args!.toCountryFlag;
+        fromCountryIsoArgument = args!.fromCountryIso;
+        toCountryIsoArgument = args!.toCountryIso;
+        totalShipmentsPage = args!.totalShipmentsPage;
+        currentShipmentsPage = args!.currentShipmentsPage;
+        isShipmentSearch = args!.isShipmentSearch;
+        isTripSearch = args!.isTripSearch;
+        trips = args!.trips ?? [];
+        countries = args!.countriesFlagsDto.countries;
+        shipments = args!.shipments ?? [];
+        print("shipments from search ${shipments.length}");
+        totalShipmentsDataArgument = args!.totalData;
+        print('dataa $totalShipmentsDataArgument');
+        _isTripsClicked = isTripSearch! || args!.isAllTrips!;
+        _isShipmentsClicked = isShipmentSearch! || args!.isAllShipments!;
+        _isInitialized = true; // Ensure initialization happens only once
+        if (args!.isAllShipments == true) {
+          getShipments();
+        } else if (args!.isAllTrips == true) {
+          getTrips();
+        }
+      }
     }
   }
 
@@ -172,19 +180,6 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     _controller.dispose();
     super.dispose();
   }
-
-  // Future<String> getAccessToken(AccessTokenProvider accessTokenProvider) async {
-  //   // String? accessToken = await storage.read(key: 'accessToken');
-
-  //   if (accessTokenProvider.accessToken != null) {
-  //     token = accessTokenProvider.accessToken!;
-  //     // viewModel.create(accessTokenProvider.accessToken!);
-  //     print('access $token');
-  //   }
-
-  //   setState(() {});
-  //   return token;
-  // }
 
   // a method for caching the shipments list
   Future<void> cacheShipments(List<ShipmentDto> shipments) async {
@@ -365,16 +360,6 @@ class _SearchResultScreenState extends State<SearchResultScreen>
 
   @override
   Widget build(BuildContext context) {
-    // SystemChrome.setSystemUIOverlayStyle(
-    //   SystemUiOverlayStyle(
-    //       statusBarColor: Colors.transparent,
-    //       systemNavigationBarColor: Colors.transparent,
-    //       statusBarIconBrightness: Brightness.dark),
-    // );
-    UserProvider userProvider = BlocProvider.of<UserProvider>(context);
-
-    // _isButtonEnabled =
-    //     fromCountryArgument != null && toCountryNameArgument != null;
     if (shipments.isNotEmpty || shipments.isEmpty) {
       shimmerIsLoading = false;
       setState(() {});
@@ -382,100 +367,9 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {
-          if (state is GetAllShipsLoadingState) {
-            print(state);
-            shimmerIsLoading = true;
-            // if (Platform.isIOS) {
-            //   DialogUtils.showDialogIos(
-            //       alertMsg: 'Loading',
-            //       alertContent: state.loadingMessage,
-            //       context: context);
-            // } else {
-            //   DialogUtils.showDialogAndroid(
-            //       alertMsg: 'Loading',
-            //       alertContent: state.loadingMessage,
-            //       context: context);
-            // }
-          } else if (state is GetAllShipsFailState) {
-            print('status code ${state.statusCode}');
-            if (Platform.isIOS) {
-              DialogUtils.showDialogIos(
-                  alertMsg: 'Fail',
-                  alertContent: state.failMessage,
-                  statusCode: state.statusCode,
-                  onAction: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, 'Login',
-                        arguments:
-                            LoginScreenArguments(args!.countriesFlagsDto));
-                  },
-                  context: context);
-            } else {
-              DialogUtils.showDialogAndroid(
-                  alertMsg: 'Fail',
-                  alertContent: state.failMessage,
-                  onAction: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, 'Login',
-                        arguments:
-                            LoginScreenArguments(args!.countriesFlagsDto));
-                  },
-                  statusCode: state.statusCode,
-                  context: context);
-            }
-          }
-
-          if (state is GetAllTripsLoadingState) {
-            shimmerIsLoading = true;
-            // ListView.builder(
-            //   itemCount: 2,
-            //   itemBuilder: (context, index) => const ShimmerCard(),
-            // );
-            // if (Platform.isIOS) {
-            //   DialogUtils.showDialogIos(
-            //       alertMsg: 'Loading',
-            //       alertContent: state.loadingMessage,
-            //       context: context);
-            // } else {
-            //   DialogUtils.showDialogAndroid(
-            //       alertMsg: 'Loading',
-            //       alertContent: state.loadingMessage,
-            //       context: context);
-            // }
-          } else if (state is GetAllTripsFailState) {
-            if (Platform.isIOS) {
-              DialogUtils.showDialogIos(
-                  alertMsg: 'Fail',
-                  alertContent: state.failMessage,
-                  statusCode: state.statusCode,
-                  context: context);
-            } else {
-              DialogUtils.showDialogAndroid(
-                  alertMsg: 'Fail',
-                  alertContent: state.failMessage,
-                  statusCode: state.statusCode,
-                  context: context);
-            }
-          }
-        },
-        listenWhen: (previous, current) {
-          if (previous is GetAllShipsLoadingState ||
-              previous is GetAllTripsLoadingState) {
-            shimmerIsLoading = false;
-            // DialogUtils.hideDialog(context);
-          }
-          if (current is GetAllShipsLoadingState ||
-              current is GetAllShipsFailState ||
-              current is GetAllTripsLoadingState ||
-              current is RefreshTokenFailState ||
-              current is GetAllTripsFailState) {
-            print(current);
-            return true;
-          }
-          return false;
-        },
-        builder: (context, state) {
           if (state is GetAllShipsSuccessState) {
+            print("shipments");
+
             print('shipment from build ${state.shipmentDto.length}');
             shipments = state.shipmentDto;
             currentShipmentsPage = state.currentPage;
@@ -509,6 +403,65 @@ class _SearchResultScreenState extends State<SearchResultScreen>
             }
             shimmerIsLoading = false;
           }
+          if (state is GetAllShipsFailState) {
+            print('status code ${state.statusCode}');
+            if (Platform.isIOS) {
+              DialogUtils.showDialogIos(
+                  alertMsg: 'Fail',
+                  alertContent: state.failMessage,
+                  statusCode: state.statusCode,
+                  context: context);
+            } else {
+              DialogUtils.showDialogAndroid(
+                  alertMsg: 'Fail',
+                  alertContent: state.failMessage,
+                  onAction: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, 'Login',
+                        arguments:
+                            LoginScreenArguments(args!.countriesFlagsDto));
+                  },
+                  statusCode: state.statusCode,
+                  context: context);
+            }
+          }
+          if (state is GetAllTripsFailState) {
+            if (Platform.isIOS) {
+              DialogUtils.showDialogIos(
+                  alertMsg: 'Fail',
+                  alertContent: state.failMessage,
+                  statusCode: state.statusCode,
+                  context: context);
+            } else {
+              DialogUtils.showDialogAndroid(
+                  alertMsg: 'Fail',
+                  alertContent: state.failMessage,
+                  statusCode: state.statusCode,
+                  context: context);
+            }
+          }
+        },
+        listenWhen: (previous, current) {
+          if (previous is GetAllShipsLoadingState ||
+              previous is GetAllTripsLoadingState) {
+            shimmerIsLoading = false;
+            // DialogUtils.hideDialog(context);
+          }
+          if (current is GetAllShipsLoadingState ||
+              current is GetAllShipsFailState ||
+              current is GetAllTripsLoadingState ||
+              current is RefreshTokenFailState ||
+              current is GetAllTripsFailState ||
+              current is GetAllShipsSuccessState ||
+              current is GetAllTripsSuccessState) {
+            print(current);
+            return true;
+          }
+          return false;
+        },
+        builder: (context, state) {
+          shimmerIsLoading = state is GetAllShipsLoadingState ||
+              state is GetAllTripsLoadingState;
           return GestureDetector(
             onTap: _overlayEntry == null ? null : _hideOverlay,
             child: Scaffold(
@@ -1702,7 +1655,7 @@ class _SearchResultScreenState extends State<SearchResultScreen>
     AccessTokenProvider accessTokenProvider =
         Provider.of<AccessTokenProvider>(context);
     // String? accessToken = await storage.read(key: 'accessToken');
-
+    print("shipments from list ${shipments.length}");
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         childCount: shipments.length + 1,
@@ -1758,57 +1711,6 @@ class _SearchResultScreenState extends State<SearchResultScreen>
         },
       ),
     );
-    // : state is GetAllShipsPaginationLoadingState
-    //     ? SliverList(
-    //         delegate: SliverChildBuilderDelegate(
-    //           childCount: shipments.length + 1,
-    //           (context, index) {
-    //             if (index < shipments.length) {
-    //               print('trueeeeee');
-    //               return ShipmentCard(
-    //                 shipmentDto: shipments[index],
-    //                 showConfirmedBottomSheet: showSuccessDialog,
-    //               );
-    //             } else {
-    //               print('1st else');
-    //               print(
-    //                   'total $totalShipmentsPage current $currentShipmentsPage');
-    //               if (totalShipmentsPage! >= currentShipmentsPage!) {
-    //                 print('elseeeee');
-
-    //                 return Row(
-    //                   mainAxisAlignment: MainAxisAlignment.center,
-    //                   children: [
-    //                     Platform.isIOS
-    //                         ? const CupertinoActivityIndicator(
-    //                             radius: 11,
-    //                             color: Colors.black,
-    //                           )
-    //                         : const CircularProgressIndicator(),
-    //                     const SizedBox(
-    //                       width: 15,
-    //                     ),
-    //                     Text(
-    //                       "Loading",
-    //                       textAlign: TextAlign.center,
-    //                       style: GoogleFonts.poppins(
-    //                           fontSize: 15,
-    //                           fontWeight: FontWeight.bold,
-    //                           color: Colors.grey[400]),
-    //                     ),
-    //                     const SizedBox(
-    //                       height: 10,
-    //                     ),
-    //                   ],
-    //                 );
-    //               }
-
-    //               // return Container();
-    //             }
-    //           },
-    //         ),
-    //       )
-    //     : SliverToBoxAdapter(child: Container());
   }
 
   Widget buildTripsList(Object? state) {
@@ -1887,18 +1789,17 @@ class _SearchResultScreenState extends State<SearchResultScreen>
         token: accessTokenProvider.accessToken!,
       );
     }
+  }
 
-    // getCachedShipments().then((cachedShipments) {
-    //   if (cachedShipments.isNotEmpty) {
-    //     print('exist');
-    //     setState(() {
-    //       shipments = cachedShipments;
-    //       shimmerIsLoading = false;
-    //     });
-    //   } else {
-    //     viewModel.create(token); // Fetch from API if cache is empty
-    //   }
-    // });
+  void getTrips() async {
+    if (accessTokenProvider.accessToken != null) {
+      print('from init access token ${accessTokenProvider.accessToken}');
+      print('from init refresh token ${accessTokenProvider.refreshToken}');
+
+      await viewModel.getAlltrips(
+        token: accessTokenProvider.accessToken!,
+      );
+    }
   }
 }
 

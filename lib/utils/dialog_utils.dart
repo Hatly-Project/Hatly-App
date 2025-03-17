@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hatly/presentation/login/login_screen.dart';
 
 class DialogUtils {
   static void showDialogAndroid(
@@ -33,7 +34,6 @@ class DialogUtils {
       {required BuildContext context,
       String? alertMsg,
       String? alertContent,
-      void Function()? onAction,
       int? statusCode}) {
     showCupertinoModalPopup<void>(
       context: context,
@@ -59,7 +59,8 @@ class DialogUtils {
             /// the action's text color to red.
             isDefaultAction: true,
             onPressed: statusCode == 401
-                ? onAction
+                ? () => Navigator.pushReplacementNamed(
+                    context, LoginScreen.routeName)
                 : () => Navigator.of(context).pop(),
             child: statusCode == 401 ? const Text('Login') : const Text('Ok'),
           ),

@@ -13,6 +13,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hatly/data/api/api_manager.dart';
+import 'package:hatly/data/api/response/count.dart';
 import 'package:hatly/domain/models/countries_dto.dart';
 import 'package:hatly/domain/models/country_dto.dart';
 import 'package:hatly/domain/models/state_dto.dart';
@@ -29,6 +30,7 @@ import 'package:hatly/presentation/home/tabs/home/search_result_screen_arguments
 import 'package:hatly/presentation/home/tabs/shipments/shipment_deal_confirmed_bottom_sheet.dart';
 import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/providers/access_token_provider.dart';
+import 'package:hatly/providers/countries_list_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
@@ -71,7 +73,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       totalTripsPage,
       currentTripsPage = 1,
       totalData;
-  HomeScreenArguments? args;
   late HomeScreenViewModel viewModel;
   late AccessTokenProvider accessTokenProvider;
   bool shimmerIsLoading = true,
@@ -106,7 +107,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
       userFirstName = loggedInState.user.firstName;
       userLastName = loggedInState.user.lastName;
       userProfilePhoto = loggedInState.user.profilePhoto;
-      print('photo $userProfilePhoto');
+      print('refreshtoken ${loggedInState.refreshToken}');
       // token = loggedInState.accessToken;
       // Now you can use the 'token' variable as needed in your code.
       // getAccessToken(accessTokenProvider);
@@ -242,7 +243,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
               child: SlideTransition(
                   position: _animation,
                   child: CountriesList(
-                    countries: args!.countriesFlagsDto,
+                    countries: context.read<CountriesListProvider>().countries!,
                     selectFromCountry:
                         _isShipmentFromClicked ? selectFromCountry : null,
                     selectToCountry:
@@ -254,18 +255,30 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
   void selectFromCountry(String selectedCountry) {
     _hideOverlay();
-    var index = args!.countriesFlagsDto.countries
+    var index = context
+        .read<CountriesListProvider>()
+        .countries!
+        .countries
         ?.indexWhere((country) => country.name == selectedCountry);
-    var countryStates = args!.countriesFlagsDto.countries![index!].states;
-    fromCountryIso = args!.countriesFlagsDto.countries![index].iso2;
+    var countryStates = context
+        .read<CountriesListProvider>()
+        .countries!
+        .countries![index!]
+        .states;
+    fromCountryIso =
+        context.read<CountriesListProvider>().countries!.countries![index].iso2;
 
     setState(() {
       fromCountry = selectedCountry;
       // fromCityValue = '';
 
-      fromCountryFlag = args!
-          .countriesFlagsDto
-          .countries![args!.countriesFlagsDto.countries!
+      fromCountryFlag = context
+          .read<CountriesListProvider>()
+          .countries!
+          .countries![context
+              .read<CountriesListProvider>()
+              .countries!
+              .countries!
               .indexWhere((country) => country.name == fromCountry)]
           .flag;
       fromStatesList = countryStates!;
@@ -279,18 +292,30 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
   void selectDestinationCountry(String selectedCountry) {
     _hideOverlay();
-    var index = args!.countriesFlagsDto.countries
+    var index = context
+        .read<CountriesListProvider>()
+        .countries!
+        .countries
         ?.indexWhere((country) => country.name == selectedCountry);
-    var countryStates = args!.countriesFlagsDto.countries![index!].states;
-    toCountryIso = args!.countriesFlagsDto.countries![index].iso2;
+    var countryStates = context
+        .read<CountriesListProvider>()
+        .countries!
+        .countries![index!]
+        .states;
+    toCountryIso =
+        context.read<CountriesListProvider>().countries!.countries![index].iso2;
 
     setState(() {
       toCountryName = selectedCountry;
 
       // fromCityValue = '';
-      toCountryFlag = args!
-          .countriesFlagsDto
-          .countries![args!.countriesFlagsDto.countries!
+      toCountryFlag = context
+          .read<CountriesListProvider>()
+          .countries!
+          .countries![context
+              .read<CountriesListProvider>()
+              .countries!
+              .countries!
               .indexWhere((country) => country.name == toCountryName)]
           .flag;
       toStatesList = countryStates!;
@@ -311,7 +336,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
     //       statusBarIconBrightness: Brightness.dark),
     // );
     UserProvider userProvider = BlocProvider.of<UserProvider>(context);
-    args = ModalRoute.of(context)!.settings.arguments as HomeScreenArguments;
     return BlocConsumer(
         bloc: viewModel,
         listener: (context, state) {
@@ -336,12 +360,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                   alertMsg: 'Fail',
                   alertContent: state.failMessage,
                   statusCode: state.statusCode,
-                  onAction: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, 'Login',
-                        arguments:
-                            LoginScreenArguments(args!.countriesFlagsDto));
-                  },
                   context: context);
             } else {
               DialogUtils.showDialogAndroid(
@@ -349,9 +367,10 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                   alertContent: state.failMessage,
                   onAction: () {
                     Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, 'Login',
-                        arguments:
-                            LoginScreenArguments(args!.countriesFlagsDto));
+                    Navigator.pushReplacementNamed(
+                      context,
+                      'Login',
+                    );
                   },
                   statusCode: state.statusCode,
                   context: context);
@@ -379,12 +398,6 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                   alertMsg: 'Fail',
                   alertContent: state.failMessage,
                   statusCode: state.statusCode,
-                  onAction: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, 'Login',
-                        arguments:
-                            LoginScreenArguments(args!.countriesFlagsDto));
-                  },
                   context: context);
             } else {
               DialogUtils.showDialogAndroid(
@@ -392,34 +405,19 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                   alertContent: state.failMessage,
                   onAction: () {
                     Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, 'Login',
-                        arguments:
-                            LoginScreenArguments(args!.countriesFlagsDto));
+                    Navigator.pushReplacementNamed(
+                      context,
+                      'Login',
+                    );
                   },
                   statusCode: state.statusCode,
                   context: context);
             }
           }
-        },
-        listenWhen: (previous, current) {
-          if (previous is SearchShipsLoadingState ||
-              previous is SearchTripsLoadingState) {
-            isLoading = false;
-            // DialogUtils.hideDialog(context);
-          }
-          if (current is SearchShipsLoadingState ||
-              current is SearchShipsFailState ||
-              current is SearchTripsLoadingState ||
-              current is SearchTripsFailState) {
-            print(current);
-            return true;
-          }
-          return false;
-        },
-        builder: (context, state) {
           if (state is SearchShipsSuccessState) {
             print('shipment from build ${state.shipmentDto.length}');
             shipments = state.shipmentDto;
+            print("shipments $shipments");
             currentShipmentsPage = state.currentPage;
             totalShipmentsPage = state.totalPages;
             totalData = state.totalData;
@@ -437,7 +435,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                 context,
                 SearchResultScreen.routeName,
                 arguments: SearchResultScreenArguments(
-                  countriesFlagsDto: args!.countriesFlagsDto,
+                  countriesFlagsDto:
+                      context.read<CountriesListProvider>().countries!,
                   fromCountry: fromCountry,
                   fromCountryFlag: fromCountryFlag,
                   toCountryName: toCountryName,
@@ -474,7 +473,8 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                 context,
                 SearchResultScreen.routeName,
                 arguments: SearchResultScreenArguments(
-                  countriesFlagsDto: args!.countriesFlagsDto,
+                  countriesFlagsDto:
+                      context.read<CountriesListProvider>().countries!,
                   fromCountry: fromCountry,
                   fromCountryFlag: fromCountryFlag,
                   toCountryName: toCountryName,
@@ -493,6 +493,25 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
 
             isLoading = false;
           }
+        },
+        listenWhen: (previous, current) {
+          if (previous is SearchShipsLoadingState ||
+              previous is SearchTripsLoadingState) {
+            isLoading = false;
+            // DialogUtils.hideDialog(context);
+          }
+          if (current is SearchShipsLoadingState ||
+              current is SearchShipsFailState ||
+              current is SearchTripsLoadingState ||
+              current is SearchTripsFailState ||
+              current is SearchShipsSuccessState ||
+              current is SearchTripsSuccessState) {
+            print(current);
+            return true;
+          }
+          return false;
+        },
+        builder: (context, state) {
           return GestureDetector(
             onTap: _overlayEntry == null ? null : _hideOverlay,
             child: Scaffold(
@@ -1409,7 +1428,17 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                                       ),
                                     ),
                                     TextButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.pushNamed(context,
+                                            SearchResultScreen.routeName,
+                                            arguments:
+                                                SearchResultScreenArguments(
+                                              isAllShipments: true,
+                                              countriesFlagsDto: context
+                                                  .read<CountriesListProvider>()
+                                                  .countries!,
+                                            ));
+                                      },
                                       style: ButtonStyle(
                                         padding: WidgetStateProperty.all<
                                                 EdgeInsetsGeometry>(

@@ -22,21 +22,21 @@ class GetMyShipmentDealDetailsViewModel
   late ApiManager _apiManager;
   late ShipmentRepository _shipmentRepository;
   late ShipmentDataSource _shipmentDataSource;
-  late GetMyShipmentDealDetailsUsecase _usecase;
-  late AcceptShipmentDealUsecase _acceptShipmentDealUsecase;
-  late ShipmentCounterOfferUsecase _shipmentCounterOfferUsecase;
-  late CancelShipmentDealUsecae _cancelShipmentDealUsecae;
+  // late GetMyShipmentDealDetailsUsecase _usecase;
+  // late AcceptShipmentDealUsecase _acceptShipmentDealUsecase;
+  // late ShipmentCounterOfferUsecase _shipmentCounterOfferUsecase;
+  // late CancelShipmentDealUsecae _cancelShipmentDealUsecae;
   AccessTokenProvider accessTokenProvider;
   GetMyShipmentDealDetailsViewModel(this.accessTokenProvider)
       : super(MyShipmentDealDetailsInitialState()) {
     _apiManager = ApiManager(accessTokenProvider: accessTokenProvider);
     _shipmentDataSource = ShipmentDataSourceImpl(_apiManager);
     _shipmentRepository = ShipmentRepositoryImpl(_shipmentDataSource);
-    _usecase = GetMyShipmentDealDetailsUsecase(repository: _shipmentRepository);
-    _acceptShipmentDealUsecase = AcceptShipmentDealUsecase(_shipmentRepository);
-    _shipmentCounterOfferUsecase =
-        ShipmentCounterOfferUsecase(shipmentRepository: _shipmentRepository);
-    _cancelShipmentDealUsecae = CancelShipmentDealUsecae(_shipmentRepository);
+    // _usecase = GetMyShipmentDealDetailsUsecase(repository: _shipmentRepository);
+    // _acceptShipmentDealUsecase = AcceptShipmentDealUsecase(_shipmentRepository);
+    // _shipmentCounterOfferUsecase =
+    //     ShipmentCounterOfferUsecase(shipmentRepository: _shipmentRepository);
+    // _cancelShipmentDealUsecae = CancelShipmentDealUsecae(_shipmentRepository);
   }
 
   Future<void> getMyShipmentDealDetails(
@@ -44,10 +44,10 @@ class GetMyShipmentDealDetailsViewModel
     emit(GetMyShipmentDealDetailsLoadingState('Loading...'));
 
     try {
-      var response =
-          await _usecase.getMyShipmentDealDetails(token: token, dealId: dealId);
+      // var response =
+      //     await _usecase.getMyShipmentDealDetails(token: token, dealId: dealId);
       // createUserInDb(user);
-      emit(GetMyShipmentDealDetailsSuccessState(response));
+      // emit(GetMyShipmentDealDetailsSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(GetMyShipmentDealDetailsFailState(e.errorMessage));
     } on Exception catch (e) {
@@ -60,13 +60,13 @@ class GetMyShipmentDealDetailsViewModel
     emit(AcceptShipmentDealLoadingState('Loading...'));
 
     try {
-      var response = await _acceptShipmentDealUsecase.acceptShipmentDeal(
-          token: token,
-          dealId: dealId,
-          status: 'accepted',
-          dealType: 'shipment');
+      // var response = await _acceptShipmentDealUsecase.acceptShipmentDeal(
+      //     token: token,
+      //     dealId: dealId,
+      //     status: 'accepted',
+      //     dealType: 'shipment');
       // createUserInDb(user);
-      emit(AcceptShipmentDealSuccessState(response));
+      // emit(AcceptShipmentDealSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(AcceptShipmentDealFailState(e.errorMessage));
     } on Exception catch (e) {
@@ -79,13 +79,13 @@ class GetMyShipmentDealDetailsViewModel
     emit(RejectShipmentDealLoadingState('Loading...'));
 
     try {
-      var response = await _acceptShipmentDealUsecase.acceptShipmentDeal(
-          token: token,
-          dealId: dealId,
-          status: 'rejected',
-          dealType: 'shipment');
+      // var response = await _acceptShipmentDealUsecase.acceptShipmentDeal(
+      //     token: token,
+      //     dealId: dealId,
+      //     status: 'rejected',
+      //     dealType: 'shipment');
       // createUserInDb(user);
-      emit(RejectShipmentDealSuccessState(response));
+      // emit(RejectShipmentDealSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(RejectShipmentDealFailState(e.errorMessage));
     } on Exception catch (e) {
@@ -98,10 +98,10 @@ class GetMyShipmentDealDetailsViewModel
     emit(CancelShipmentDealLoadingState('Loading...'));
 
     try {
-      var response =
-          await _cancelShipmentDealUsecae.invoke(token: token, dealId: dealId);
+      // var response =
+      //     await _cancelShipmentDealUsecae.invoke(token: token, dealId: dealId);
       // createUserInDb(user);
-      emit(CancelShipmentDealSuccessState(response));
+      // emit(CancelShipmentDealSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(CancelShipmentDealFailState(e.errorMessage));
     } on Exception catch (e) {
@@ -116,9 +116,9 @@ class GetMyShipmentDealDetailsViewModel
     emit(CounterOfferLoadingState('Loading...'));
 
     try {
-      var response = await _shipmentCounterOfferUsecase.invoke(
-          token: token, dealId: dealId, reward: reward);
-      emit(CounterOfferSuccessState(response));
+      // var response = await _shipmentCounterOfferUsecase.invoke(
+      //     token: token, dealId: dealId, reward: reward);
+      // emit(CounterOfferSuccessState(response));
     } on ServerErrorException catch (e) {
       emit(CounterOfferFailState(e.errorMessage));
     } on Exception catch (e) {

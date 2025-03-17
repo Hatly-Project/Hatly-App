@@ -34,27 +34,31 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
   late String fromCountryFlag, toCountryFlag, fromCountryName, toCountryName;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    print("countries ${widget.countriesStatesDto!.first.iso2}");
+    print("frommm ${widget.shipmentDto!.to}");
+    int fromCountryIndex = widget.countriesStatesDto!.indexWhere((country) =>
+        country.iso2!.toLowerCase() == widget.shipmentDto!.from!.toLowerCase());
+    if (fromCountryIndex != -1) {
+      fromCountryFlag = widget.countriesStatesDto![fromCountryIndex].flag!;
+      fromCountryName = widget.countriesStatesDto![fromCountryIndex].name!;
+    } else {
+      // Handle the case where the from country is not found
+      fromCountryFlag = '';
+      fromCountryName = 'Unknown';
+    }
 
-    fromCountryFlag = widget
-        .countriesStatesDto![widget.countriesStatesDto!
-            .indexWhere((country) => country.iso2 == widget.shipmentDto!.from)]
-        .flag!;
-
-    fromCountryName = widget
-        .countriesStatesDto![widget.countriesStatesDto!
-            .indexWhere((country) => country.iso2 == widget.shipmentDto!.from)]
-        .name!;
-
-    toCountryFlag = widget
-        .countriesStatesDto![widget.countriesStatesDto!
-            .indexWhere((country) => country.iso2 == widget.shipmentDto!.to)]
-        .flag!;
-    toCountryName = widget
-        .countriesStatesDto![widget.countriesStatesDto!
-            .indexWhere((country) => country.iso2 == widget.shipmentDto!.to)]
-        .name!;
+    int toCountryIndex = widget.countriesStatesDto!.indexWhere((country) =>
+        country.iso2!.toLowerCase() == widget.shipmentDto!.to!.toLowerCase());
+    print("to index $toCountryIndex");
+    if (toCountryIndex != -1) {
+      toCountryFlag = widget.countriesStatesDto![toCountryIndex].flag!;
+      toCountryName = widget.countriesStatesDto![toCountryIndex].name!;
+    } else {
+      // Handle the case where the to country is not found
+      toCountryFlag = '';
+      toCountryName = 'Unknown';
+    }
   }
 
   @override
@@ -141,17 +145,15 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
                         width: 50,
                         height: 50,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          // mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              width: 270,
-                              // height: 15,
-                              child: Text(
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
                                 widget.shipmentDto!.title!,
                                 style: Theme.of(context)
                                     .textTheme
@@ -160,71 +162,71 @@ class _HorizontalShipmentCardState extends State<HorizontalShipmentCard> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.w300),
                                 textAlign: TextAlign.start,
-                                overflow: TextOverflow.ellipsis,
+                                // overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 10),
-                              // margin: EdgeInsets.symmetric(vertical: 6),
-                              child: Row(
-                                children: [
-                                  Image.asset(
-                                    'images/weight_icob.png',
-                                    width: 14,
-                                    height: 14,
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(left: 5),
-                                    width: 27,
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        '${widget.shipmentDto!.wight}g',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displayMedium
-                                            ?.copyWith(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w300),
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                // margin: EdgeInsets.symmetric(vertical: 6),
+                                child: Row(
+                                  children: [
+                                    Image.asset(
+                                      'images/weight_icob.png',
+                                      width: 14,
+                                      height: 14,
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 5),
+                                      width: 27,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          '${widget.shipmentDto!.wight}g',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayMedium
+                                              ?.copyWith(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w300),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Container(
-                                    height: 20,
-                                    width: 1.5,
-                                    color: Color(0xFFD6D6D6),
-                                    margin:
-                                        EdgeInsets.symmetric(horizontal: 15),
-                                  ),
-                                  Image.asset(
-                                    'images/date_icon.png',
-                                    width: 14,
-                                    height: 14,
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(left: 8),
-                                    width: 110,
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        'Before: ${formatDate(widget.shipmentDto!.expectedDate!.toIso8601String())}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displayMedium
-                                            ?.copyWith(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w300),
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
+                                    Container(
+                                      height: 20,
+                                      width: 1.5,
+                                      color: Color(0xFFD6D6D6),
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 15),
+                                    ),
+                                    Image.asset(
+                                      'images/date_icon.png',
+                                      width: 14,
+                                      height: 14,
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 8),
+                                      width: 110,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'Before: ${formatDate(widget.shipmentDto!.expectedDate!.toIso8601String())}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayMedium
+                                              ?.copyWith(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w300),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
