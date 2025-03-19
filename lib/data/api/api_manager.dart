@@ -442,8 +442,12 @@ class ApiManager {
     String? accessToken =
         await const FlutterSecureStorage().read(key: 'accessToken');
 
+    String? refreshToken =
+        await const FlutterSecureStorage().read(key: 'refreshToken');
+
     // var url = Uri.https(baseUrl, '$apiVersion/auth/check');
-    var requestBody = CheckAcessTokenRequest(token: accessToken);
+    var requestBody =
+        CheckAcessTokenRequest(token: accessToken, refreshToken: refreshToken);
     print("requestBody ${requestBody.toJson()}");
     Response response = await dio.post(
       '$apiVersion/auth/check',
@@ -1410,7 +1414,7 @@ class ApiManager {
 
       response = await dio.post(
         '$apiVersion/shipment',
-        data: requestBody,
+        data: requestBody.toJson(),
       );
       var shipmentResponse =
           CreateShipmentsResponse.fromJson(jsonEncode(response.data));

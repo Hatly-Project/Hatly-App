@@ -6,7 +6,7 @@ import 'package:hatly/presentation/components/shipment_card.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
 import 'package:hatly/presentation/home/tabs/home/home_tab.dart';
 import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
-import 'package:hatly/presentation/home/tabs/shipments/add_shipment_screen.dart';
+import 'package:hatly/presentation/home/tabs/shipments/add_shipment/add_shipment_screen.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipments_tab.dart';
 import 'package:hatly/presentation/home/tabs/trips/my_trips.dart';
 import 'bottom_nav_icon.dart';

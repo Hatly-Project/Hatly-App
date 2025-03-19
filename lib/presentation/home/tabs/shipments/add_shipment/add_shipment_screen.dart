@@ -1,9 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:developer' show log;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
-import 'package:hatly/presentation/home/tabs/shipments/add_shipment_details_tab.dart';
-import 'package:hatly/presentation/home/tabs/shipments/add_shipment_items_tab.dart';
+import 'package:hatly/presentation/components/button_widget.dart';
+import 'package:hatly/presentation/home/tabs/shipments/add_shipment/add_shipment_details_tab.dart';
+import 'package:hatly/presentation/home/tabs/shipments/add_shipment/add_shipment_items_tab.dart';
 import 'package:hatly/providers/countries_list_provider.dart';
 
 class AddShipmentScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class AddShipmentScreen extends StatefulWidget {
 class _AddShipmentScreenState extends State<AddShipmentScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool isButtonEnabled = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -24,8 +26,26 @@ class _AddShipmentScreenState extends State<AddShipmentScreen>
     _tabController = TabController(length: 2, vsync: this);
   }
 
-  void _nextTab(String? shipmentName) {
-    print('Nameee $shipmentName');
+  void changeIsButtonEnabled(
+    bool value,
+    String? fromCountry,
+    String? toCountry,
+    String? note,
+    String? name,
+    String? date,
+    String? bonus,
+    String? fromCity,
+    String? toCity,
+  ) {
+    if (value) {
+      log("$fromCountry $toCountry $note $name $date $bonus $fromCity $toCity");
+    }
+    setState(() {
+      isButtonEnabled = value;
+    });
+  }
+
+  void _nextTab() {
     if (_tabController.index < 2) {
       setState(() {
         _tabController.animateTo(_tabController.index + 1);
@@ -207,10 +227,11 @@ class _AddShipmentScreenState extends State<AddShipmentScreen>
             ),
             Expanded(
               child: TabBarView(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 controller: _tabController,
                 children: [
                   AddShipmentDetailsTab(
+                    changeIsButtonEnabled: changeIsButtonEnabled,
                     countriesFlagsDto:
                         context.read<CountriesListProvider>().countries!,
                     next: _nextTab,
@@ -218,24 +239,23 @@ class _AddShipmentScreenState extends State<AddShipmentScreen>
                   AddShipmentItemsTab()
                 ],
               ),
+            ),
+            Container(
+              margin: EdgeInsets.all(15),
+              child: ButtonWidget(
+                isButtonEnabled: isButtonEnabled,
+                onPressed: () {
+                  _nextTab();
+                  // widget.next(shipmentNameController.text);
+                },
+                buttonText: _tabController.index == 0
+                    ? 'Add Items'
+                    : _tabController.index == 1
+                        ? 'Review'
+                        : 'Add Shipment',
+              ),
             )
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabContent(String text) {
-    return Center(
-      child: AnimatedSwitcher(
-        duration: Duration(milliseconds: 300),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return ScaleTransition(scale: animation, child: child);
-        },
-        child: Text(
-          text,
-          key: ValueKey<String>(text),
-          style: TextStyle(fontSize: 24),
         ),
       ),
     );

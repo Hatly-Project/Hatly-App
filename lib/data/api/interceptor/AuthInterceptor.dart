@@ -27,6 +27,10 @@ class Authinterceptor extends Interceptor {
     if (accessToken != null && refreshToken != null) {
       options.headers['Authorization'] = 'Bearer $accessToken';
       options.headers['Cookie'] = 'refreshToken=$refreshToken';
+      options.data = {
+        "token": accessToken,
+        "refreshToken": refreshToken,
+      };
     }
     handler.next(options);
   }
@@ -48,6 +52,7 @@ class Authinterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
+    print("error ${err.response?.data}");
     String errorMessage = "";
     if (err.requestOptions.path.contains("auth/refresh")) {
       errorMessage = err.response?.data['message'];
@@ -97,7 +102,7 @@ class Authinterceptor extends Interceptor {
     var requestBody = RefreshAuthRequest(token: accessToken);
     response = await dio.post(
       'https://hatly-api.onrender.com/api/v2/auth/refresh',
-      data: requestBody.toJson(),
+      // data: requestBody.toJson(),
     );
     var refreshResponse =
         RefreshAccessTokenResponse.fromJson(jsonEncode(response.data));

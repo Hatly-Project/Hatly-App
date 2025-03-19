@@ -1,16 +1,14 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hatly/data/api/api_manager.dart';
 import 'package:hatly/domain/customException/custom_exception.dart';
 import 'package:hatly/domain/models/countries_dto.dart';
+import 'package:hatly/presentation/login/login_screen.dart';
+import 'package:hatly/presentation/login/login_screen_arguments.dart';
 import 'package:hatly/providers/auth_provider.dart';
 import 'package:hatly/presentation/home/home_screen.dart';
 import 'package:hatly/presentation/home/tabs/home/home_screen_arguments.dart';
-import 'package:hatly/presentation/welcome/welcome_screen.dart';
-import 'package:hatly/presentation/welcome/welcome_screen_arguments.dart';
 import 'package:hatly/providers/countries_list_provider.dart';
 import 'package:hatly/utils/dialog_utils.dart';
 
@@ -74,9 +72,12 @@ class _SplashScreenState extends State<SplashScreen>
         Navigator.pushReplacementNamed(context, HomeScreen.routeName,
             arguments: HomeScreenArguments(countriesList!));
       } else {
-        Navigator.pushReplacementNamed(context, WelcomeScreen.routeName,
-            arguments: WelcomeScreenArguments(countriesList!));
+        Navigator.pushReplacementNamed(context, LoginScreen.routeName,
+            arguments: LoginScreenArguments(countriesList!));
       }
+    } else {
+      Navigator.pushReplacementNamed(context, LoginScreen.routeName,
+          arguments: LoginScreenArguments(countriesList!));
     }
   }
 

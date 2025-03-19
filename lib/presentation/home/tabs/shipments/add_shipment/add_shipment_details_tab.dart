@@ -14,8 +14,11 @@ import 'package:intl/intl.dart';
 
 class AddShipmentDetailsTab extends StatefulWidget {
   CountriesDto countriesFlagsDto;
-  Function next;
-  AddShipmentDetailsTab({required this.countriesFlagsDto, required this.next});
+  Function next, changeIsButtonEnabled;
+  AddShipmentDetailsTab(
+      {required this.countriesFlagsDto,
+      required this.changeIsButtonEnabled,
+      required this.next});
 
   @override
   State<AddShipmentDetailsTab> createState() => _AddShipmentDetailsTabState();
@@ -198,10 +201,7 @@ class _AddShipmentDetailsTabState extends State<AddShipmentDetailsTab>
               .indexWhere((country) => country.name == fromCountry)]
           .flag;
       fromStatesList = countryStates!;
-      if (checkIsButtonEnabled()) {
-        _isButtonEnabled = true;
-        print('enabled');
-      }
+      checkIsButtonEnabled();
     });
     print('from $fromCountry');
   }
@@ -212,10 +212,7 @@ class _AddShipmentDetailsTabState extends State<AddShipmentDetailsTab>
     setState(() {
       fromCity = selectedCity;
       // fromCityValue = '';
-      if (checkIsButtonEnabled()) {
-        _isButtonEnabled = true;
-        print('enabled');
-      }
+      checkIsButtonEnabled();
     });
     print('from $fromCity');
   }
@@ -226,10 +223,7 @@ class _AddShipmentDetailsTabState extends State<AddShipmentDetailsTab>
     setState(() {
       toCity = selectedCity;
       // fromCityValue = '';
-      if (checkIsButtonEnabled()) {
-        _isButtonEnabled = true;
-        print('enabled');
-      }
+      checkIsButtonEnabled();
     });
     print('to $toCity');
   }
@@ -252,10 +246,7 @@ class _AddShipmentDetailsTabState extends State<AddShipmentDetailsTab>
               .indexWhere((country) => country.name == toCountryName)]
           .flag;
       toStatesList = countryStates!;
-      if (checkIsButtonEnabled()) {
-        _isButtonEnabled = true;
-        print('enabled');
-      }
+      checkIsButtonEnabled();
     });
     print('to $toCountryName');
   }
@@ -1356,16 +1347,6 @@ class _AddShipmentDetailsTabState extends State<AddShipmentDetailsTab>
                   // },
                 ),
               ),
-              Container(
-                margin: EdgeInsets.only(top: 15),
-                child: ButtonWidget(
-                  isButtonEnabled: _isButtonEnabled,
-                  onPressed: () {
-                    widget.next(shipmentNameController.text);
-                  },
-                  buttonText: 'Add Items',
-                ),
-              )
             ],
           ),
         ),
@@ -1438,16 +1419,27 @@ class _AddShipmentDetailsTabState extends State<AddShipmentDetailsTab>
         toCity != null &&
         shipmentDateController.text.trim().isNotEmpty &&
         shipmentNameController.text.trim().isNotEmpty) {
-      setState(() {
-        _isButtonEnabled = true;
-      });
+      widget.changeIsButtonEnabled(
+        true,
+        fromCountry,
+        toCountryName,
+        shipmentNoteController.text,
+        shipmentNameController.text,
+        date,
+        shipmentNoteController.text,
+        fromCity,
+        toCity,
+      );
+      // setState(() {
+      //   _isButtonEnabled = true;
+      // });
       print('trueeeeeeee');
       return _isButtonEnabled;
     } else {
       print('falseee');
-      setState(() {
-        _isButtonEnabled = false;
-      });
+      widget.changeIsButtonEnabled(
+          false, null, null, null, null, null, null, null, null);
+
       return _isButtonEnabled;
     }
   }

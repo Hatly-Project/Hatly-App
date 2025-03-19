@@ -19,7 +19,7 @@ import 'package:hatly/presentation/home/tabs/home/search_result_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/edit_profile_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/payment_information_screen.dart';
 import 'package:hatly/presentation/home/tabs/profile/profile_tab.dart';
-import 'package:hatly/presentation/home/tabs/shipments/add_shipment_screen.dart';
+import 'package:hatly/presentation/home/tabs/shipments/add_shipment/add_shipment_screen.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_deal_details_argument.dart';
 import 'package:hatly/presentation/home/tabs/shipments/my_shipment_details.dart';

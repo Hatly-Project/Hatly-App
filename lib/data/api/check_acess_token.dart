@@ -2,17 +2,20 @@ import 'dart:convert';
 
 class CheckAcessTokenRequest {
   String? token;
+  String? refreshToken;
 
-  CheckAcessTokenRequest({this.token});
+  CheckAcessTokenRequest({this.token, this.refreshToken});
 
   factory CheckAcessTokenRequest.fromMap(Map<String, dynamic> data) {
     return CheckAcessTokenRequest(
       token: data['token'] as String?,
+      refreshToken: data['refreshToken'] as String?,
     );
   }
 
   Map<String, dynamic> toMap() => {
         'token': token,
+        'refreshToken': refreshToken,
       };
 
   /// `dart:convert`
